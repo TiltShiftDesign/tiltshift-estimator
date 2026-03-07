@@ -1475,6 +1475,7 @@ export default function App() {
   const [estimators, setEstimators]   = useState(ESTIMATORS);
   const [matCategories, setMatCategories] = useState(["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"]);
   const [showAddMat, setShowAddMat]   = useState(false);
+  const [addMatTargetItemId, setAddMatTargetItemId] = useState(null); // scope item to add line to after saving
   const [newMatForm, setNewMatForm]   = useState({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
   const [showNew, setShowNew] = useState(false);
   const [showProp, setShowProp] = useState(false);
@@ -1867,7 +1868,7 @@ export default function App() {
                       onAddFinish={t => setFinishes(p=>[...p,t])}
                       exclusionOptions={exclusionOptions}
                       onAddExclusionOption={setExclusionOptions}
-                      onAddToLibrary={()=>setShowAddMat(true)}
+                      onAddToLibrary={()=>{ setAddMatTargetItemId(item.id); setShowAddMat(true); }}
                       matCategories={matCategories}
                     />
                   ))}
@@ -2304,7 +2305,7 @@ export default function App() {
       {showAddMat && (
         <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowAddMat(false)}>
           <div className="md" style={{maxWidth:480}}>
-            <h2>Add Material to Library</h2>
+            <h2>{addMatTargetItemId ? "Add Material to Library & Estimate" : "Add Material to Library"}</h2>
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div>
                 <div className="fl">Material Name</div>
@@ -2348,18 +2349,32 @@ export default function App() {
               </div>
             </div>
             <div className="mf">
-              <button className="btn-g" onClick={()=>{setShowAddMat(false);setNewMatForm({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});}}>Cancel</button>
+              <button className="btn-g" onClick={()=>{
+                setShowAddMat(false);
+                setAddMatTargetItemId(null);
+                setNewMatForm({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
+              }}>Cancel</button>
               <button className="btn-p" onClick={()=>{
                 if(!newMatForm.name.trim()) return;
-                setMats(p=>[...p,{
-                  id:uid(),
-                  category:newMatForm.category,
-                  name:newMatForm.name.trim(),
-                  priceLF:parseFloat(newMatForm.priceLF)||0,
-                  priceLB:parseFloat(newMatForm.priceLB)||0,
-                  priceEA:parseFloat(newMatForm.priceEA)||0,
-                }]);
+                const newMat = {
+                  id: uid(),
+                  category: newMatForm.category,
+                  name: newMatForm.name.trim(),
+                  priceLF: parseFloat(newMatForm.priceLF)||0,
+                  priceLB: parseFloat(newMatForm.priceLB)||0,
+                  priceEA: parseFloat(newMatForm.priceEA)||0,
+                };
+                setMats(p => [...p, newMat]);
+                // If opened from a scope item, add a line for this material immediately
+                if (addMatTargetItemId) {
+                  const defaultUnit = newMat.priceLF ? "LF" : newMat.priceEA ? "EA" : newMat.priceLB ? "LB" : "LF";
+                  updScopeItem(actId, addMatTargetItemId, item => ({
+                    ...item,
+                    materialLines: [...(item.materialLines||[]), { id:uid(), materialId:newMat.id, qty:1, unit:defaultUnit, note:"" }]
+                  }));
+                }
                 setShowAddMat(false);
+                setAddMatTargetItemId(null);
                 setNewMatForm({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
               }}>Add to Library</button>
             </div>
