@@ -306,7 +306,7 @@ const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
     const ovAmt  = sub * (Number(ovhd) / 100);
     const preMarkup = sub + ovAmt;
     const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999); // guard against 100%
-    const mkAmt  = preMarkup / (1 - mkupFrac) - preMarkup;
+    const mkAmt  = Math.round((preMarkup / (1 - mkupFrac) - preMarkup) / 10) * 10;
     return { rawMat, matW, labor, sub, ovAmt, mkAmt, total: sub + ovAmt + mkAmt };
   };
 
@@ -786,7 +786,7 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
 
 // ── Reusable lines editor (materials + labor in one panel) ───────────────────
 function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, onDelMat, onAddMat,
-  onUpdLab, onDelLab, onAddLab, matCategory, onAddToLibrary, matCategories }) {
+  onUpdLab, onDelLab, onAddLab, matCategory, matCategories }) {
   const MAT_CATS = matCategories || ["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"];
   const firstMatId = matCategory
     ? (mats.find(x=>x.category===matCategory)||mats[0]).id
@@ -802,12 +802,6 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
           <span style={{fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",fontWeight:500}}>Materials</span>
           <div style={{display:"flex",gap:6}}>
-            {onAddToLibrary && (
-              <button className="btn-g btn-s" onClick={onAddToLibrary}
-                style={{fontSize:11,color:"var(--bronze)",borderColor:"var(--border)"}}>
-                + New Material to Library
-              </button>
-            )}
             <button className="btn-g btn-s" onClick={()=>onAddMat(firstMatId)}>+ Add Line</button>
           </div>
         </div>
@@ -1029,7 +1023,7 @@ function ExclusionsEditor({ exclusions, onChange, exclusionOptions, onAddOption 
 // ── Scope Item Card ───────────────────────────────────────────────────────────
 function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
   onUpdate, onDelete, defaultOpen, itemTypes, onAddItemType,
-  finishes, onAddFinish, exclusionOptions, onAddExclusionOption, onAddToLibrary, matCategories }) {
+  finishes, onAddFinish, exclusionOptions, onAddExclusionOption, matCategories }) {
 
   const [open,        setOpen]        = useState(defaultOpen);
   const [installOpen, setInstallOpen] = useState(false);
@@ -1187,7 +1181,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
               mats={mats} laborCats={laborCats} wastePct={wastePct}
               onUpdMat={updMat} onDelMat={delMat} onAddMat={addMatLine}
               onUpdLab={updLab} onDelLab={delLab} onAddLab={addLabLine}
-              onAddToLibrary={onAddToLibrary} matCategories={matCategories}
+              matCategories={matCategories}
             />
             {/* Finish + Exclusions row */}
             <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:16}}>
@@ -1582,7 +1576,16 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .pgrand .vl{font-family:'DM Mono',monospace;font-size:24px;color:#fff;}
 .pftr{background:#f5f2ec;padding:16px 40px;font-size:10px;color:#8a8680;display:flex;justify-content:space-between;align-items:center;}
 .pact{display:flex;gap:12px;justify-content:center;padding:20px;}
-@media print{.pact{display:none!important;}.po{position:static;background:none;padding:0;}.pd{box-shadow:none;max-width:none;}}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body>*:not(.po){display:none!important;}
+  .pact{display:none!important;}
+  .po{position:static!important;background:none!important;padding:0!important;overflow:visible!important;display:block!important;}
+  .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border-radius:0!important;}
+  .pitm{page-break-inside:avoid;break-inside:avoid;}
+  .pc{page-break-after:always;break-after:always;}
+  .pgrand{page-break-inside:avoid;break-inside:avoid;}
+}
 `;
 
 // ── Main App ──────────────────────────────────────────────────────────────────
@@ -2042,7 +2045,6 @@ export default function App() {
                       onAddFinish={t => setFinishes(p=>[...p,t])}
                       exclusionOptions={exclusionOptions}
                       onAddExclusionOption={setExclusionOptions}
-                      onAddToLibrary={()=>{ setAddMatTargetItemId(item.id); setShowAddMat(true); }}
                       matCategories={matCategories}
                     />
                   ))}
