@@ -79,380 +79,137 @@ const DEFAULT_LABOR_CATEGORIES = [
 ];
 
 const DEFAULT_MATERIALS = [
-
-  // ── SQUARE TUBE (A500 / A36, hot-rolled, welded) ─────────────────────────────
-  // lb/ft from AISC tables; PNW service center ~$1.00–1.05/lb small qty
-  { id:"sq01", category:"Square Tube", name:'3/4" × 3/4" Sq Tube 16ga',      unit:"LF",  unitCost:0.84  },
-  { id:"sq02", category:"Square Tube", name:'3/4" × 3/4" Sq Tube 16ga',      unit:"LB",  unitCost:1.02  },
-  { id:"sq03", category:"Square Tube", name:'3/4" × 3/4" Sq Tube 16ga',      unit:"EA",  unitCost:16.80 },
-  { id:"sq04", category:"Square Tube", name:'1" × 1" Sq Tube 16ga',          unit:"LF",  unitCost:1.12  },
-  { id:"sq05", category:"Square Tube", name:'1" × 1" Sq Tube 16ga',          unit:"LB",  unitCost:1.02  },
-  { id:"sq06", category:"Square Tube", name:'1" × 1" Sq Tube 16ga',          unit:"EA",  unitCost:22.40 },
-  { id:"sq07", category:"Square Tube", name:'1" × 1" Sq Tube 11ga',          unit:"LF",  unitCost:1.62  },
-  { id:"sq08", category:"Square Tube", name:'1" × 1" Sq Tube 11ga',          unit:"LB",  unitCost:1.02  },
-  { id:"sq09", category:"Square Tube", name:'1" × 1" Sq Tube 11ga',          unit:"EA",  unitCost:32.40 },
-  { id:"sq10", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 16ga',      unit:"LF",  unitCost:1.73  },
-  { id:"sq11", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 16ga',      unit:"LB",  unitCost:1.02  },
-  { id:"sq12", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 16ga',      unit:"EA",  unitCost:34.60 },
-  { id:"sq13", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 11ga',      unit:"LF",  unitCost:2.55  },
-  { id:"sq14", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 11ga',      unit:"LB",  unitCost:1.02  },
-  { id:"sq15", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 11ga',      unit:"EA",  unitCost:51.00 },
-  { id:"sq16", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 3/16"',     unit:"LF",  unitCost:3.47  },
-  { id:"sq17", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 3/16"',     unit:"LB",  unitCost:1.02  },
-  { id:"sq18", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 3/16"',     unit:"EA",  unitCost:69.40 },
-  { id:"sq19", category:"Square Tube", name:'2" × 2" Sq Tube 16ga',          unit:"LF",  unitCost:2.35  },
-  { id:"sq20", category:"Square Tube", name:'2" × 2" Sq Tube 16ga',          unit:"LB",  unitCost:1.02  },
-  { id:"sq21", category:"Square Tube", name:'2" × 2" Sq Tube 16ga',          unit:"EA",  unitCost:47.00 },
-  { id:"sq22", category:"Square Tube", name:'2" × 2" Sq Tube 11ga',          unit:"LF",  unitCost:3.57  },
-  { id:"sq23", category:"Square Tube", name:'2" × 2" Sq Tube 11ga',          unit:"LB",  unitCost:1.02  },
-  { id:"sq24", category:"Square Tube", name:'2" × 2" Sq Tube 11ga',          unit:"EA",  unitCost:71.40 },
-  { id:"sq25", category:"Square Tube", name:'2" × 2" Sq Tube 3/16"',         unit:"LF",  unitCost:4.80  },
-  { id:"sq26", category:"Square Tube", name:'2" × 2" Sq Tube 3/16"',         unit:"LB",  unitCost:1.02  },
-  { id:"sq27", category:"Square Tube", name:'2" × 2" Sq Tube 3/16"',         unit:"EA",  unitCost:96.00 },
-  { id:"sq28", category:"Square Tube", name:'2" × 2" Sq Tube 1/4"',          unit:"LF",  unitCost:6.22  },
-  { id:"sq29", category:"Square Tube", name:'2" × 2" Sq Tube 1/4"',          unit:"LB",  unitCost:1.02  },
-  { id:"sq30", category:"Square Tube", name:'2" × 2" Sq Tube 1/4"',          unit:"EA",  unitCost:124.40},
-  { id:"sq31", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 11ga',      unit:"LF",  unitCost:4.49  },
-  { id:"sq32", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 11ga',      unit:"LB",  unitCost:1.02  },
-  { id:"sq33", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 11ga',      unit:"EA",  unitCost:89.80 },
-  { id:"sq34", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 3/16"',     unit:"LF",  unitCost:6.02  },
-  { id:"sq35", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 3/16"',     unit:"LB",  unitCost:1.02  },
-  { id:"sq36", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 3/16"',     unit:"EA",  unitCost:120.40},
-  { id:"sq37", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 1/4"',      unit:"LF",  unitCost:7.86  },
-  { id:"sq38", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 1/4"',      unit:"LB",  unitCost:1.02  },
-  { id:"sq39", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 1/4"',      unit:"EA",  unitCost:157.20},
-  { id:"sq40", category:"Square Tube", name:'3" × 3" Sq Tube 11ga',          unit:"LF",  unitCost:5.41  },
-  { id:"sq41", category:"Square Tube", name:'3" × 3" Sq Tube 11ga',          unit:"LB",  unitCost:1.02  },
-  { id:"sq42", category:"Square Tube", name:'3" × 3" Sq Tube 11ga',          unit:"EA",  unitCost:108.20},
-  { id:"sq43", category:"Square Tube", name:'3" × 3" Sq Tube 3/16"',         unit:"LF",  unitCost:7.24  },
-  { id:"sq44", category:"Square Tube", name:'3" × 3" Sq Tube 3/16"',         unit:"LB",  unitCost:1.02  },
-  { id:"sq45", category:"Square Tube", name:'3" × 3" Sq Tube 3/16"',         unit:"EA",  unitCost:144.80},
-  { id:"sq46", category:"Square Tube", name:'3" × 3" Sq Tube 1/4"',          unit:"LF",  unitCost:9.49  },
-  { id:"sq47", category:"Square Tube", name:'3" × 3" Sq Tube 1/4"',          unit:"LB",  unitCost:1.02  },
-  { id:"sq48", category:"Square Tube", name:'3" × 3" Sq Tube 1/4"',          unit:"EA",  unitCost:189.80},
-  { id:"sq49", category:"Square Tube", name:'4" × 4" Sq Tube 3/16"',         unit:"LF",  unitCost:9.69  },
-  { id:"sq50", category:"Square Tube", name:'4" × 4" Sq Tube 3/16"',         unit:"LB",  unitCost:1.02  },
-  { id:"sq51", category:"Square Tube", name:'4" × 4" Sq Tube 3/16"',         unit:"EA",  unitCost:193.80},
-  { id:"sq52", category:"Square Tube", name:'4" × 4" Sq Tube 1/4"',          unit:"LF",  unitCost:12.74 },
-  { id:"sq53", category:"Square Tube", name:'4" × 4" Sq Tube 1/4"',          unit:"LB",  unitCost:1.02  },
-  { id:"sq54", category:"Square Tube", name:'4" × 4" Sq Tube 1/4"',          unit:"EA",  unitCost:254.80},
+  // ── SQUARE TUBE (A500 / A36) ──────────────────────────────────────────────────
+  { id:"sq01", category:"Square Tube", name:'3/4" × 3/4" Sq Tube 16ga', priceLF:0.84, priceLB:1.02, priceEA:16.8 },
+  { id:"sq02", category:"Square Tube", name:'1" × 1" Sq Tube 16ga', priceLF:1.12, priceLB:1.02, priceEA:22.4 },
+  { id:"sq03", category:"Square Tube", name:'1" × 1" Sq Tube 11ga', priceLF:1.62, priceLB:1.02, priceEA:32.4 },
+  { id:"sq04", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 16ga', priceLF:1.73, priceLB:1.02, priceEA:34.6 },
+  { id:"sq05", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 11ga', priceLF:2.55, priceLB:1.02, priceEA:51.0 },
+  { id:"sq06", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 3/16"', priceLF:3.47, priceLB:1.02, priceEA:69.4 },
+  { id:"sq07", category:"Square Tube", name:'2" × 2" Sq Tube 16ga', priceLF:2.35, priceLB:1.02, priceEA:47.0 },
+  { id:"sq08", category:"Square Tube", name:'2" × 2" Sq Tube 11ga', priceLF:3.57, priceLB:1.02, priceEA:71.4 },
+  { id:"sq09", category:"Square Tube", name:'2" × 2" Sq Tube 3/16"', priceLF:4.8, priceLB:1.02, priceEA:96.0 },
+  { id:"sq10", category:"Square Tube", name:'2" × 2" Sq Tube 1/4"', priceLF:6.22, priceLB:1.02, priceEA:124.4 },
+  { id:"sq11", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 11ga', priceLF:4.49, priceLB:1.02, priceEA:89.8 },
+  { id:"sq12", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 3/16"', priceLF:6.02, priceLB:1.02, priceEA:120.4 },
+  { id:"sq13", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 1/4"', priceLF:7.86, priceLB:1.02, priceEA:157.2 },
+  { id:"sq14", category:"Square Tube", name:'3" × 3" Sq Tube 11ga', priceLF:5.41, priceLB:1.02, priceEA:108.2 },
+  { id:"sq15", category:"Square Tube", name:'3" × 3" Sq Tube 3/16"', priceLF:7.24, priceLB:1.02, priceEA:144.8 },
+  { id:"sq16", category:"Square Tube", name:'3" × 3" Sq Tube 1/4"', priceLF:9.49, priceLB:1.02, priceEA:189.8 },
+  { id:"sq17", category:"Square Tube", name:'4" × 4" Sq Tube 3/16"', priceLF:9.69, priceLB:1.02, priceEA:193.8 },
+  { id:"sq18", category:"Square Tube", name:'4" × 4" Sq Tube 1/4"', priceLF:12.74, priceLB:1.02, priceEA:254.8 },
 
   // ── RECTANGULAR TUBE (A500 / A36) ────────────────────────────────────────────
-  { id:"rt01", category:"Rect Tube",   name:'1" × 1/2" Rect Tube 16ga',      unit:"LF",  unitCost:0.82  },
-  { id:"rt02", category:"Rect Tube",   name:'1" × 1/2" Rect Tube 16ga',      unit:"LB",  unitCost:1.02  },
-  { id:"rt03", category:"Rect Tube",   name:'1" × 1/2" Rect Tube 16ga',      unit:"EA",  unitCost:16.40 },
-  { id:"rt04", category:"Rect Tube",   name:'1" × 2" Rect Tube 11ga',        unit:"LF",  unitCost:2.65  },
-  { id:"rt05", category:"Rect Tube",   name:'1" × 2" Rect Tube 11ga',        unit:"LB",  unitCost:1.02  },
-  { id:"rt06", category:"Rect Tube",   name:'1" × 2" Rect Tube 11ga',        unit:"EA",  unitCost:53.00 },
-  { id:"rt07", category:"Rect Tube",   name:'1" × 3" Rect Tube 11ga',        unit:"LF",  unitCost:3.57  },
-  { id:"rt08", category:"Rect Tube",   name:'1" × 3" Rect Tube 11ga',        unit:"LB",  unitCost:1.02  },
-  { id:"rt09", category:"Rect Tube",   name:'1" × 3" Rect Tube 11ga',        unit:"EA",  unitCost:71.40 },
-  { id:"rt10", category:"Rect Tube",   name:'1.5" × 3" Rect Tube 11ga',      unit:"LF",  unitCost:4.39  },
-  { id:"rt11", category:"Rect Tube",   name:'1.5" × 3" Rect Tube 11ga',      unit:"LB",  unitCost:1.02  },
-  { id:"rt12", category:"Rect Tube",   name:'1.5" × 3" Rect Tube 11ga',      unit:"EA",  unitCost:87.80 },
-  { id:"rt13", category:"Rect Tube",   name:'2" × 3" Rect Tube 11ga',        unit:"LF",  unitCost:5.20  },
-  { id:"rt14", category:"Rect Tube",   name:'2" × 3" Rect Tube 11ga',        unit:"LB",  unitCost:1.02  },
-  { id:"rt15", category:"Rect Tube",   name:'2" × 3" Rect Tube 11ga',        unit:"EA",  unitCost:104.00},
-  { id:"rt16", category:"Rect Tube",   name:'2" × 3" Rect Tube 3/16"',       unit:"LF",  unitCost:6.94  },
-  { id:"rt17", category:"Rect Tube",   name:'2" × 3" Rect Tube 3/16"',       unit:"LB",  unitCost:1.02  },
-  { id:"rt18", category:"Rect Tube",   name:'2" × 3" Rect Tube 3/16"',       unit:"EA",  unitCost:138.80},
-  { id:"rt19", category:"Rect Tube",   name:'2" × 4" Rect Tube 3/16"',       unit:"LF",  unitCost:8.47  },
-  { id:"rt20", category:"Rect Tube",   name:'2" × 4" Rect Tube 3/16"',       unit:"LB",  unitCost:1.02  },
-  { id:"rt21", category:"Rect Tube",   name:'2" × 4" Rect Tube 3/16"',       unit:"EA",  unitCost:169.40},
-  { id:"rt22", category:"Rect Tube",   name:'2" × 4" Rect Tube 1/4"',        unit:"LF",  unitCost:11.01 },
-  { id:"rt23", category:"Rect Tube",   name:'2" × 4" Rect Tube 1/4"',        unit:"LB",  unitCost:1.02  },
-  { id:"rt24", category:"Rect Tube",   name:'2" × 4" Rect Tube 1/4"',        unit:"EA",  unitCost:220.20},
-  { id:"rt25", category:"Rect Tube",   name:'3" × 5" Rect Tube 3/16"',       unit:"LF",  unitCost:11.53 },
-  { id:"rt26", category:"Rect Tube",   name:'3" × 5" Rect Tube 3/16"',       unit:"LB",  unitCost:1.02  },
-  { id:"rt27", category:"Rect Tube",   name:'3" × 5" Rect Tube 3/16"',       unit:"EA",  unitCost:230.60},
-  { id:"rt28", category:"Rect Tube",   name:'3" × 6" Rect Tube 1/4"',        unit:"LF",  unitCost:16.83 },
-  { id:"rt29", category:"Rect Tube",   name:'3" × 6" Rect Tube 1/4"',        unit:"LB",  unitCost:1.02  },
-  { id:"rt30", category:"Rect Tube",   name:'3" × 6" Rect Tube 1/4"',        unit:"EA",  unitCost:336.60},
+  { id:"rt01", category:"Rect Tube", name:'1" × 1/2" Rect Tube 16ga', priceLF:0.82, priceLB:1.02, priceEA:16.4 },
+  { id:"rt02", category:"Rect Tube", name:'1" × 2" Rect Tube 11ga', priceLF:2.65, priceLB:1.02, priceEA:53.0 },
+  { id:"rt03", category:"Rect Tube", name:'1" × 3" Rect Tube 11ga', priceLF:3.57, priceLB:1.02, priceEA:71.4 },
+  { id:"rt04", category:"Rect Tube", name:'1.5" × 3" Rect Tube 11ga', priceLF:4.39, priceLB:1.02, priceEA:87.8 },
+  { id:"rt05", category:"Rect Tube", name:'2" × 3" Rect Tube 11ga', priceLF:5.2, priceLB:1.02, priceEA:104.0 },
+  { id:"rt06", category:"Rect Tube", name:'2" × 3" Rect Tube 3/16"', priceLF:6.94, priceLB:1.02, priceEA:138.8 },
+  { id:"rt07", category:"Rect Tube", name:'2" × 4" Rect Tube 3/16"', priceLF:8.47, priceLB:1.02, priceEA:169.4 },
+  { id:"rt08", category:"Rect Tube", name:'2" × 4" Rect Tube 1/4"', priceLF:11.01, priceLB:1.02, priceEA:220.2 },
+  { id:"rt09", category:"Rect Tube", name:'3" × 5" Rect Tube 3/16"', priceLF:11.53, priceLB:1.02, priceEA:230.6 },
+  { id:"rt10", category:"Rect Tube", name:'3" × 6" Rect Tube 1/4"', priceLF:16.83, priceLB:1.02, priceEA:336.6 },
 
-  // ── ROUND TUBE (A513 / A36, DOM or ERW) ──────────────────────────────────────
-  { id:"ro01", category:"Round Tube",  name:'1/2" OD Round Tube 16ga',       unit:"LF",  unitCost:0.72  },
-  { id:"ro02", category:"Round Tube",  name:'1/2" OD Round Tube 16ga',       unit:"LB",  unitCost:1.05  },
-  { id:"ro03", category:"Round Tube",  name:'1/2" OD Round Tube 16ga',       unit:"EA",  unitCost:14.40 },
-  { id:"ro04", category:"Round Tube",  name:'3/4" OD Round Tube 16ga',       unit:"LF",  unitCost:0.96  },
-  { id:"ro05", category:"Round Tube",  name:'3/4" OD Round Tube 16ga',       unit:"LB",  unitCost:1.05  },
-  { id:"ro06", category:"Round Tube",  name:'3/4" OD Round Tube 16ga',       unit:"EA",  unitCost:19.20 },
-  { id:"ro07", category:"Round Tube",  name:'1" OD Round Tube 16ga',         unit:"LF",  unitCost:1.31  },
-  { id:"ro08", category:"Round Tube",  name:'1" OD Round Tube 16ga',         unit:"LB",  unitCost:1.05  },
-  { id:"ro09", category:"Round Tube",  name:'1" OD Round Tube 16ga',         unit:"EA",  unitCost:26.20 },
-  { id:"ro10", category:"Round Tube",  name:'1" OD Round Tube 11ga',         unit:"LF",  unitCost:1.97  },
-  { id:"ro11", category:"Round Tube",  name:'1" OD Round Tube 11ga',         unit:"LB",  unitCost:1.05  },
-  { id:"ro12", category:"Round Tube",  name:'1" OD Round Tube 11ga',         unit:"EA",  unitCost:39.40 },
-  { id:"ro13", category:"Round Tube",  name:'1.5" OD Round Tube 16ga',       unit:"LF",  unitCost:1.97  },
-  { id:"ro14", category:"Round Tube",  name:'1.5" OD Round Tube 16ga',       unit:"LB",  unitCost:1.05  },
-  { id:"ro15", category:"Round Tube",  name:'1.5" OD Round Tube 16ga',       unit:"EA",  unitCost:39.40 },
-  { id:"ro16", category:"Round Tube",  name:'1.5" OD Round Tube 11ga',       unit:"LF",  unitCost:2.97  },
-  { id:"ro17", category:"Round Tube",  name:'1.5" OD Round Tube 11ga',       unit:"LB",  unitCost:1.05  },
-  { id:"ro18", category:"Round Tube",  name:'1.5" OD Round Tube 11ga',       unit:"EA",  unitCost:59.40 },
-  { id:"ro19", category:"Round Tube",  name:'2" OD Round Tube 16ga',         unit:"LF",  unitCost:2.65  },
-  { id:"ro20", category:"Round Tube",  name:'2" OD Round Tube 16ga',         unit:"LB",  unitCost:1.05  },
-  { id:"ro21", category:"Round Tube",  name:'2" OD Round Tube 16ga',         unit:"EA",  unitCost:53.00 },
-  { id:"ro22", category:"Round Tube",  name:'2" OD Round Tube 11ga',         unit:"LF",  unitCost:3.97  },
-  { id:"ro23", category:"Round Tube",  name:'2" OD Round Tube 11ga',         unit:"LB",  unitCost:1.05  },
-  { id:"ro24", category:"Round Tube",  name:'2" OD Round Tube 11ga',         unit:"EA",  unitCost:79.40 },
-  { id:"ro25", category:"Round Tube",  name:'2.5" OD Round Tube 11ga',       unit:"LF",  unitCost:4.97  },
-  { id:"ro26", category:"Round Tube",  name:'2.5" OD Round Tube 11ga',       unit:"LB",  unitCost:1.05  },
-  { id:"ro27", category:"Round Tube",  name:'2.5" OD Round Tube 11ga',       unit:"EA",  unitCost:99.40 },
-  { id:"ro28", category:"Round Tube",  name:'3" OD Round Tube 11ga',         unit:"LF",  unitCost:5.97  },
-  { id:"ro29", category:"Round Tube",  name:'3" OD Round Tube 11ga',         unit:"LB",  unitCost:1.05  },
-  { id:"ro30", category:"Round Tube",  name:'3" OD Round Tube 11ga',         unit:"EA",  unitCost:119.40},
-  { id:"ro31", category:"Round Tube",  name:'4" OD Round Tube 3/16"',        unit:"LF",  unitCost:10.18 },
-  { id:"ro32", category:"Round Tube",  name:'4" OD Round Tube 3/16"',        unit:"LB",  unitCost:1.05  },
-  { id:"ro33", category:"Round Tube",  name:'4" OD Round Tube 3/16"',        unit:"EA",  unitCost:203.60},
+  // ── ROUND TUBE (A513 ERW) ────────────────────────────────────────────────────
+  { id:"ro01", category:"Round Tube", name:'1/2" OD Round Tube 16ga', priceLF:0.72, priceLB:1.05, priceEA:14.4 },
+  { id:"ro02", category:"Round Tube", name:'3/4" OD Round Tube 16ga', priceLF:0.96, priceLB:1.05, priceEA:19.2 },
+  { id:"ro03", category:"Round Tube", name:'1" OD Round Tube 16ga', priceLF:1.31, priceLB:1.05, priceEA:26.2 },
+  { id:"ro04", category:"Round Tube", name:'1" OD Round Tube 11ga', priceLF:1.97, priceLB:1.05, priceEA:39.4 },
+  { id:"ro05", category:"Round Tube", name:'1.5" OD Round Tube 16ga', priceLF:1.97, priceLB:1.05, priceEA:39.4 },
+  { id:"ro06", category:"Round Tube", name:'1.5" OD Round Tube 11ga', priceLF:2.97, priceLB:1.05, priceEA:59.4 },
+  { id:"ro07", category:"Round Tube", name:'2" OD Round Tube 16ga', priceLF:2.65, priceLB:1.05, priceEA:53.0 },
+  { id:"ro08", category:"Round Tube", name:'2" OD Round Tube 11ga', priceLF:3.97, priceLB:1.05, priceEA:79.4 },
+  { id:"ro09", category:"Round Tube", name:'2.5" OD Round Tube 11ga', priceLF:4.97, priceLB:1.05, priceEA:99.4 },
+  { id:"ro10", category:"Round Tube", name:'3" OD Round Tube 11ga', priceLF:5.97, priceLB:1.05, priceEA:119.4 },
+  { id:"ro11", category:"Round Tube", name:'4" OD Round Tube 3/16"', priceLF:10.18, priceLB:1.05, priceEA:203.6 },
 
-  // ── PIPE (A53 Grade B, Sch 40 standard) ──────────────────────────────────────
-  // NPS = nominal pipe size; OD is slightly larger
-  { id:"pi01", category:"Pipe",        name:'3/4" NPS Pipe Sch 40',          unit:"LF",  unitCost:1.68  },
-  { id:"pi02", category:"Pipe",        name:'3/4" NPS Pipe Sch 40',          unit:"LB",  unitCost:1.03  },
-  { id:"pi03", category:"Pipe",        name:'3/4" NPS Pipe Sch 40',          unit:"EA",  unitCost:33.60 },
-  { id:"pi04", category:"Pipe",        name:'1" NPS Pipe Sch 40',            unit:"LF",  unitCost:2.37  },
-  { id:"pi05", category:"Pipe",        name:'1" NPS Pipe Sch 40',            unit:"LB",  unitCost:1.03  },
-  { id:"pi06", category:"Pipe",        name:'1" NPS Pipe Sch 40',            unit:"EA",  unitCost:47.40 },
-  { id:"pi07", category:"Pipe",        name:'1.25" NPS Pipe Sch 40',         unit:"LF",  unitCost:3.20  },
-  { id:"pi08", category:"Pipe",        name:'1.25" NPS Pipe Sch 40',         unit:"LB",  unitCost:1.03  },
-  { id:"pi09", category:"Pipe",        name:'1.25" NPS Pipe Sch 40',         unit:"EA",  unitCost:64.00 },
-  { id:"pi10", category:"Pipe",        name:'1.5" NPS Pipe Sch 40',          unit:"LF",  unitCost:3.71  },
-  { id:"pi11", category:"Pipe",        name:'1.5" NPS Pipe Sch 40',          unit:"LB",  unitCost:1.03  },
-  { id:"pi12", category:"Pipe",        name:'1.5" NPS Pipe Sch 40',          unit:"EA",  unitCost:74.20 },
-  { id:"pi13", category:"Pipe",        name:'2" NPS Pipe Sch 40',            unit:"LF",  unitCost:5.36  },
-  { id:"pi14", category:"Pipe",        name:'2" NPS Pipe Sch 40',            unit:"LB",  unitCost:1.03  },
-  { id:"pi15", category:"Pipe",        name:'2" NPS Pipe Sch 40',            unit:"EA",  unitCost:107.20},
-  { id:"pi16", category:"Pipe",        name:'2.5" NPS Pipe Sch 40',          unit:"LF",  unitCost:7.53  },
-  { id:"pi17", category:"Pipe",        name:'2.5" NPS Pipe Sch 40',          unit:"LB",  unitCost:1.03  },
-  { id:"pi18", category:"Pipe",        name:'2.5" NPS Pipe Sch 40',          unit:"EA",  unitCost:150.60},
-  { id:"pi19", category:"Pipe",        name:'3" NPS Pipe Sch 40',            unit:"LF",  unitCost:9.37  },
-  { id:"pi20", category:"Pipe",        name:'3" NPS Pipe Sch 40',            unit:"LB",  unitCost:1.03  },
-  { id:"pi21", category:"Pipe",        name:'3" NPS Pipe Sch 40',            unit:"EA",  unitCost:187.40},
-  { id:"pi22", category:"Pipe",        name:'4" NPS Pipe Sch 40',            unit:"LF",  unitCost:13.85 },
-  { id:"pi23", category:"Pipe",        name:'4" NPS Pipe Sch 40',            unit:"LB",  unitCost:1.03  },
-  { id:"pi24", category:"Pipe",        name:'4" NPS Pipe Sch 40',            unit:"EA",  unitCost:277.00},
+  // ── PIPE (A53 Grade B, Sch 40) ───────────────────────────────────────────────
+  { id:"pi01", category:"Pipe", name:'3/4" NPS Pipe Sch 40', priceLF:1.68, priceLB:1.03, priceEA:33.6 },
+  { id:"pi02", category:"Pipe", name:'1" NPS Pipe Sch 40', priceLF:2.37, priceLB:1.03, priceEA:47.4 },
+  { id:"pi03", category:"Pipe", name:'1.25" NPS Pipe Sch 40', priceLF:3.2, priceLB:1.03, priceEA:64.0 },
+  { id:"pi04", category:"Pipe", name:'1.5" NPS Pipe Sch 40', priceLF:3.71, priceLB:1.03, priceEA:74.2 },
+  { id:"pi05", category:"Pipe", name:'2" NPS Pipe Sch 40', priceLF:5.36, priceLB:1.03, priceEA:107.2 },
+  { id:"pi06", category:"Pipe", name:'2.5" NPS Pipe Sch 40', priceLF:7.53, priceLB:1.03, priceEA:150.6 },
+  { id:"pi07", category:"Pipe", name:'3" NPS Pipe Sch 40', priceLF:9.37, priceLB:1.03, priceEA:187.4 },
+  { id:"pi08", category:"Pipe", name:'4" NPS Pipe Sch 40', priceLF:13.85, priceLB:1.03, priceEA:277.0 },
 
-  // ── FLAT BAR (A36, hot-rolled) ────────────────────────────────────────────────
-  // ~$0.82/lb for flat bar PNW; prices from weight = (width × thickness × 3.4 lb/in²/ft)
-  { id:"fb01", category:"Flat Bar",    name:'1/8" × 1" Flat Bar',            unit:"LF",  unitCost:0.46  },
-  { id:"fb02", category:"Flat Bar",    name:'1/8" × 1" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb03", category:"Flat Bar",    name:'1/8" × 1" Flat Bar',            unit:"EA",  unitCost:9.20  },
-  { id:"fb04", category:"Flat Bar",    name:'1/8" × 1.5" Flat Bar',          unit:"LF",  unitCost:0.69  },
-  { id:"fb05", category:"Flat Bar",    name:'1/8" × 1.5" Flat Bar',          unit:"LB",  unitCost:0.82  },
-  { id:"fb06", category:"Flat Bar",    name:'1/8" × 1.5" Flat Bar',          unit:"EA",  unitCost:13.80 },
-  { id:"fb07", category:"Flat Bar",    name:'1/8" × 2" Flat Bar',            unit:"LF",  unitCost:0.92  },
-  { id:"fb08", category:"Flat Bar",    name:'1/8" × 2" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb09", category:"Flat Bar",    name:'1/8" × 2" Flat Bar',            unit:"EA",  unitCost:18.40 },
-  { id:"fb10", category:"Flat Bar",    name:'1/8" × 3" Flat Bar',            unit:"LF",  unitCost:1.38  },
-  { id:"fb11", category:"Flat Bar",    name:'1/8" × 3" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb12", category:"Flat Bar",    name:'1/8" × 3" Flat Bar',            unit:"EA",  unitCost:27.60 },
-  { id:"fb13", category:"Flat Bar",    name:'3/16" × 1" Flat Bar',           unit:"LF",  unitCost:0.69  },
-  { id:"fb14", category:"Flat Bar",    name:'3/16" × 1" Flat Bar',           unit:"LB",  unitCost:0.82  },
-  { id:"fb15", category:"Flat Bar",    name:'3/16" × 1" Flat Bar',           unit:"EA",  unitCost:13.80 },
-  { id:"fb16", category:"Flat Bar",    name:'3/16" × 1.5" Flat Bar',         unit:"LF",  unitCost:1.04  },
-  { id:"fb17", category:"Flat Bar",    name:'3/16" × 1.5" Flat Bar',         unit:"LB",  unitCost:0.82  },
-  { id:"fb18", category:"Flat Bar",    name:'3/16" × 1.5" Flat Bar',         unit:"EA",  unitCost:20.80 },
-  { id:"fb19", category:"Flat Bar",    name:'3/16" × 2" Flat Bar',           unit:"LF",  unitCost:1.38  },
-  { id:"fb20", category:"Flat Bar",    name:'3/16" × 2" Flat Bar',           unit:"LB",  unitCost:0.82  },
-  { id:"fb21", category:"Flat Bar",    name:'3/16" × 2" Flat Bar',           unit:"EA",  unitCost:27.60 },
-  { id:"fb22", category:"Flat Bar",    name:'3/16" × 3" Flat Bar',           unit:"LF",  unitCost:2.07  },
-  { id:"fb23", category:"Flat Bar",    name:'3/16" × 3" Flat Bar',           unit:"LB",  unitCost:0.82  },
-  { id:"fb24", category:"Flat Bar",    name:'3/16" × 3" Flat Bar',           unit:"EA",  unitCost:41.40 },
-  { id:"fb25", category:"Flat Bar",    name:'1/4" × 1" Flat Bar',            unit:"LF",  unitCost:0.92  },
-  { id:"fb26", category:"Flat Bar",    name:'1/4" × 1" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb27", category:"Flat Bar",    name:'1/4" × 1" Flat Bar',            unit:"EA",  unitCost:18.40 },
-  { id:"fb28", category:"Flat Bar",    name:'1/4" × 1.5" Flat Bar',          unit:"LF",  unitCost:1.38  },
-  { id:"fb29", category:"Flat Bar",    name:'1/4" × 1.5" Flat Bar',          unit:"LB",  unitCost:0.82  },
-  { id:"fb30", category:"Flat Bar",    name:'1/4" × 1.5" Flat Bar',          unit:"EA",  unitCost:27.60 },
-  { id:"fb31", category:"Flat Bar",    name:'1/4" × 2" Flat Bar',            unit:"LF",  unitCost:1.84  },
-  { id:"fb32", category:"Flat Bar",    name:'1/4" × 2" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb33", category:"Flat Bar",    name:'1/4" × 2" Flat Bar',            unit:"EA",  unitCost:36.80 },
-  { id:"fb34", category:"Flat Bar",    name:'1/4" × 3" Flat Bar',            unit:"LF",  unitCost:2.76  },
-  { id:"fb35", category:"Flat Bar",    name:'1/4" × 3" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb36", category:"Flat Bar",    name:'1/4" × 3" Flat Bar',            unit:"EA",  unitCost:55.20 },
-  { id:"fb37", category:"Flat Bar",    name:'1/4" × 4" Flat Bar',            unit:"LF",  unitCost:3.67  },
-  { id:"fb38", category:"Flat Bar",    name:'1/4" × 4" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb39", category:"Flat Bar",    name:'1/4" × 4" Flat Bar',            unit:"EA",  unitCost:73.40 },
-  { id:"fb40", category:"Flat Bar",    name:'3/8" × 2" Flat Bar',            unit:"LF",  unitCost:2.76  },
-  { id:"fb41", category:"Flat Bar",    name:'3/8" × 2" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb42", category:"Flat Bar",    name:'3/8" × 2" Flat Bar',            unit:"EA",  unitCost:55.20 },
-  { id:"fb43", category:"Flat Bar",    name:'3/8" × 3" Flat Bar',            unit:"LF",  unitCost:4.14  },
-  { id:"fb44", category:"Flat Bar",    name:'3/8" × 3" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb45", category:"Flat Bar",    name:'3/8" × 3" Flat Bar',            unit:"EA",  unitCost:82.80 },
-  { id:"fb46", category:"Flat Bar",    name:'1/2" × 2" Flat Bar',            unit:"LF",  unitCost:3.67  },
-  { id:"fb47", category:"Flat Bar",    name:'1/2" × 2" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb48", category:"Flat Bar",    name:'1/2" × 2" Flat Bar',            unit:"EA",  unitCost:73.40 },
-  { id:"fb49", category:"Flat Bar",    name:'1/2" × 3" Flat Bar',            unit:"LF",  unitCost:5.51  },
-  { id:"fb50", category:"Flat Bar",    name:'1/2" × 3" Flat Bar',            unit:"LB",  unitCost:0.82  },
-  { id:"fb51", category:"Flat Bar",    name:'1/2" × 3" Flat Bar',            unit:"EA",  unitCost:110.20},
+  // ── FLAT BAR (A36, hot-rolled) ───────────────────────────────────────────────
+  { id:"fb01", category:"Flat Bar", name:'1/8" × 1" Flat Bar', priceLF:0.46, priceLB:0.82, priceEA:9.2 },
+  { id:"fb02", category:"Flat Bar", name:'1/8" × 1.5" Flat Bar', priceLF:0.69, priceLB:0.82, priceEA:13.8 },
+  { id:"fb03", category:"Flat Bar", name:'1/8" × 2" Flat Bar', priceLF:0.92, priceLB:0.82, priceEA:18.4 },
+  { id:"fb04", category:"Flat Bar", name:'1/8" × 3" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
+  { id:"fb05", category:"Flat Bar", name:'3/16" × 1" Flat Bar', priceLF:0.69, priceLB:0.82, priceEA:13.8 },
+  { id:"fb06", category:"Flat Bar", name:'3/16" × 1.5" Flat Bar', priceLF:1.04, priceLB:0.82, priceEA:20.8 },
+  { id:"fb07", category:"Flat Bar", name:'3/16" × 2" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
+  { id:"fb08", category:"Flat Bar", name:'3/16" × 3" Flat Bar', priceLF:2.07, priceLB:0.82, priceEA:41.4 },
+  { id:"fb09", category:"Flat Bar", name:'1/4" × 1" Flat Bar', priceLF:0.92, priceLB:0.82, priceEA:18.4 },
+  { id:"fb10", category:"Flat Bar", name:'1/4" × 1.5" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
+  { id:"fb11", category:"Flat Bar", name:'1/4" × 2" Flat Bar', priceLF:1.84, priceLB:0.82, priceEA:36.8 },
+  { id:"fb12", category:"Flat Bar", name:'1/4" × 3" Flat Bar', priceLF:2.76, priceLB:0.82, priceEA:55.2 },
+  { id:"fb13", category:"Flat Bar", name:'1/4" × 4" Flat Bar', priceLF:3.67, priceLB:0.82, priceEA:73.4 },
+  { id:"fb14", category:"Flat Bar", name:'3/8" × 2" Flat Bar', priceLF:2.76, priceLB:0.82, priceEA:55.2 },
+  { id:"fb15", category:"Flat Bar", name:'3/8" × 3" Flat Bar', priceLF:4.14, priceLB:0.82, priceEA:82.8 },
+  { id:"fb16", category:"Flat Bar", name:'1/2" × 2" Flat Bar', priceLF:3.67, priceLB:0.82, priceEA:73.4 },
+  { id:"fb17", category:"Flat Bar", name:'1/2" × 3" Flat Bar', priceLF:5.51, priceLB:0.82, priceEA:110.2 },
 
-  // ── ROUND BAR (A36, hot-rolled) ───────────────────────────────────────────────
-  // weight = (d²/4 × π × 0.2833) lb/in³ → lb/ft; ~$0.85/lb
-  { id:"rb01", category:"Round Bar",   name:'1/2" Round Bar',                unit:"LF",  unitCost:0.57  },
-  { id:"rb02", category:"Round Bar",   name:'1/2" Round Bar',                unit:"LB",  unitCost:0.85  },
-  { id:"rb03", category:"Round Bar",   name:'1/2" Round Bar',                unit:"EA",  unitCost:11.40 },
-  { id:"rb04", category:"Round Bar",   name:'5/8" Round Bar',                unit:"LF",  unitCost:0.89  },
-  { id:"rb05", category:"Round Bar",   name:'5/8" Round Bar',                unit:"LB",  unitCost:0.85  },
-  { id:"rb06", category:"Round Bar",   name:'5/8" Round Bar',                unit:"EA",  unitCost:17.80 },
-  { id:"rb07", category:"Round Bar",   name:'3/4" Round Bar',                unit:"LF",  unitCost:1.28  },
-  { id:"rb08", category:"Round Bar",   name:'3/4" Round Bar',                unit:"LB",  unitCost:0.85  },
-  { id:"rb09", category:"Round Bar",   name:'3/4" Round Bar',                unit:"EA",  unitCost:25.60 },
-  { id:"rb10", category:"Round Bar",   name:'7/8" Round Bar',                unit:"LF",  unitCost:1.75  },
-  { id:"rb11", category:"Round Bar",   name:'7/8" Round Bar',                unit:"LB",  unitCost:0.85  },
-  { id:"rb12", category:"Round Bar",   name:'7/8" Round Bar',                unit:"EA",  unitCost:35.00 },
-  { id:"rb13", category:"Round Bar",   name:'1" Round Bar',                  unit:"LF",  unitCost:2.28  },
-  { id:"rb14", category:"Round Bar",   name:'1" Round Bar',                  unit:"LB",  unitCost:0.85  },
-  { id:"rb15", category:"Round Bar",   name:'1" Round Bar',                  unit:"EA",  unitCost:45.60 },
-  { id:"rb16", category:"Round Bar",   name:'1.25" Round Bar',               unit:"LF",  unitCost:3.57  },
-  { id:"rb17", category:"Round Bar",   name:'1.25" Round Bar',               unit:"LB",  unitCost:0.85  },
-  { id:"rb18", category:"Round Bar",   name:'1.25" Round Bar',               unit:"EA",  unitCost:71.40 },
-  { id:"rb19", category:"Round Bar",   name:'1.5" Round Bar',                unit:"LF",  unitCost:5.14  },
-  { id:"rb20", category:"Round Bar",   name:'1.5" Round Bar',                unit:"LB",  unitCost:0.85  },
-  { id:"rb21", category:"Round Bar",   name:'1.5" Round Bar',                unit:"EA",  unitCost:102.80},
-  { id:"rb22", category:"Round Bar",   name:'2" Round Bar',                  unit:"LF",  unitCost:9.14  },
-  { id:"rb23", category:"Round Bar",   name:'2" Round Bar',                  unit:"LB",  unitCost:0.85  },
-  { id:"rb24", category:"Round Bar",   name:'2" Round Bar',                  unit:"EA",  unitCost:182.80},
+  // ── ROUND BAR (A36, hot-rolled) ──────────────────────────────────────────────
+  { id:"rb01", category:"Round Bar", name:'1/2" Round Bar', priceLF:0.57, priceLB:0.85, priceEA:11.4 },
+  { id:"rb02", category:"Round Bar", name:'5/8" Round Bar', priceLF:0.89, priceLB:0.85, priceEA:17.8 },
+  { id:"rb03", category:"Round Bar", name:'3/4" Round Bar', priceLF:1.28, priceLB:0.85, priceEA:25.6 },
+  { id:"rb04", category:"Round Bar", name:'7/8" Round Bar', priceLF:1.75, priceLB:0.85, priceEA:35.0 },
+  { id:"rb05", category:"Round Bar", name:'1" Round Bar', priceLF:2.28, priceLB:0.85, priceEA:45.6 },
+  { id:"rb06", category:"Round Bar", name:'1.25" Round Bar', priceLF:3.57, priceLB:0.85, priceEA:71.4 },
+  { id:"rb07", category:"Round Bar", name:'1.5" Round Bar', priceLF:5.14, priceLB:0.85, priceEA:102.8 },
+  { id:"rb08", category:"Round Bar", name:'2" Round Bar', priceLF:9.14, priceLB:0.85, priceEA:182.8 },
 
-  // ── ANGLE (A36, equal leg, hot-rolled) ────────────────────────────────────────
-  // ~$0.82/lb; AISC weights used
-  { id:"an01", category:"Angle",       name:'L 1" × 1" × 1/8"',             unit:"LF",  unitCost:0.82  },
-  { id:"an02", category:"Angle",       name:'L 1" × 1" × 1/8"',             unit:"LB",  unitCost:0.82  },
-  { id:"an03", category:"Angle",       name:'L 1" × 1" × 1/8"',             unit:"EA",  unitCost:16.40 },
-  { id:"an04", category:"Angle",       name:'L 1.5" × 1.5" × 1/8"',         unit:"LF",  unitCost:1.24  },
-  { id:"an05", category:"Angle",       name:'L 1.5" × 1.5" × 1/8"',         unit:"LB",  unitCost:0.82  },
-  { id:"an06", category:"Angle",       name:'L 1.5" × 1.5" × 1/8"',         unit:"EA",  unitCost:24.80 },
-  { id:"an07", category:"Angle",       name:'L 1.5" × 1.5" × 3/16"',        unit:"LF",  unitCost:1.84  },
-  { id:"an08", category:"Angle",       name:'L 1.5" × 1.5" × 3/16"',        unit:"LB",  unitCost:0.82  },
-  { id:"an09", category:"Angle",       name:'L 1.5" × 1.5" × 3/16"',        unit:"EA",  unitCost:36.80 },
-  { id:"an10", category:"Angle",       name:'L 2" × 2" × 1/8"',             unit:"LF",  unitCost:1.66  },
-  { id:"an11", category:"Angle",       name:'L 2" × 2" × 1/8"',             unit:"LB",  unitCost:0.82  },
-  { id:"an12", category:"Angle",       name:'L 2" × 2" × 1/8"',             unit:"EA",  unitCost:33.20 },
-  { id:"an13", category:"Angle",       name:'L 2" × 2" × 3/16"',            unit:"LF",  unitCost:2.46  },
-  { id:"an14", category:"Angle",       name:'L 2" × 2" × 3/16"',            unit:"LB",  unitCost:0.82  },
-  { id:"an15", category:"Angle",       name:'L 2" × 2" × 3/16"',            unit:"EA",  unitCost:49.20 },
-  { id:"an16", category:"Angle",       name:'L 2" × 2" × 1/4"',             unit:"LF",  unitCost:3.28  },
-  { id:"an17", category:"Angle",       name:'L 2" × 2" × 1/4"',             unit:"LB",  unitCost:0.82  },
-  { id:"an18", category:"Angle",       name:'L 2" × 2" × 1/4"',             unit:"EA",  unitCost:65.60 },
-  { id:"an19", category:"Angle",       name:'L 2.5" × 2.5" × 3/16"',        unit:"LF",  unitCost:3.08  },
-  { id:"an20", category:"Angle",       name:'L 2.5" × 2.5" × 3/16"',        unit:"LB",  unitCost:0.82  },
-  { id:"an21", category:"Angle",       name:'L 2.5" × 2.5" × 3/16"',        unit:"EA",  unitCost:61.60 },
-  { id:"an22", category:"Angle",       name:'L 2.5" × 2.5" × 1/4"',         unit:"LF",  unitCost:4.10  },
-  { id:"an23", category:"Angle",       name:'L 2.5" × 2.5" × 1/4"',         unit:"LB",  unitCost:0.82  },
-  { id:"an24", category:"Angle",       name:'L 2.5" × 2.5" × 1/4"',         unit:"EA",  unitCost:82.00 },
-  { id:"an25", category:"Angle",       name:'L 3" × 3" × 3/16"',            unit:"LF",  unitCost:3.69  },
-  { id:"an26", category:"Angle",       name:'L 3" × 3" × 3/16"',            unit:"LB",  unitCost:0.82  },
-  { id:"an27", category:"Angle",       name:'L 3" × 3" × 3/16"',            unit:"EA",  unitCost:73.80 },
-  { id:"an28", category:"Angle",       name:'L 3" × 3" × 1/4"',             unit:"LF",  unitCost:4.92  },
-  { id:"an29", category:"Angle",       name:'L 3" × 3" × 1/4"',             unit:"LB",  unitCost:0.82  },
-  { id:"an30", category:"Angle",       name:'L 3" × 3" × 1/4"',             unit:"EA",  unitCost:98.40 },
-  { id:"an31", category:"Angle",       name:'L 3" × 3" × 3/8"',             unit:"LF",  unitCost:7.30  },
-  { id:"an32", category:"Angle",       name:'L 3" × 3" × 3/8"',             unit:"LB",  unitCost:0.82  },
-  { id:"an33", category:"Angle",       name:'L 3" × 3" × 3/8"',             unit:"EA",  unitCost:146.00},
-  { id:"an34", category:"Angle",       name:'L 4" × 4" × 1/4"',             unit:"LF",  unitCost:6.56  },
-  { id:"an35", category:"Angle",       name:'L 4" × 4" × 1/4"',             unit:"LB",  unitCost:0.82  },
-  { id:"an36", category:"Angle",       name:'L 4" × 4" × 1/4"',             unit:"EA",  unitCost:131.20},
-  { id:"an37", category:"Angle",       name:'L 4" × 4" × 3/8"',             unit:"LF",  unitCost:9.76  },
-  { id:"an38", category:"Angle",       name:'L 4" × 4" × 3/8"',             unit:"LB",  unitCost:0.82  },
-  { id:"an39", category:"Angle",       name:'L 4" × 4" × 3/8"',             unit:"EA",  unitCost:195.20},
+  // ── ANGLE (A36, equal leg) ───────────────────────────────────────────────────
+  { id:"an01", category:"Angle", name:'L 1" × 1" × 1/8"', priceLF:0.82, priceLB:0.82, priceEA:16.4 },
+  { id:"an02", category:"Angle", name:'L 1.5" × 1.5" × 1/8"', priceLF:1.24, priceLB:0.82, priceEA:24.8 },
+  { id:"an03", category:"Angle", name:'L 1.5" × 1.5" × 3/16"', priceLF:1.84, priceLB:0.82, priceEA:36.8 },
+  { id:"an04", category:"Angle", name:'L 2" × 2" × 1/8"', priceLF:1.66, priceLB:0.82, priceEA:33.2 },
+  { id:"an05", category:"Angle", name:'L 2" × 2" × 3/16"', priceLF:2.46, priceLB:0.82, priceEA:49.2 },
+  { id:"an06", category:"Angle", name:'L 2" × 2" × 1/4"', priceLF:3.28, priceLB:0.82, priceEA:65.6 },
+  { id:"an07", category:"Angle", name:'L 2.5" × 2.5" × 3/16"', priceLF:3.08, priceLB:0.82, priceEA:61.6 },
+  { id:"an08", category:"Angle", name:'L 2.5" × 2.5" × 1/4"', priceLF:4.1, priceLB:0.82, priceEA:82.0 },
+  { id:"an09", category:"Angle", name:'L 3" × 3" × 3/16"', priceLF:3.69, priceLB:0.82, priceEA:73.8 },
+  { id:"an10", category:"Angle", name:'L 3" × 3" × 1/4"', priceLF:4.92, priceLB:0.82, priceEA:98.4 },
+  { id:"an11", category:"Angle", name:'L 3" × 3" × 3/8"', priceLF:7.3, priceLB:0.82, priceEA:146.0 },
+  { id:"an12", category:"Angle", name:'L 4" × 4" × 1/4"', priceLF:6.56, priceLB:0.82, priceEA:131.2 },
+  { id:"an13", category:"Angle", name:'L 4" × 4" × 3/8"', priceLF:9.76, priceLB:0.82, priceEA:195.2 },
 
-  // ── C CHANNEL (A36, American Standard) ───────────────────────────────────────
-  { id:"ch01", category:"C Channel",   name:"C 3×4.1",                       unit:"LF",  unitCost:3.36  },
-  { id:"ch02", category:"C Channel",   name:"C 3×4.1",                       unit:"LB",  unitCost:0.82  },
-  { id:"ch03", category:"C Channel",   name:"C 3×4.1",                       unit:"EA",  unitCost:67.20 },
-  { id:"ch04", category:"C Channel",   name:"C 4×5.4",                       unit:"LF",  unitCost:4.43  },
-  { id:"ch05", category:"C Channel",   name:"C 4×5.4",                       unit:"LB",  unitCost:0.82  },
-  { id:"ch06", category:"C Channel",   name:"C 4×5.4",                       unit:"EA",  unitCost:88.60 },
-  { id:"ch07", category:"C Channel",   name:"C 5×6.7",                       unit:"LF",  unitCost:5.49  },
-  { id:"ch08", category:"C Channel",   name:"C 5×6.7",                       unit:"LB",  unitCost:0.82  },
-  { id:"ch09", category:"C Channel",   name:"C 5×6.7",                       unit:"EA",  unitCost:109.80},
-  { id:"ch10", category:"C Channel",   name:"C 6×8.2",                       unit:"LF",  unitCost:6.72  },
-  { id:"ch11", category:"C Channel",   name:"C 6×8.2",                       unit:"LB",  unitCost:0.82  },
-  { id:"ch12", category:"C Channel",   name:"C 6×8.2",                       unit:"EA",  unitCost:134.40},
-  { id:"ch13", category:"C Channel",   name:"C 8×11.5",                      unit:"LF",  unitCost:9.43  },
-  { id:"ch14", category:"C Channel",   name:"C 8×11.5",                      unit:"LB",  unitCost:0.82  },
-  { id:"ch15", category:"C Channel",   name:"C 8×11.5",                      unit:"EA",  unitCost:188.60},
+  // ── SHEET (A36/A1011, hot-rolled) ────────────────────────────────────────────
+  { id:"sh01", category:"Sheet", name:'Sheet 10ga (0.135")', priceSF:7.02, priceLB:0.78, priceEA:0 },
+  { id:"sh02", category:"Sheet", name:'Sheet 11ga (0.120")', priceSF:6.24, priceLB:0.78, priceEA:0 },
+  { id:"sh03", category:"Sheet", name:'Sheet 12ga (0.105")', priceSF:5.46, priceLB:0.78, priceEA:0 },
+  { id:"sh04", category:"Sheet", name:'Sheet 14ga (0.075")', priceSF:3.9, priceLB:0.78, priceEA:0 },
+  { id:"sh05", category:"Sheet", name:'Sheet 16ga (0.060")', priceSF:3.12, priceLB:0.78, priceEA:0 },
 
-  // ── W BEAM (A992 Wide Flange) ─────────────────────────────────────────────────
-  { id:"wb01", category:"W Beam",      name:"W 4×13",                        unit:"LF",  unitCost:11.18 },
-  { id:"wb02", category:"W Beam",      name:"W 4×13",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb03", category:"W Beam",      name:"W 4×13",                        unit:"EA",  unitCost:223.60},
-  { id:"wb04", category:"W Beam",      name:"W 5×16",                        unit:"LF",  unitCost:13.76 },
-  { id:"wb05", category:"W Beam",      name:"W 5×16",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb06", category:"W Beam",      name:"W 5×16",                        unit:"EA",  unitCost:275.20},
-  { id:"wb07", category:"W Beam",      name:"W 6×12",                        unit:"LF",  unitCost:10.32 },
-  { id:"wb08", category:"W Beam",      name:"W 6×12",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb09", category:"W Beam",      name:"W 6×12",                        unit:"EA",  unitCost:206.40},
-  { id:"wb10", category:"W Beam",      name:"W 6×15",                        unit:"LF",  unitCost:12.90 },
-  { id:"wb11", category:"W Beam",      name:"W 6×15",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb12", category:"W Beam",      name:"W 6×15",                        unit:"EA",  unitCost:258.00},
-  { id:"wb13", category:"W Beam",      name:"W 8×18",                        unit:"LF",  unitCost:15.48 },
-  { id:"wb14", category:"W Beam",      name:"W 8×18",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb15", category:"W Beam",      name:"W 8×18",                        unit:"EA",  unitCost:309.60},
-  { id:"wb16", category:"W Beam",      name:"W 8×24",                        unit:"LF",  unitCost:20.64 },
-  { id:"wb17", category:"W Beam",      name:"W 8×24",                        unit:"LB",  unitCost:0.86  },
-  { id:"wb18", category:"W Beam",      name:"W 8×24",                        unit:"EA",  unitCost:412.80},
-  { id:"wb19", category:"W Beam",      name:"W 10×22",                       unit:"LF",  unitCost:18.92 },
-  { id:"wb20", category:"W Beam",      name:"W 10×22",                       unit:"LB",  unitCost:0.86  },
-  { id:"wb21", category:"W Beam",      name:"W 10×22",                       unit:"EA",  unitCost:378.40},
-  { id:"wb22", category:"W Beam",      name:"W 10×33",                       unit:"LF",  unitCost:28.38 },
-  { id:"wb23", category:"W Beam",      name:"W 10×33",                       unit:"LB",  unitCost:0.86  },
-  { id:"wb24", category:"W Beam",      name:"W 10×33",                       unit:"EA",  unitCost:567.60},
-  { id:"wb25", category:"W Beam",      name:"W 12×26",                       unit:"LF",  unitCost:22.36 },
-  { id:"wb26", category:"W Beam",      name:"W 12×26",                       unit:"LB",  unitCost:0.86  },
-  { id:"wb27", category:"W Beam",      name:"W 12×26",                       unit:"EA",  unitCost:447.20},
-
-  // ── SHEET (A36 / A1011, hot-rolled) ──────────────────────────────────────────
-  { id:"sh01", category:"Sheet",       name:'Sheet 10ga (0.135")',            unit:"SqFt",unitCost:7.02  },
-  { id:"sh02", category:"Sheet",       name:'Sheet 10ga (0.135")',            unit:"LB",  unitCost:0.78  },
-  { id:"sh03", category:"Sheet",       name:'Sheet 11ga (0.120")',            unit:"SqFt",unitCost:6.24  },
-  { id:"sh04", category:"Sheet",       name:'Sheet 11ga (0.120")',            unit:"LB",  unitCost:0.78  },
-  { id:"sh05", category:"Sheet",       name:'Sheet 12ga (0.105")',            unit:"SqFt",unitCost:5.46  },
-  { id:"sh06", category:"Sheet",       name:'Sheet 12ga (0.105")',            unit:"LB",  unitCost:0.78  },
-  { id:"sh07", category:"Sheet",       name:'Sheet 14ga (0.075")',            unit:"SqFt",unitCost:3.90  },
-  { id:"sh08", category:"Sheet",       name:'Sheet 14ga (0.075")',            unit:"LB",  unitCost:0.78  },
-  { id:"sh09", category:"Sheet",       name:'Sheet 16ga (0.060")',            unit:"SqFt",unitCost:3.12  },
-  { id:"sh10", category:"Sheet",       name:'Sheet 16ga (0.060")',            unit:"LB",  unitCost:0.78  },
-
-  // ── PLATE (A36, hot-rolled) ───────────────────────────────────────────────────
-  { id:"pl01", category:"Plate",       name:'Plate 3/16" (0.188")',           unit:"SqFt",unitCost:11.52 },
-  { id:"pl02", category:"Plate",       name:'Plate 3/16" (0.188")',           unit:"LB",  unitCost:0.80  },
-  { id:"pl03", category:"Plate",       name:'Plate 1/4" (0.250")',            unit:"SqFt",unitCost:15.36 },
-  { id:"pl04", category:"Plate",       name:'Plate 1/4" (0.250")',            unit:"LB",  unitCost:0.80  },
-  { id:"pl05", category:"Plate",       name:'Plate 3/8" (0.375")',            unit:"SqFt",unitCost:23.04 },
-  { id:"pl06", category:"Plate",       name:'Plate 3/8" (0.375")',            unit:"LB",  unitCost:0.80  },
-  { id:"pl07", category:"Plate",       name:'Plate 1/2" (0.500")',            unit:"SqFt",unitCost:30.72 },
-  { id:"pl08", category:"Plate",       name:'Plate 1/2" (0.500")',            unit:"LB",  unitCost:0.80  },
-  { id:"pl09", category:"Plate",       name:'Plate 5/8" (0.625")',            unit:"SqFt",unitCost:38.40 },
-  { id:"pl10", category:"Plate",       name:'Plate 5/8" (0.625")',            unit:"LB",  unitCost:0.80  },
-  { id:"pl11", category:"Plate",       name:'Plate 3/4" (0.750")',            unit:"SqFt",unitCost:46.08 },
-  { id:"pl12", category:"Plate",       name:'Plate 3/4" (0.750")',            unit:"LB",  unitCost:0.80  },
-  { id:"pl13", category:"Plate",       name:'Plate 1" (1.000")',              unit:"SqFt",unitCost:61.44 },
-  { id:"pl14", category:"Plate",       name:'Plate 1" (1.000")',              unit:"LB",  unitCost:0.80  },
+  // ── PLATE (A36, hot-rolled) ──────────────────────────────────────────────────
+  { id:"pl01", category:"Plate", name:'Plate 3/16" (0.188")', priceSF:11.52, priceLB:0.8, priceEA:0 },
+  { id:"pl02", category:"Plate", name:'Plate 1/4" (0.250")', priceSF:15.36, priceLB:0.8, priceEA:0 },
+  { id:"pl03", category:"Plate", name:'Plate 3/8" (0.375")', priceSF:23.04, priceLB:0.8, priceEA:0 },
+  { id:"pl04", category:"Plate", name:'Plate 1/2" (0.500")', priceSF:30.72, priceLB:0.8, priceEA:0 },
+  { id:"pl05", category:"Plate", name:'Plate 5/8" (0.625")', priceSF:38.4, priceLB:0.8, priceEA:0 },
+  { id:"pl06", category:"Plate", name:'Plate 3/4" (0.750")', priceSF:46.08, priceLB:0.8, priceEA:0 },
+  { id:"pl07", category:"Plate", name:'Plate 1" (1.000")', priceSF:61.44, priceLB:0.8, priceEA:0 },
 
   // ── HARDWARE ─────────────────────────────────────────────────────────────────
-  { id:"hw01", category:"Hardware",    name:"Core Drill Anchor Kit",          unit:"EA",  unitCost:12.50 },
-  { id:"hw02", category:"Hardware",    name:'Post Base Plate 4"×4"',          unit:"EA",  unitCost:8.75  },
-  { id:"hw03", category:"Hardware",    name:'Post Base Plate 6"×6"',          unit:"EA",  unitCost:14.50 },
-  { id:"hw04", category:"Hardware",    name:'Lag Screw 1/2" × 3"',           unit:"EA",  unitCost:0.85  },
-  { id:"hw05", category:"Hardware",    name:'Lag Screw 1/2" × 4"',           unit:"EA",  unitCost:1.05  },
-  { id:"hw06", category:"Hardware",    name:'Wedge Anchor 3/8" × 3"',        unit:"EA",  unitCost:0.95  },
-  { id:"hw07", category:"Hardware",    name:'Wedge Anchor 1/2" × 3.75"',     unit:"EA",  unitCost:1.25  },
-  { id:"hw08", category:"Hardware",    name:'Hex Bolt 1/2" × 1.5"',          unit:"EA",  unitCost:0.55  },
-  { id:"hw09", category:"Hardware",    name:'Stainless Cable Assy 1/8"',      unit:"EA",  unitCost:22.00 },
-  { id:"hw10", category:"Hardware",    name:'Stainless Cable Assy 3/16"',     unit:"EA",  unitCost:28.50 },
-  { id:"hw11", category:"Hardware",    name:"Cable Tensioner (swage)",        unit:"EA",  unitCost:18.00 },
-  { id:"hw12", category:"Hardware",    name:"Cable Tensioner (threaded)",     unit:"EA",  unitCost:24.00 },
+  { id:"hw01", category:"Hardware", name:'Post Base Plate 4"×4"', priceLF:0, priceLB:0, priceEA:8.75 },
+  { id:"hw02", category:"Hardware", name:'Post Base Plate 6"×6"', priceLF:0, priceLB:0, priceEA:14.5 },
+  { id:"hw03", category:"Hardware", name:'Lag Screw 1/2" × 3"', priceLF:0, priceLB:0, priceEA:0.85 },
+  { id:"hw04", category:"Hardware", name:'Lag Screw 1/2" × 4"', priceLF:0, priceLB:0, priceEA:1.05 },
+  { id:"hw05", category:"Hardware", name:'Wedge Anchor 3/8" × 3"', priceLF:0, priceLB:0, priceEA:0.95 },
+  { id:"hw06", category:"Hardware", name:'Wedge Anchor 1/2" × 3.75"', priceLF:0, priceLB:0, priceEA:1.25 },
+  { id:"hw07", category:"Hardware", name:'Hex Bolt 1/2" × 1.5"', priceLF:0, priceLB:0, priceEA:0.55 },
+  { id:"hw08", category:"Hardware", name:'Stainless Cable Assy 1/8"', priceLF:0, priceLB:0, priceEA:22.0 },
+  { id:"hw09", category:"Hardware", name:'Stainless Cable Assy 3/16"', priceLF:0, priceLB:0, priceEA:28.5 },
 
   // ── INSTALL MATERIALS ─────────────────────────────────────────────────────────
-  { id:"im01", category:"Install Materials", name:'Concrete Anchor — 3/8"',   unit:"EA",  unitCost:2.40  },
-  { id:"im02", category:"Install Materials", name:'Concrete Anchor — 1/2"',   unit:"EA",  unitCost:3.20  },
-  { id:"im03", category:"Install Materials", name:"Core Drill Consumable Kit", unit:"EA",  unitCost:18.00 },
-  { id:"im04", category:"Install Materials", name:"Non-Shrink Grout (50 lb)",  unit:"EA",  unitCost:22.00 },
-  { id:"im05", category:"Install Materials", name:"Shim Pack",                 unit:"EA",  unitCost:4.50  },
-  { id:"im06", category:"Install Materials", name:'Threaded Rod 1/2" × 12"',  unit:"EA",  unitCost:3.75  },
-  { id:"im07", category:"Install Materials", name:'Threaded Rod 5/8" × 12"',  unit:"EA",  unitCost:5.25  },
-  { id:"im08", category:"Install Materials", name:"Touch-Up Paint (spray)",    unit:"EA",  unitCost:9.00  },
-  { id:"im09", category:"Install Materials", name:"Silicone Sealant (tube)",   unit:"EA",  unitCost:7.50  },
-  { id:"im10", category:"Install Materials", name:"Self-Leveling Caulk",       unit:"EA",  unitCost:12.00 },
+  { id:"im01", category:"Install Materials", name:'Concrete Anchor — 3/8"', priceLF:0, priceLB:0, priceEA:2.4 },
+  { id:"im02", category:"Install Materials", name:'Concrete Anchor — 1/2"', priceLF:0, priceLB:0, priceEA:3.2 },
+  { id:"im03", category:"Install Materials", name:'Threaded Rod 1/2" × 12"', priceLF:0, priceLB:0, priceEA:3.75 },
+  { id:"im04", category:"Install Materials", name:'Threaded Rod 5/8" × 12"', priceLF:0, priceLB:0, priceEA:5.25 },
 ];
 
 const DEFAULT_FINISHES = [
@@ -522,12 +279,21 @@ const blankAlternate = (altIdx) => ({
   notes: "",
 });
 
+// Get the unit price from a material given the chosen unit on the line
+const matUnitPrice = (m, unit) => {
+  if (!m) return 0;
+  if (unit === "LB")   return m.priceLB || 0;
+  if (unit === "EA")   return m.priceEA || 0;
+  if (unit === "SqFt") return m.priceSF || 0;
+  return m.priceLF || m.priceSF || 0; // LF default
+};
+
 // Returns { base, install, alts[], total }
 const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
   const calcLines = (matLines, labLines) => {
     const rawMat = matLines.reduce((s,l) => {
       const m = mats.find(x => x.id === l.materialId);
-      return s + (m ? m.unitCost * Number(l.qty) : 0);
+      return s + matUnitPrice(m, l.unit) * Number(l.qty);
     }, 0);
     const matW  = rawMat * (1 + Number(wastePct) / 100);
     const labor = labLines.reduce((s,l) => {
@@ -933,7 +699,17 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                 <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>
               ))}</tr></thead>
               <tbody>{matLines.map(line=>{
-                const m=mats.find(x=>x.id===line.materialId), ext=m?m.unitCost*Number(line.qty):0;
+                const m = mats.find(x=>x.id===line.materialId);
+                const lineUnit = line.unit || (m?.priceSF ? "SqFt" : "LF");
+                const unitPrice = matUnitPrice(m, lineUnit);
+                const ext = unitPrice * Number(line.qty);
+                // Available units for this material
+                const availUnits = m ? [
+                  ...(m.priceLF ? ["LF"] : []),
+                  ...(m.priceSF ? ["SqFt"] : []),
+                  ...(m.priceLB ? ["LB"] : []),
+                  ...(m.priceEA ? ["EA"] : []),
+                ] : ["LF","LB","EA"];
                 const isOpen = openCalc === line.id;
                 return (
                   <Fragment key={line.id}>
@@ -950,8 +726,12 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                       <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:68}}>
                         <input type="number" min="0" value={line.qty} onChange={e=>onUpdMat(line.id,"qty",e.target.value)} style={{fontSize:12}}/>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:52,fontSize:11,color:"var(--ink3)"}}>{m?.unit}</td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:86,textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>{m?fmt(m.unitCost):"—"}</td>
+                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:72}}>
+                        <select value={lineUnit} onChange={e=>onUpdMat(line.id,"unit",e.target.value)} style={{fontSize:12,width:"100%"}}>
+                          {availUnits.map(u=><option key={u} value={u}>{u}</option>)}
+                        </select>
+                      </td>
+                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:86,textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>{m ? fmt(unitPrice) : "—"}</td>
                       <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:96}}>
                         <span style={{color:"var(--bronze)",fontWeight:600,fontFamily:"'DM Mono',monospace",fontSize:12}}>{fmt(ext)}</span>
                       </td>
@@ -1695,7 +1475,7 @@ export default function App() {
   const [estimators, setEstimators]   = useState(ESTIMATORS);
   const [matCategories, setMatCategories] = useState(["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"]);
   const [showAddMat, setShowAddMat]   = useState(false);
-  const [newMatForm, setNewMatForm]   = useState({name:"",category:"Hardware",unit:"EA",unitCost:""});
+  const [newMatForm, setNewMatForm]   = useState({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
   const [showNew, setShowNew] = useState(false);
   const [showProp, setShowProp] = useState(false);
   const [dbReady, setDbReady] = useState(false);
@@ -1714,7 +1494,7 @@ export default function App() {
 
   // Bump this any time DEFAULT_MATERIALS or DEFAULT_LABOR_CATEGORIES changes.
   // On load, if Supabase has an older version the defaults are pushed to the DB.
-  const CONFIG_VERSION = 2;
+  const CONFIG_VERSION = 3;
 
   // Load on mount
   useEffect(() => {
@@ -2116,9 +1896,16 @@ export default function App() {
                     <h3>Material Price List</h3>
                     <button className="btn-b btn-s" onClick={()=>setShowAddMat(true)}>+ Add New Material</button>
                   </div>
-                  <div style={{padding:0}}>
+                  <div style={{padding:0,overflowX:"auto"}}>
                     <table className="rt">
-                      <thead><tr><th>Category</th><th>Name</th><th>Unit</th><th>Unit Cost ($)</th><th/></tr></thead>
+                      <thead><tr>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th style={{textAlign:"right"}}>$/LF or $/SqFt</th>
+                        <th style={{textAlign:"right"}}>$/LB</th>
+                        <th style={{textAlign:"right"}}>$/EA (20' stick)</th>
+                        <th/>
+                      </tr></thead>
                       <tbody>{mats.map(m=>(
                         <tr key={m.id}>
                           <td>
@@ -2127,8 +1914,15 @@ export default function App() {
                             </select>
                           </td>
                           <td><input value={m.name} onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,name:e.target.value}:x))}/></td>
-                          <td><select value={m.unit} onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,unit:e.target.value}:x))} style={{width:80}}>{["LF","SqFt","EA","LB","TON"].map(u=><option key={u}>{u}</option>)}</select></td>
-                          <td><input type="number" value={m.unitCost} step="0.01" onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,unitCost:parseFloat(e.target.value)||0}:x))} style={{width:110}}/></td>
+                          <td><input type="number" value={m.priceLF ?? m.priceSF ?? 0} step="0.01" style={{width:90,textAlign:"right"}}
+                            onChange={e=>{
+                              const v = parseFloat(e.target.value)||0;
+                              setMats(p=>p.map(x=>x.id===m.id ? (x.priceSF !== undefined ? {...x,priceSF:v} : {...x,priceLF:v}) : x));
+                            }}/></td>
+                          <td><input type="number" value={m.priceLB ?? 0} step="0.01" style={{width:90,textAlign:"right"}}
+                            onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,priceLB:parseFloat(e.target.value)||0}:x))}/></td>
+                          <td><input type="number" value={m.priceEA ?? 0} step="0.01" style={{width:100,textAlign:"right"}}
+                            onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,priceEA:parseFloat(e.target.value)||0}:x))}/></td>
                           <td><button className="btn-d" onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button></td>
                         </tr>
                       ))}</tbody>
@@ -2509,7 +2303,7 @@ export default function App() {
       {/* ADD MATERIAL TO LIBRARY MODAL */}
       {showAddMat && (
         <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowAddMat(false)}>
-          <div className="md" style={{maxWidth:460}}>
+          <div className="md" style={{maxWidth:480}}>
             <h2>Add Material to Library</h2>
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div>
@@ -2526,29 +2320,47 @@ export default function App() {
                   onAddType={t=>{setMatCategories(p=>[...p,t]);setNewMatForm(f=>({...f,category:t}));}}
                 />
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14}}>
                 <div>
-                  <div className="fl">Unit</div>
-                  <select value={newMatForm.unit} onChange={e=>setNewMatForm(f=>({...f,unit:e.target.value}))}>
-                    {["LF","SqFt","EA","LB","TON"].map(u=><option key={u}>{u}</option>)}
-                  </select>
+                  <div className="fl">$/LF (or $/SqFt)</div>
+                  <input type="number" step="0.01" min="0"
+                    value={newMatForm.priceLF}
+                    onChange={e=>setNewMatForm(f=>({...f,priceLF:e.target.value}))}
+                    placeholder="0.00"/>
                 </div>
                 <div>
-                  <div className="fl">Unit Cost ($)</div>
+                  <div className="fl">$/LB</div>
                   <input type="number" step="0.01" min="0"
-                    value={newMatForm.unitCost}
-                    onChange={e=>setNewMatForm(f=>({...f,unitCost:e.target.value}))}
+                    value={newMatForm.priceLB}
+                    onChange={e=>setNewMatForm(f=>({...f,priceLB:e.target.value}))}
+                    placeholder="0.00"/>
+                </div>
+                <div>
+                  <div className="fl">$/EA (20' stick)</div>
+                  <input type="number" step="0.01" min="0"
+                    value={newMatForm.priceEA}
+                    onChange={e=>setNewMatForm(f=>({...f,priceEA:e.target.value}))}
                     placeholder="0.00"/>
                 </div>
               </div>
+              <div style={{fontSize:11,color:"var(--ink3)",lineHeight:1.6}}>
+                Leave any price at 0 to hide that unit option. For sheet or plate, enter the per-SqFt price in the first field.
+              </div>
             </div>
             <div className="mf">
-              <button className="btn-g" onClick={()=>{setShowAddMat(false);setNewMatForm({name:"",category:"Hardware",unit:"EA",unitCost:""});}}>Cancel</button>
+              <button className="btn-g" onClick={()=>{setShowAddMat(false);setNewMatForm({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});}}>Cancel</button>
               <button className="btn-p" onClick={()=>{
                 if(!newMatForm.name.trim()) return;
-                setMats(p=>[...p,{id:uid(),category:newMatForm.category,name:newMatForm.name.trim(),unit:newMatForm.unit,unitCost:parseFloat(newMatForm.unitCost)||0}]);
+                setMats(p=>[...p,{
+                  id:uid(),
+                  category:newMatForm.category,
+                  name:newMatForm.name.trim(),
+                  priceLF:parseFloat(newMatForm.priceLF)||0,
+                  priceLB:parseFloat(newMatForm.priceLB)||0,
+                  priceEA:parseFloat(newMatForm.priceEA)||0,
+                }]);
                 setShowAddMat(false);
-                setNewMatForm({name:"",category:"Hardware",unit:"EA",unitCost:""});
+                setNewMatForm({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
               }}>Add to Library</button>
             </div>
           </div>
