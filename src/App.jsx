@@ -1578,9 +1578,9 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .pact{display:flex;gap:12px;justify-content:center;padding:20px;}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  body>*:not(.po){display:none!important;}
   .pact{display:none!important;}
-  .po{position:static!important;background:none!important;padding:0!important;overflow:visible!important;display:block!important;}
+  .app{display:none!important;}
+  .po{position:static!important;background:none!important;padding:0!important;overflow:visible!important;}
   .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border-radius:0!important;}
   .pitm{page-break-inside:avoid;break-inside:avoid;}
   .pc{page-break-after:always;break-after:always;}
