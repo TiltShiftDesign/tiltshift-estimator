@@ -854,7 +854,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                         }
                       </td>
                       {/* Qty */}
-                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:68}}>
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:90}}>
                         <input type="number" min="0" value={line.qty}
                           onChange={e=>onUpdMat(line.id,"qty",e.target.value)} style={{fontSize:12}}/>
                       </td>
@@ -1435,7 +1435,7 @@ function LaborLineRow({ line, laborCats, onChange, onDelete, calcOpen, onToggleC
           <span style={{fontSize:11,color:"var(--ink3)"}}>Select category first</span>
         )}
       </td>
-      <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle",width:80}}>
+      <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle",width:90}}>
         <input type="number" min="0" step="0.25" value={line.hrs}
           onChange={e => onChange({ ...line, hrs: e.target.value })}
           style={{width:"100%", fontSize:12}}
@@ -1505,12 +1505,12 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .tr{margin-left:auto;}
 .body{display:flex;flex:1;overflow:hidden;}
 
-.sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;}
-.sidebar.open{width:288px;}
-.sidebar.closed{width:32px;overflow:hidden;}
-.sidebar-toggle{width:32px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--ink3);font-size:13px;flex-shrink:0;transition:color .15s;}
+.sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .18s ease;overflow:hidden;}
+.sidebar[data-open="true"]{width:288px;}
+.sidebar[data-open="false"]{width:36px;}
+.sidebar-toggle{width:36px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--ink3);font-size:14px;flex-shrink:0;transition:color .15s,background .15s;padding:0;}
 .sidebar-toggle:hover{color:var(--bronze);background:var(--cream);}
-.sidebar-content{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.sidebar-content{display:flex;flex-direction:column;flex:1;overflow:hidden;width:288px;}
 .sh{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .sh h3{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--ink2);}
 .elist{flex:1;overflow-y:auto;padding:10px;}
@@ -1867,10 +1867,10 @@ export default function App() {
         <div className="body">
           {/* SIDEBAR */}
           {(tab==="estimate"||tab==="history") && (
-            <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+            <aside className="sidebar" data-open={String(sidebarOpen)}>
               <button className="sidebar-toggle" onClick={()=>setSidebarOpen(o=>!o)}
                 title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}>
-                {sidebarOpen ? "‹" : "›"}
+                {sidebarOpen ? "❮" : "❯"}
               </button>
               {sidebarOpen && (
                 <div className="sidebar-content">
