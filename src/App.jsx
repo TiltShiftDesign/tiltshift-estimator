@@ -1545,8 +1545,8 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .mf{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
 
 /* Proposal */
-.po{position:fixed;inset:0;background:#e8e4de;z-index:200;overflow-y:auto;padding:24px 0;}
-.pd{max-width:760px;margin:0 auto;background:#fff;color:#1c1a17;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 0 40px rgba(0,0,0,.18);border:1px solid #d8d3cb;}
+.po{position:fixed;inset:0;background:#e8e4de;z-index:200;overflow-y:auto;padding:24px 0 0;}
+.pd{max-width:760px;margin:0 auto;background:#fff;color:#1c1a17;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 0 40px rgba(0,0,0,.18);border:1px solid #d8d3cb;margin-bottom:0;}
 /* Header — compact, border-only, no filled background */
 .pc{padding:20px 32px 16px;border-bottom:2px solid #1c1a17;display:flex;align-items:center;justify-content:space-between;gap:24px;}
 .pc-left{display:flex;flex-direction:column;gap:6px;}
@@ -2328,7 +2328,7 @@ export default function App() {
 
                     {/* Description — with top rule, narrower width */}
                     {item.description && (
-                      <div className="pi-desc" style={{borderTop:"1px solid #ede9e2",paddingTop:6,maxWidth:"51%"}}>{item.description}</div>
+                      <div className="pi-desc" style={{borderTop:"1px solid #ede9e2",paddingTop:6,maxWidth:"65%"}}>{item.description}</div>
                     )}
 
                     {/* Finish / Exclusions inline */}
