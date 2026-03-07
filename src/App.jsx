@@ -1560,27 +1560,27 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .pc-right .p-date{font-family:'DM Mono',monospace;font-size:11px;color:#555;margin-top:3px;}
 /* Scope items */
 .pitm{border-bottom:1px solid #e0dbd2;page-break-inside:avoid;break-inside:avoid;}
-.pi-row{display:flex;align-items:baseline;justify-content:space-between;padding:9px 32px;gap:16px;border-bottom:1px solid #ede9e2;}
+.pi-row{display:flex;align-items:baseline;justify-content:space-between;padding:7px 32px;gap:16px;border-bottom:1px solid #ede9e2;}
 .pi-row:last-child{border-bottom:none;}
-.pi-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#8c6d3f;min-width:30px;flex-shrink:0;}
-.pi-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#1c1a17;flex:1;}
-.pi-type{font-size:9px;color:#8a8680;text-transform:uppercase;letter-spacing:.1em;margin-left:8px;}
-.pi-desc{font-size:11px;color:#555;line-height:1.6;padding:0 32px 8px 32px;max-width:600px;}
-.pi-meta{display:flex;gap:16px;padding:5px 32px 9px;flex-wrap:wrap;}
-.pi-meta-item{font-size:10px;color:#666;}
+.pi-num{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:#8c6d3f;min-width:28px;flex-shrink:0;}
+.pi-name{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:#1c1a17;flex:1;}
+.pi-type{font-size:8px;color:#8a8680;text-transform:uppercase;letter-spacing:.1em;margin-left:6px;}
+.pi-desc{font-size:9px;color:#555;line-height:1.6;padding:0 32px 6px 32px;max-width:600px;}
+.pi-meta{display:flex;gap:14px;padding:3px 32px 7px;flex-wrap:wrap;}
+.pi-meta-item{font-size:9px;color:#666;}
 .pi-meta-item strong{color:#8c6d3f;font-weight:500;}
-.pi-note{font-size:10px;color:#555;line-height:1.65;padding:4px 32px 9px;border-left:none;}
-.pi-sub{display:flex;align-items:baseline;justify-content:space-between;padding:6px 32px 6px 52px;gap:16px;border-bottom:1px solid #f0ece6;}
-.pi-sub .pi-num{color:#888;font-size:9px;}
-.pi-sub .pi-sname{font-size:11px;color:#555;}
-.pi-total{display:flex;align-items:baseline;justify-content:space-between;padding:8px 32px;border-top:1px solid #d0cbc2;background:#faf8f4;}
-.pi-total .lb{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8a8680;}
-.pi-total .vl{font-family:'DM Mono',monospace;font-size:14px;color:#8c6d3f;font-weight:700;}
-.pi-price{font-family:'DM Mono',monospace;font-size:12px;color:#1c1a17;font-weight:600;}
+.pi-note{font-size:9px;color:#555;line-height:1.6;padding:3px 32px 7px;border-left:none;}
+.pi-sub{display:flex;align-items:baseline;justify-content:space-between;padding:4px 32px 4px 50px;gap:16px;border-bottom:1px solid #f0ece6;}
+.pi-sub .pi-num{color:#888;font-size:8px;}
+.pi-sub .pi-sname{font-size:9px;color:#555;}
+.pi-total{display:flex;align-items:baseline;justify-content:space-between;padding:6px 32px;border-top:1px solid #d0cbc2;background:#faf8f4;}
+.pi-total .lb{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#8a8680;}
+.pi-total .vl{font-family:'DM Mono',monospace;font-size:12px;color:#8c6d3f;font-weight:700;}
+.pi-price{font-family:'DM Mono',monospace;font-size:10px;color:#1c1a17;font-weight:600;}
 /* Grand total */
-.pgrand{display:flex;justify-content:space-between;align-items:baseline;padding:14px 32px;border-top:2px solid #1c1a17;margin-top:4px;}
-.pgrand .lb{font-family:'Cormorant Garamond',serif;font-size:18px;color:#1c1a17;font-weight:600;}
-.pgrand .vl{font-family:'DM Mono',monospace;font-size:20px;color:#8c6d3f;font-weight:700;}
+.pgrand{display:flex;justify-content:space-between;align-items:baseline;padding:12px 32px;border-top:2px solid #1c1a17;margin-top:4px;}
+.pgrand .lb{font-family:'Cormorant Garamond',serif;font-size:15px;color:#1c1a17;font-weight:600;}
+.pgrand .vl{font-family:'DM Mono',monospace;font-size:16px;color:#8c6d3f;font-weight:700;}
 /* Footer */
 .pftr{border-top:1px solid #e0dbd2;padding:10px 32px;font-size:9px;color:#8a8680;display:flex;justify-content:space-between;align-items:center;}
 .pact{display:flex;gap:12px;justify-content:center;padding:16px;}
@@ -2319,14 +2319,16 @@ export default function App() {
                       <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1,minWidth:0}}>
                         <span className="pi-num">{baseNum.slice(0,2)}</span>
                         <span className="pi-name">{item.name||`Item ${i+1}`}</span>
-                        {item.type && <span className="pi-type">{item.type}</span>}
                       </div>
-                      <span className="pi-price">{fmt(pt.total)}</span>
+                      {/* Only show total here if no sub-breakdown below */}
+                      {!(hasInstall || (item.alternates||[]).some((_,ai)=>pt.alts[ai]?.total>0)) && (
+                        <span className="pi-price" style={{color:"#8c6d3f"}}>{fmt(pt.total)}</span>
+                      )}
                     </div>
 
-                    {/* Description */}
+                    {/* Description — with top rule, narrower width */}
                     {item.description && (
-                      <div className="pi-desc">{item.description}</div>
+                      <div className="pi-desc" style={{borderTop:"1px solid #ede9e2",paddingTop:6,maxWidth:"51%"}}>{item.description}</div>
                     )}
 
                     {/* Finish / Exclusions inline */}
@@ -2352,9 +2354,9 @@ export default function App() {
                         <div className="pi-sub">
                           <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1}}>
                             <span className="pi-num">{baseNum}</span>
-                            <span className="pi-sname">Fabrication &amp; Finishing</span>
+                            <span className="pi-sname">Fabrication</span>
                           </div>
-                          <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(pt.base.total)}</span>
+                          <span className="pi-price" style={{fontSize:9,color:"#555"}}>{fmt(pt.base.total)}</span>
                         </div>
                         {hasInstall && (
                           <div className="pi-sub">
@@ -2362,7 +2364,7 @@ export default function App() {
                               <span className="pi-num" style={{color:"#5a7a8c"}}>{installNum}</span>
                               <span className="pi-sname">Install{item.installNotes ? ` — ${item.installNotes}` : ""}</span>
                             </div>
-                            <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(pt.install.total)}</span>
+                            <span className="pi-price" style={{fontSize:9,color:"#555"}}>{fmt(pt.install.total)}</span>
                           </div>
                         )}
                         {(item.alternates||[]).map((alt,ai)=>{
@@ -2374,7 +2376,7 @@ export default function App() {
                                 <span className="pi-num" style={{color:"#7a6a9c"}}>{itemNum(i,ai+2)}</span>
                                 <span className="pi-sname">Alt{alt.label?` — ${alt.label}`:""}</span>
                               </div>
-                              <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(altT.total)}</span>
+                              <span className="pi-price" style={{fontSize:9,color:"#555"}}>{fmt(altT.total)}</span>
                             </div>
                           );
                         })}
