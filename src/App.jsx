@@ -302,9 +302,11 @@ const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
       const cat = laborCats.find(c => c.id === l.categoryId);
       return s + (cat ? cat.rate * Number(l.hrs) : 0);
     }, 0);
-    const sub   = matW + labor;
-    const ovAmt = sub * (Number(ovhd) / 100);
-    const mkAmt = (sub + ovAmt) * (Number(mkup) / 100);
+    const sub    = matW + labor;
+    const ovAmt  = sub * (Number(ovhd) / 100);
+    const preMarkup = sub + ovAmt;
+    const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999); // guard against 100%
+    const mkAmt  = preMarkup / (1 - mkupFrac) - preMarkup;
     return { rawMat, matW, labor, sub, ovAmt, mkAmt, total: sub + ovAmt + mkAmt };
   };
 
