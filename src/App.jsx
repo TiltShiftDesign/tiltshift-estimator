@@ -690,13 +690,8 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
   const displayName = line.custom ? (line.customName || "Custom line") : (selected?.name || "— Select material —");
 
   const pick = (mat) => {
-    onUpdMat(line.id, "materialId", mat.id);
-    onUpdMat(line.id, "custom", false);
-    onUpdMat(line.id, "customName", "");
-    // Set default unit
     const defaultUnit = mat.priceLF ? "LF" : mat.priceSF ? "SqFt" : mat.priceEA ? "EA" : mat.priceLB ? "LB" : "LF";
-    onUpdMat(line.id, "unit", defaultUnit);
-    onUpdMat(line.id, "customCost", null);
+    onUpdMat(line.id, { materialId:mat.id, custom:false, customName:"", unit:defaultUnit, customCost:null });
     setSearch("");
     setOpen(false);
   };
@@ -737,9 +732,7 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
             {/* Custom line option */}
             <div
               onClick={() => {
-                onUpdMat(line.id, "custom", true);
-                onUpdMat(line.id, "materialId", null);
-                onUpdMat(line.id, "customCost", line.customCost ?? 0);
+                onUpdMat(line.id, { custom:true, materialId:null, customName:"", customCost:0, unit:"LF" });
                 setSearch(""); setOpen(false);
               }}
               style={{padding:"7px 10px",fontSize:12,cursor:"pointer",borderBottom:"1px solid var(--cream3)",
@@ -853,7 +846,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                                 style={{fontSize:12,minWidth:160}}
                               />
                               <button className="btn-g btn-s" style={{fontSize:10,padding:"3px 7px",flexShrink:0,whiteSpace:"nowrap"}}
-                                onClick={()=>{onUpdMat(line.id,"custom",false);onUpdMat(line.id,"materialId",mats[0]?.id);}}>
+                                onClick={()=>onUpdMat(line.id, { custom:false, materialId:mats[0]?.id, customName:"", customCost:null })}>
                                 Library ↩
                               </button>
                             </div>
@@ -1047,8 +1040,12 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
   const updItem = patch => onUpdate({ ...item, ...patch });
 
   // Fab material helpers
-  const addMatLine = (matId) => updItem({ materialLines: [...(item.materialLines||[]), { id:uid(), materialId:matId||mats[0].id, qty:1, note:"" }] });
-  const updMat = (lid,f,v) => updItem({ materialLines: item.materialLines.map(l => l.id===lid ? {...l,[f]:v} : l) });
+  const addMatLine = (matId) => updItem({ materialLines: [...(item.materialLines||[]), { id:uid(), materialId:matId||mats[0].id, qty:1, unit:"LF", note:"", custom:false, customName:"", customCost:null }] });
+  const updMat = (lid, fieldOrPatch, v) => updItem({ materialLines: item.materialLines.map(l => {
+    if (l.id !== lid) return l;
+    if (typeof fieldOrPatch === "object") return { ...l, ...fieldOrPatch };
+    return { ...l, [fieldOrPatch]: v };
+  })});
   const delMat = lid => updItem({ materialLines: item.materialLines.filter(l => l.id!==lid) });
 
   // Fab labor helpers
@@ -1057,8 +1054,12 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
   const delLab = lid => updItem({ laborLines: item.laborLines.filter(l => l.id!==lid) });
 
   // Install material helpers
-  const addInstMatLine = (matId) => updItem({ installMaterialLines: [...(item.installMaterialLines||[]), { id:uid(), materialId:matId||mats[0].id, qty:1, note:"" }] });
-  const updInstMat = (lid,f,v) => updItem({ installMaterialLines: item.installMaterialLines.map(l => l.id===lid ? {...l,[f]:v} : l) });
+  const addInstMatLine = (matId) => updItem({ installMaterialLines: [...(item.installMaterialLines||[]), { id:uid(), materialId:matId||mats[0].id, qty:1, unit:"LF", note:"", custom:false, customName:"", customCost:null }] });
+  const updInstMat = (lid, fieldOrPatch, v) => updItem({ installMaterialLines: item.installMaterialLines.map(l => {
+    if (l.id !== lid) return l;
+    if (typeof fieldOrPatch === "object") return { ...l, ...fieldOrPatch };
+    return { ...l, [fieldOrPatch]: v };
+  })});
   const delInstMat = lid => updItem({ installMaterialLines: item.installMaterialLines.filter(l => l.id!==lid) });
 
   // Install labor helpers
@@ -2525,9 +2526,9 @@ export default function App() {
                 // If opened from a scope item, add a line for this material immediately
                 if (addMatTargetItemId) {
                   const defaultUnit = newMat.priceLF ? "LF" : newMat.priceEA ? "EA" : newMat.priceLB ? "LB" : "LF";
-                  updScopeItem(actId, addMatTargetItemId, item => ({
-                    ...item,
-                    materialLines: [...(item.materialLines||[]), { id:uid(), materialId:newMat.id, qty:1, unit:defaultUnit, note:"" }]
+                  updScopeItem(actId, addMatTargetItemId, prev => ({
+                    ...prev,
+                    materialLines: [...(prev.materialLines||[]), { id:uid(), materialId:newMat.id, qty:1, unit:defaultUnit, note:"", customCost:null }]
                   }));
                 }
                 setShowAddMat(false);
