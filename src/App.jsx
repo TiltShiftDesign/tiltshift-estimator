@@ -1586,9 +1586,10 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .pact{display:flex;gap:12px;justify-content:center;padding:16px;}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:#fff!important;}
   .pact{display:none!important;}
   .app{display:none!important;}
-  .po{position:static!important;background:none!important;padding:0!important;overflow:visible!important;}
+  .po{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important;}
   .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border:none!important;}
   .pitm{page-break-inside:avoid;break-inside:avoid;}
   .pgrand{page-break-inside:avoid;break-inside:avoid;}
@@ -2328,7 +2329,7 @@ export default function App() {
 
                     {/* Description — with top rule, narrower width */}
                     {item.description && (
-                      <div className="pi-desc" style={{borderTop:"1px solid #ede9e2",paddingTop:6,maxWidth:"65%"}}>{item.description}</div>
+                      <div className="pi-desc" style={{borderTop:"1px solid #ede9e2",paddingTop:6,maxWidth:"70%"}}>{item.description}</div>
                     )}
 
                     {/* Finish / Exclusions inline */}
