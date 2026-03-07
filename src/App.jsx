@@ -1545,46 +1545,54 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .mf{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
 
 /* Proposal */
-.po{position:fixed;inset:0;background:#2a2620;z-index:200;overflow-y:auto;padding:32px 0;}
-.pd{max-width:800px;margin:0 auto;background:#fff;color:#1c1a17;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 0 60px rgba(0,0,0,.5);}
-.pc{background:var(--ink);padding:48px 56px 40px;border-bottom:3px solid var(--bronze);}
-.pc-top{display:flex;align-items:flex-start;justify-content:space-between;}
-.pc-proj{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--white);margin-top:28px;font-weight:300;}
-.pc-meta{display:flex;gap:36px;margin-top:18px;}
-.pmi dt{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#6a6660;}
-.pmi dd{font-size:13px;color:var(--cream);margin-top:3px;}
-.pitm{border-bottom:1px solid #e5e0d8;}
-.pih{background:#f8f5f0;padding:14px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e0d8;}
-.pih h4{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
-.pih .ptype{font-size:10px;color:#8a8680;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
-.pib{padding:20px 40px;}
-.ptbl{width:100%;border-collapse:collapse;margin-bottom:14px;}
-.ptbl th{background:#f5f2ec;padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6b6760;font-weight:500;}
-.ptbl td{padding:6px 10px;border-bottom:1px solid #ede9e0;font-size:11px;}
-.ptbl td:last-child{text-align:right;font-family:'DM Mono',monospace;}
-.pnote{font-size:11px;color:#555;line-height:1.7;background:#faf8f4;padding:12px;border-left:3px solid #d4aa7a;margin-top:12px;}
-.pitot{display:flex;justify-content:flex-end;gap:16px;align-items:center;padding:8px 0 0;border-top:1px solid #ddd;}
-.pitot .lb{font-size:11px;color:#8a8680;}
-.pitot .vl{font-family:'DM Mono',monospace;font-size:13px;color:#8c6d3f;font-weight:600;}
-.psum{padding:28px 40px;}
-.pstbl{width:100%;border-collapse:collapse;margin-top:12px;}
-.pstbl th{padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b6760;border-bottom:1px solid #e5e0d8;text-align:left;}
-.pstbl td{padding:8px 10px;border-bottom:1px solid #f0ece4;font-size:12px;}
-.pstbl td:last-child{text-align:right;font-family:'DM Mono',monospace;font-weight:600;color:#8c6d3f;}
-.pgrand{background:var(--ink);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;}
-.pgrand .lb{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--bronze3);font-weight:300;}
-.pgrand .vl{font-family:'DM Mono',monospace;font-size:24px;color:#fff;}
-.pftr{background:#f5f2ec;padding:16px 40px;font-size:10px;color:#8a8680;display:flex;justify-content:space-between;align-items:center;}
-.pact{display:flex;gap:12px;justify-content:center;padding:20px;}
+.po{position:fixed;inset:0;background:#e8e4de;z-index:200;overflow-y:auto;padding:24px 0;}
+.pd{max-width:760px;margin:0 auto;background:#fff;color:#1c1a17;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 0 40px rgba(0,0,0,.18);border:1px solid #d8d3cb;}
+/* Header — compact, border-only, no filled background */
+.pc{padding:20px 32px 16px;border-bottom:2px solid #1c1a17;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.pc-left{display:flex;flex-direction:column;gap:6px;}
+.pc-proj{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#1c1a17;line-height:1.2;}
+.pc-meta{display:flex;gap:20px;flex-wrap:wrap;}
+.pmi{margin:0;}
+.pmi dt{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#8a8680;}
+.pmi dd{font-size:11px;color:#1c1a17;margin:1px 0 0;font-weight:500;}
+.pc-right{text-align:right;flex-shrink:0;}
+.pc-right .p-label{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:#8a8680;}
+.pc-right .p-date{font-family:'DM Mono',monospace;font-size:11px;color:#555;margin-top:3px;}
+/* Scope items */
+.pitm{border-bottom:1px solid #e0dbd2;page-break-inside:avoid;break-inside:avoid;}
+.pi-row{display:flex;align-items:baseline;justify-content:space-between;padding:9px 32px;gap:16px;border-bottom:1px solid #ede9e2;}
+.pi-row:last-child{border-bottom:none;}
+.pi-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#8c6d3f;min-width:30px;flex-shrink:0;}
+.pi-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#1c1a17;flex:1;}
+.pi-type{font-size:9px;color:#8a8680;text-transform:uppercase;letter-spacing:.1em;margin-left:8px;}
+.pi-desc{font-size:11px;color:#555;line-height:1.6;padding:0 32px 8px 32px;max-width:600px;}
+.pi-meta{display:flex;gap:16px;padding:5px 32px 9px;flex-wrap:wrap;}
+.pi-meta-item{font-size:10px;color:#666;}
+.pi-meta-item strong{color:#8c6d3f;font-weight:500;}
+.pi-note{font-size:10px;color:#555;line-height:1.65;padding:4px 32px 9px;border-left:none;}
+.pi-sub{display:flex;align-items:baseline;justify-content:space-between;padding:6px 32px 6px 52px;gap:16px;border-bottom:1px solid #f0ece6;}
+.pi-sub .pi-num{color:#888;font-size:9px;}
+.pi-sub .pi-sname{font-size:11px;color:#555;}
+.pi-total{display:flex;align-items:baseline;justify-content:space-between;padding:8px 32px;border-top:1px solid #d0cbc2;background:#faf8f4;}
+.pi-total .lb{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8a8680;}
+.pi-total .vl{font-family:'DM Mono',monospace;font-size:14px;color:#8c6d3f;font-weight:700;}
+.pi-price{font-family:'DM Mono',monospace;font-size:12px;color:#1c1a17;font-weight:600;}
+/* Grand total */
+.pgrand{display:flex;justify-content:space-between;align-items:baseline;padding:14px 32px;border-top:2px solid #1c1a17;margin-top:4px;}
+.pgrand .lb{font-family:'Cormorant Garamond',serif;font-size:18px;color:#1c1a17;font-weight:600;}
+.pgrand .vl{font-family:'DM Mono',monospace;font-size:20px;color:#8c6d3f;font-weight:700;}
+/* Footer */
+.pftr{border-top:1px solid #e0dbd2;padding:10px 32px;font-size:9px;color:#8a8680;display:flex;justify-content:space-between;align-items:center;}
+.pact{display:flex;gap:12px;justify-content:center;padding:16px;}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   .pact{display:none!important;}
   .app{display:none!important;}
   .po{position:static!important;background:none!important;padding:0!important;overflow:visible!important;}
-  .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border-radius:0!important;}
+  .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border:none!important;}
   .pitm{page-break-inside:avoid;break-inside:avoid;}
-  .pc{page-break-after:always;break-after:always;}
   .pgrand{page-break-inside:avoid;break-inside:avoid;}
+  .pi-total{background:none!important;}
 }
 `;
 
@@ -2278,201 +2286,121 @@ export default function App() {
               <button className="btn-b" onClick={()=>window.print()}>Print / Save PDF</button>
             </div>
             <div className="pd">
+
+              {/* ── Compact header ── */}
               <div className="pc">
-                <div className="pc-top">
-                  <LogoPrimaryWhite height={100}/>
-                  <div style={{textAlign:"right"}}>
-                    <div style={{fontSize:10,color:"#6a6660",letterSpacing:".2em",textTransform:"uppercase"}}>Estimate / Proposal</div>
-                    <div style={{fontFamily:"'DM Mono',monospace",fontSize:11,color:"#8a8680",marginTop:6}}>{est.date}</div>
+                <div className="pc-left">
+                  <div style={{filter:"invert(1) brightness(0)",display:"inline-block"}}><LogoWordmarkWhite height={18}/></div>
+                  <div className="pc-proj">{est.project||"Project Proposal"}</div>
+                  <div className="pc-meta">
+                    {est.jobNumber && <dl className="pmi"><dt>Job No.</dt><dd>{est.jobNumber}</dd></dl>}
+                    {est.client    && <dl className="pmi"><dt>Prepared For</dt><dd>{est.client}</dd></dl>}
+                    {est.estimator && <dl className="pmi"><dt>Estimator</dt><dd>{est.estimator}</dd></dl>}
                   </div>
                 </div>
-                <div className="pc-proj">{est.project||"Project Proposal"}</div>
-                <div className="pc-meta">
-                  {[
-                    est.jobNumber ? ["Job No.",est.jobNumber] : null,
-                    ["Prepared For",est.client||"—"],
-                    ["Estimator",est.estimator],
-                    ["Scope Items",`${est.scopeItems.length} item${est.scopeItems.length!==1?"s":""}`],
-                  ].filter(Boolean).map(([dt,dd])=>(
-                    <dl key={dt} className="pmi"><dt>{dt}</dt><dd>{dd}</dd></dl>
-                  ))}
+                <div className="pc-right">
+                  <div className="p-label">Estimate / Proposal</div>
+                  <div className="p-date">{est.date}</div>
                 </div>
               </div>
 
-              {/* One section per scope item */}
+              {/* ── One row per scope item ── */}
               {est.scopeItems.map((item,i)=>{
-                const pt      = iT[i];
+                const pt         = iT[i];
                 const baseNum    = itemNum(i, 0);
                 const installNum = itemNum(i, 1);
                 const hasInstall = pt.install.total > 0;
-                const hasAlts    = (item.alternates||[]).filter((_,ai)=>pt.alts[ai]?.total>0).length > 0;
 
                 return (
                   <div key={item.id} className="pitm">
 
-                    {/* ── Item header ── */}
-                    <div style={{
-                      padding:"20px 40px 18px",
-                      borderBottom:"1px solid #e5e0d8",
-                      background:"#faf7f2",
-                    }}>
-                      {/* Number + Name + Total */}
-                      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:16}}>
-                        <div style={{flex:1}}>
-                          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}>
-                            <span style={{
-                              fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:700,
-                              color:"#8c6d3f",background:"#ede8df",border:"1px solid #d4aa7a",
-                              padding:"2px 8px",borderRadius:2,flexShrink:0,letterSpacing:".05em",
-                            }}>{baseNum.slice(0,2)}</span>
-                            <h4 style={{
-                              margin:0,fontFamily:"'Cormorant Garamond',serif",
-                              fontSize:20,fontWeight:600,color:"#1c1a17",lineHeight:1.2,
-                            }}>{item.name||`Item ${i+1}`}</h4>
-                          </div>
-                          {item.type && (
-                            <div style={{
-                              fontSize:10,color:"#8a8680",textTransform:"uppercase",
-                              letterSpacing:".12em",marginBottom:item.description?6:0,
-                              marginLeft:2,
-                            }}>{item.type}</div>
-                          )}
-                          {item.description && (
-                            <p style={{
-                              margin:"6px 0 0",fontSize:12,color:"#3a3730",
-                              lineHeight:1.65,maxWidth:560,
-                            }}>{item.description}</p>
-                          )}
-                        </div>
-                        <div style={{textAlign:"right",flexShrink:0}}>
-                          <div style={{
-                            fontFamily:"'DM Mono',monospace",fontSize:20,
-                            color:"#8c6d3f",fontWeight:600,
-                          }}>{fmt(pt.total)}</div>
-                          <div style={{fontSize:10,color:"#8a8680",marginTop:2,letterSpacing:".06em"}}>TOTAL BID</div>
-                        </div>
+                    {/* Name + total */}
+                    <div className="pi-row">
+                      <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1,minWidth:0}}>
+                        <span className="pi-num">{baseNum.slice(0,2)}</span>
+                        <span className="pi-name">{item.name||`Item ${i+1}`}</span>
+                        {item.type && <span className="pi-type">{item.type}</span>}
                       </div>
-
-                      {/* Finish + Exclusions row */}
-                      {(item.finish || (item.exclusions||[]).length>0) && (
-                        <div style={{
-                          marginTop:14,paddingTop:12,
-                          borderTop:"1px solid #e5dfd5",
-                          display:"flex",flexWrap:"wrap",gap:16,
-                        }}>
-                          {item.finish && (
-                            <div style={{display:"flex",alignItems:"center",gap:8}}>
-                              <span style={{fontSize:10,color:"#8a8680",textTransform:"uppercase",letterSpacing:".1em",fontWeight:500}}>Finish</span>
-                              <span style={{
-                                fontSize:11,padding:"3px 10px",borderRadius:10,
-                                background:"#f5efe6",border:"1px solid #d4aa7a",color:"#8c6d3f",fontWeight:500,
-                              }}>{item.finish}</span>
-                            </div>
-                          )}
-                          {(item.exclusions||[]).length>0 && (
-                            <div style={{display:"flex",alignItems:"baseline",gap:6,flexWrap:"wrap"}}>
-                              <span style={{fontSize:10,color:"#8a8680",textTransform:"uppercase",letterSpacing:".1em",fontWeight:500,flexShrink:0}}>Excludes</span>
-                              <span style={{fontSize:11,color:"#555"}}>
-                                {item.exclusions.join(" · ")}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Notes */}
-                      {item.notes && (
-                        <div style={{
-                          marginTop:12,padding:"10px 14px",
-                          background:"#fff",border:"none",
-                          borderLeft:"3px solid #d4aa7a",
-                          fontSize:11,color:"#555",lineHeight:1.7,
-                        }}>{item.notes}</div>
-                      )}
+                      <span className="pi-price">{fmt(pt.total)}</span>
                     </div>
 
-                    {/* ── Pricing rows ── */}
-                    <div style={{background:"#fff"}}>
-                      {/* XX.0 Fabrication price row */}
-                      <div style={{
-                        display:"flex",alignItems:"center",justifyContent:"space-between",
-                        padding:"13px 40px",borderBottom:"1px solid #f0ece4",
-                      }}>
-                        <div style={{display:"flex",alignItems:"center",gap:10}}>
-                          <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:700,color:"#8c6d3f",minWidth:34}}>{baseNum}</span>
-                          <span style={{fontSize:12,color:"#3a3730",fontWeight:500}}>Fabrication &amp; Finishing</span>
-                        </div>
-                        <span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#1c1a17",fontWeight:600}}>{fmt(pt.base.total)}</span>
+                    {/* Description */}
+                    {item.description && (
+                      <div className="pi-desc">{item.description}</div>
+                    )}
+
+                    {/* Finish / Exclusions inline */}
+                    {(item.finish || (item.exclusions||[]).length>0) && (
+                      <div className="pi-meta">
+                        {item.finish && (
+                          <span className="pi-meta-item"><strong>Finish:</strong> {item.finish}</span>
+                        )}
+                        {(item.exclusions||[]).length>0 && (
+                          <span className="pi-meta-item"><strong>Excludes:</strong> {item.exclusions.join(", ")}</span>
+                        )}
                       </div>
+                    )}
 
-                      {/* XX.1 Install price row */}
-                      {hasInstall && (
-                        <div style={{
-                          display:"flex",alignItems:"center",justifyContent:"space-between",
-                          padding:"13px 40px",borderBottom:"1px solid #f0ece4",
-                        }}>
-                          <div style={{display:"flex",alignItems:"center",gap:10}}>
-                            <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:700,color:"#5a7a8c",minWidth:34}}>{installNum}</span>
-                            <span style={{fontSize:12,color:"#3a3730",fontWeight:500}}>Install</span>
+                    {/* Notes */}
+                    {item.notes && (
+                      <div className="pi-note">{item.notes}</div>
+                    )}
+
+                    {/* Sub-line rows only if install or alternates present */}
+                    {(hasInstall || (item.alternates||[]).some((_,ai)=>pt.alts[ai]?.total>0)) && (
+                      <div>
+                        <div className="pi-sub">
+                          <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1}}>
+                            <span className="pi-num">{baseNum}</span>
+                            <span className="pi-sname">Fabrication &amp; Finishing</span>
                           </div>
-                          <span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#1c1a17",fontWeight:600}}>{fmt(pt.install.total)}</span>
+                          <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(pt.base.total)}</span>
                         </div>
-                      )}
-
-                      {/* Install notes if any */}
-                      {item.installNotes && (
-                        <div style={{
-                          padding:"8px 40px 12px",
-                          fontSize:11,color:"#555",lineHeight:1.65,
-                          borderBottom:"1px solid #f0ece4",
-                        }}>{item.installNotes}</div>
-                      )}
-
-                      {/* Alternate price rows */}
-                      {(item.alternates||[]).map((alt,ai)=>{
-                        const altNum = itemNum(i, ai+2);
-                        const altT   = pt.alts[ai] || {total:0};
-                        if (altT.total <= 0) return null;
-                        return (
-                          <div key={alt.id} style={{
-                            display:"flex",alignItems:"center",justifyContent:"space-between",
-                            padding:"13px 40px",borderBottom:"1px solid #f0ece4",
-                            background:"#fdf9ff",
-                          }}>
-                            <div style={{display:"flex",alignItems:"center",gap:10}}>
-                              <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:700,color:"#7a6a9c",minWidth:34}}>{altNum}</span>
-                              <span style={{fontSize:12,color:"#3a3730",fontWeight:500}}>
-                                Alternate{alt.label ? ` — ${alt.label}` : ""}
-                              </span>
+                        {hasInstall && (
+                          <div className="pi-sub">
+                            <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1}}>
+                              <span className="pi-num" style={{color:"#5a7a8c"}}>{installNum}</span>
+                              <span className="pi-sname">Install{item.installNotes ? ` — ${item.installNotes}` : ""}</span>
                             </div>
-                            <span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#1c1a17",fontWeight:600}}>{fmt(altT.total)}</span>
+                            <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(pt.install.total)}</span>
                           </div>
-                        );
-                      })}
-
-                      {/* Item total bar */}
-                      <div style={{
-                        display:"flex",alignItems:"center",justifyContent:"space-between",
-                        padding:"14px 40px",background:"#f5f0e8",
-                        borderTop:"1px solid #d4c8b8",
-                      }}>
-                        <span style={{fontSize:11,color:"#8a8680",letterSpacing:".06em",textTransform:"uppercase",fontWeight:500}}>
-                          Item {baseNum.slice(0,2)} Total
-                        </span>
-                        <span style={{fontFamily:"'DM Mono',monospace",fontSize:15,color:"#8c6d3f",fontWeight:700}}>{fmt(pt.total)}</span>
+                        )}
+                        {(item.alternates||[]).map((alt,ai)=>{
+                          const altT = pt.alts[ai]||{total:0};
+                          if (altT.total<=0) return null;
+                          return (
+                            <div key={alt.id} className="pi-sub">
+                              <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1}}>
+                                <span className="pi-num" style={{color:"#7a6a9c"}}>{itemNum(i,ai+2)}</span>
+                                <span className="pi-sname">Alt{alt.label?` — ${alt.label}`:""}</span>
+                              </div>
+                              <span className="pi-price" style={{fontSize:11,color:"#555"}}>{fmt(altT.total)}</span>
+                            </div>
+                          );
+                        })}
+                        <div className="pi-total">
+                          <span className="lb">Item {baseNum.slice(0,2)} Total</span>
+                          <span className="vl">{fmt(pt.total)}</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                   </div>
                 );
               })}
 
-              <div className="pgrand"><span className="lb">Total Bid Price</span><span className="vl">{fmt(grand)}</span></div>
+              {/* ── Grand total ── */}
+              <div className="pgrand">
+                <span className="lb">Total Bid Price</span>
+                <span className="vl">{fmt(grand)}</span>
+              </div>
+
+              {/* ── Footer ── */}
               <div className="pftr">
-                <LogoMarkWhite height={20}/>
-                <span>tiltshiftdesign.com · Bellingham, WA</span>
+                <span>Tilt Shift Design · tiltshiftdesign.com · Bellingham, WA</span>
                 <span>Estimate valid 30 days · Prices subject to material market conditions</span>
               </div>
+
             </div>
           </div>
         );
