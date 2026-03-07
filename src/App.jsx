@@ -1505,7 +1505,12 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .tr{margin-left:auto;}
 .body{display:flex;flex:1;overflow:hidden;}
 
-.sidebar{width:288px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;}
+.sidebar.open{width:288px;}
+.sidebar.closed{width:32px;overflow:hidden;}
+.sidebar-toggle{width:32px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--ink3);font-size:13px;flex-shrink:0;transition:color .15s;}
+.sidebar-toggle:hover{color:var(--bronze);background:var(--cream);}
+.sidebar-content{display:flex;flex-direction:column;flex:1;overflow:hidden;}
 .sh{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .sh h3{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--ink2);}
 .elist{flex:1;overflow-y:auto;padding:10px;}
@@ -1619,6 +1624,7 @@ export default function App() {
 
   // ── Core state ──────────────────────────────────────────────────────────────
   const [tab, setTab]         = useState("estimate");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [ests, setEsts]       = useState([]);
   const [actId, setActId]     = useState(null);
   const [mats, setMats]       = useState(DEFAULT_MATERIALS);
@@ -1861,36 +1867,44 @@ export default function App() {
         <div className="body">
           {/* SIDEBAR */}
           {(tab==="estimate"||tab==="history") && (
-            <aside className="sidebar">
-              <div className="sh">
-                <h3>Estimates</h3>
-                <span style={{fontSize:11,color:"var(--ink3)"}}>{ests.length} total</span>
-              </div>
-              <div className="elist">
-                {ests.length===0 && <div style={{padding:"24px 12px",color:"var(--ink3)",textAlign:"center",fontSize:12,lineHeight:1.7}}>No estimates yet.<br/>Click <strong>+ New Estimate</strong> to begin.</div>}
-                {ests.map(est=>{
-                  const {total}=allTotals(est);
-                  return (
-                    <div key={est.id} className={`ecard${actId===est.id?" act":""}`} onClick={()=>{setActId(est.id);setTab("estimate");}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-                        <div className="ename" style={{flex:1,minWidth:0}}>{est.project||"Untitled Project"}</div>
-                        <button className="btn-d" style={{flexShrink:0,marginLeft:6,fontSize:11,padding:"1px 6px"}}
-                          onClick={e=>{e.stopPropagation();if(confirm(`Delete "${est.project||"Untitled Project"}"?`))delEst(est.id);}}>✕</button>
-                      </div>
-                      {est.jobNumber && <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"var(--bronze)",marginTop:2,fontWeight:500}}>{est.jobNumber}</div>}
-                      <div className="emeta">{est.client} · {est.date}</div>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
-                        <span className={`sbadge sb-${est.status}`}>{est.status}</span>
-                        <span className="etotal">{total?fmt(total):"—"}</span>
-                      </div>
-                      <div style={{marginTop:5,fontSize:10,color:"var(--ink3)"}}>
-                        {est.scopeItems.length} item{est.scopeItems.length!==1?"s":""}
-                        {est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ") && ` · ${est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ")}`}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+              <button className="sidebar-toggle" onClick={()=>setSidebarOpen(o=>!o)}
+                title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}>
+                {sidebarOpen ? "‹" : "›"}
+              </button>
+              {sidebarOpen && (
+                <div className="sidebar-content">
+                  <div className="sh">
+                    <h3>Estimates</h3>
+                    <span style={{fontSize:11,color:"var(--ink3)"}}>{ests.length} total</span>
+                  </div>
+                  <div className="elist">
+                    {ests.length===0 && <div style={{padding:"24px 12px",color:"var(--ink3)",textAlign:"center",fontSize:12,lineHeight:1.7}}>No estimates yet.<br/>Click <strong>+ New Estimate</strong> to begin.</div>}
+                    {ests.map(est=>{
+                      const {total}=allTotals(est);
+                      return (
+                        <div key={est.id} className={`ecard${actId===est.id?" act":""}`} onClick={()=>{setActId(est.id);setTab("estimate");}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                            <div className="ename" style={{flex:1,minWidth:0}}>{est.project||"Untitled Project"}</div>
+                            <button className="btn-d" style={{flexShrink:0,marginLeft:6,fontSize:11,padding:"1px 6px"}}
+                              onClick={e=>{e.stopPropagation();if(confirm(`Delete "${est.project||"Untitled Project"}"?`))delEst(est.id);}}>✕</button>
+                          </div>
+                          {est.jobNumber && <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"var(--bronze)",marginTop:2,fontWeight:500}}>{est.jobNumber}</div>}
+                          <div className="emeta">{est.client} · {est.date}</div>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
+                            <span className={`sbadge sb-${est.status}`}>{est.status}</span>
+                            <span className="etotal">{total?fmt(total):"—"}</span>
+                          </div>
+                          <div style={{marginTop:5,fontSize:10,color:"var(--ink3)"}}>
+                            {est.scopeItems.length} item{est.scopeItems.length!==1?"s":""}
+                            {est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ") && ` · ${est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ")}`}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </aside>
           )}
 
