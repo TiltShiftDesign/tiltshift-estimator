@@ -1585,12 +1585,11 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .pftr{border-top:1px solid #e0dbd2;padding:10px 32px;font-size:9px;color:#8a8680;display:flex;justify-content:space-between;align-items:center;}
 .pact{display:flex;gap:12px;justify-content:center;padding:16px;}
 @media print{
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  html,body{background:#fff!important;}
+  html,body,.po{background:#fff!important;-webkit-print-color-adjust:economy!important;print-color-adjust:economy!important;}
   .pact{display:none!important;}
   .app{display:none!important;}
-  .po{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important;}
-  .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border:none!important;}
+  .po{position:static!important;padding:0!important;overflow:visible!important;}
+  .pd{box-shadow:none!important;max-width:none!important;width:100%!important;border:none!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   .pitm{page-break-inside:avoid;break-inside:avoid;}
   .pgrand{page-break-inside:avoid;break-inside:avoid;}
   .pi-total{background:none!important;}
