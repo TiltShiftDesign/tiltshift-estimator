@@ -292,8 +292,10 @@ const matUnitPrice = (m, unit) => {
 const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
   const calcLines = (matLines, labLines) => {
     const rawMat = matLines.reduce((s,l) => {
+      if (l.custom) return s + (Number(l.customCost)||0) * Number(l.qty);
       const m = mats.find(x => x.id === l.materialId);
-      return s + matUnitPrice(m, l.unit) * Number(l.qty);
+      const price = l.customCost != null ? Number(l.customCost) : matUnitPrice(m, l.unit);
+      return s + price * Number(l.qty);
     }, 0);
     const matW  = rawMat * (1 + Number(wastePct) / 100);
     const labor = labLines.reduce((s,l) => {
@@ -665,6 +667,128 @@ function CalcBtn({ hasCalc, onClick, active }) {
   );
 }
 
+// ── Searchable material picker ────────────────────────────────────────────────
+function MatPicker({ line, mats, matCategories, onUpdMat }) {
+  const [search, setSearch] = useState("");
+  const [open,   setOpen]   = useState(false);
+  const ref = useRef(null);
+
+  const MAT_CATS = matCategories || [];
+  const q = search.toLowerCase();
+  const filtered = q
+    ? mats.filter(x => x.name.toLowerCase().includes(q) || x.category.toLowerCase().includes(q))
+    : mats;
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = line.custom ? null : mats.find(x => x.id === line.materialId);
+  const displayName = line.custom ? (line.customName || "Custom line") : (selected?.name || "— Select material —");
+
+  const pick = (mat) => {
+    onUpdMat(line.id, "materialId", mat.id);
+    onUpdMat(line.id, "custom", false);
+    onUpdMat(line.id, "customName", "");
+    // Set default unit
+    const defaultUnit = mat.priceLF ? "LF" : mat.priceSF ? "SqFt" : mat.priceEA ? "EA" : mat.priceLB ? "LB" : "LF";
+    onUpdMat(line.id, "unit", defaultUnit);
+    onUpdMat(line.id, "customCost", null);
+    setSearch("");
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} style={{position:"relative",minWidth:200}}>
+      <div
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display:"flex",alignItems:"center",justifyContent:"space-between",
+          padding:"5px 8px",border:"1px solid var(--border2)",borderRadius:2,
+          background:"var(--white)",cursor:"pointer",fontSize:12,gap:6,
+          borderColor: open ? "var(--bronze)" : "var(--border2)",
+        }}
+      >
+        <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",
+          color: line.custom ? "var(--ink2)" : selected ? "var(--ink)" : "var(--ink3)"
+        }}>{displayName}</span>
+        <span style={{fontSize:9,color:"var(--ink3)",flexShrink:0}}>▾</span>
+      </div>
+      {open && (
+        <div style={{
+          position:"absolute",top:"100%",left:0,zIndex:999,width:320,
+          background:"var(--white)",border:"1px solid var(--border2)",borderRadius:2,
+          boxShadow:"0 4px 16px rgba(28,26,23,.15)",maxHeight:320,display:"flex",flexDirection:"column",
+        }}>
+          <div style={{padding:"6px 8px",borderBottom:"1px solid var(--cream3)"}}>
+            <input
+              autoFocus
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search materials…"
+              style={{fontSize:12,width:"100%"}}
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
+          <div style={{overflowY:"auto",flex:1}}>
+            {/* Custom line option */}
+            <div
+              onClick={() => {
+                onUpdMat(line.id, "custom", true);
+                onUpdMat(line.id, "materialId", null);
+                onUpdMat(line.id, "customCost", line.customCost ?? 0);
+                setSearch(""); setOpen(false);
+              }}
+              style={{padding:"7px 10px",fontSize:12,cursor:"pointer",borderBottom:"1px solid var(--cream3)",
+                color:"var(--bronze)",fontWeight:500,background:"var(--cream)"}}
+            >
+              + Custom line (not in library)
+            </div>
+            {q
+              ? filtered.map(x => (
+                  <div key={x.id} onClick={() => pick(x)}
+                    style={{padding:"6px 10px",fontSize:12,cursor:"pointer",
+                      background: x.id===line.materialId ? "var(--cream2)" : "var(--white)",
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
+                    onMouseLeave={e=>e.currentTarget.style.background= x.id===line.materialId?"var(--cream2)":"var(--white)"}
+                  >
+                    <span style={{color:"var(--ink3)",fontSize:10,marginRight:6}}>{x.category}</span>{x.name}
+                  </div>
+                ))
+              : MAT_CATS.map(cat => {
+                  const items = mats.filter(x => x.category === cat);
+                  if (!items.length) return null;
+                  return (
+                    <div key={cat}>
+                      <div style={{padding:"5px 10px",fontSize:10,fontWeight:600,letterSpacing:".08em",
+                        textTransform:"uppercase",color:"var(--ink3)",background:"var(--cream2)",
+                        borderBottom:"1px solid var(--cream3)"}}>
+                        {cat}
+                      </div>
+                      {items.map(x => (
+                        <div key={x.id} onClick={() => pick(x)}
+                          style={{padding:"6px 10px 6px 16px",fontSize:12,cursor:"pointer",
+                            background: x.id===line.materialId ? "var(--cream2)" : "var(--white)",
+                          }}
+                          onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
+                          onMouseLeave={e=>e.currentTarget.style.background= x.id===line.materialId?"var(--cream2)":"var(--white)"}
+                        >{x.name}</div>
+                      ))}
+                    </div>
+                  );
+                })
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Reusable lines editor (materials + labor in one panel) ───────────────────
 function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, onDelMat, onAddMat,
   onUpdLab, onDelLab, onAddLab, matCategory, onAddToLibrary, matCategories }) {
@@ -673,7 +797,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
     ? (mats.find(x=>x.category===matCategory)||mats[0]).id
     : mats[0].id;
 
-  const [openCalc, setOpenCalc] = useState(null); // line id or null
+  const [openCalc, setOpenCalc] = useState(null);
   const toggleCalc = id => setOpenCalc(c => c === id ? null : id);
 
   return (
@@ -689,7 +813,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                 + New Material to Library
               </button>
             )}
-            <button className="btn-g btn-s" onClick={()=>onAddMat(firstMatId)}>+ Add Material</button>
+            <button className="btn-g btn-s" onClick={()=>onAddMat(firstMatId)}>+ Add Line</button>
           </div>
         </div>
         {matLines.length===0
@@ -699,49 +823,79 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                 <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>
               ))}</tr></thead>
               <tbody>{matLines.map(line=>{
-                const m = mats.find(x=>x.id===line.materialId);
+                const m = line.custom ? null : mats.find(x=>x.id===line.materialId);
                 const lineUnit = line.unit || (m?.priceSF ? "SqFt" : "LF");
-                const unitPrice = matUnitPrice(m, lineUnit);
+                // Unit cost: custom override wins, then library price
+                const libraryPrice = matUnitPrice(m, lineUnit);
+                const unitPrice = line.customCost != null ? Number(line.customCost) : libraryPrice;
                 const ext = unitPrice * Number(line.qty);
-                // Available units for this material
-                const availUnits = m ? [
-                  ...(m.priceLF ? ["LF"] : []),
-                  ...(m.priceSF ? ["SqFt"] : []),
-                  ...(m.priceLB ? ["LB"] : []),
-                  ...(m.priceEA ? ["EA"] : []),
-                ] : ["LF","LB","EA"];
+                const availUnits = line.custom
+                  ? ["LF","SqFt","LB","EA"]
+                  : m ? [
+                      ...(m.priceLF ? ["LF"] : []),
+                      ...(m.priceSF ? ["SqFt"] : []),
+                      ...(m.priceLB ? ["LB"] : []),
+                      ...(m.priceEA ? ["EA"] : []),
+                    ] : ["LF","LB","EA"];
                 const isOpen = openCalc === line.id;
+                const bb = isOpen ? "none" : "1px solid var(--cream3)";
                 return (
                   <Fragment key={line.id}>
                     <tr>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle"}}>
-                        <select value={line.materialId} onChange={e=>onUpdMat(line.id,"materialId",e.target.value)} style={{minWidth:180,fontSize:12}}>
-                          {MAT_CATS.map(cat=>(
-                            <optgroup key={cat} label={cat}>
-                              {mats.filter(x=>x.category===cat).map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
-                            </optgroup>
-                          ))}
-                        </select>
+                      {/* Material picker */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle"}}>
+                        {line.custom
+                          ? <div style={{display:"flex",gap:4,alignItems:"center"}}>
+                              <input
+                                value={line.customName||""}
+                                onChange={e=>onUpdMat(line.id,"customName",e.target.value)}
+                                placeholder="Custom material name…"
+                                style={{fontSize:12,minWidth:160}}
+                              />
+                              <button className="btn-g btn-s" style={{fontSize:10,padding:"3px 7px",flexShrink:0,whiteSpace:"nowrap"}}
+                                onClick={()=>{onUpdMat(line.id,"custom",false);onUpdMat(line.id,"materialId",mats[0]?.id);}}>
+                                Library ↩
+                              </button>
+                            </div>
+                          : <MatPicker line={line} mats={mats} matCategories={MAT_CATS} onUpdMat={onUpdMat}/>
+                        }
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:68}}>
-                        <input type="number" min="0" value={line.qty} onChange={e=>onUpdMat(line.id,"qty",e.target.value)} style={{fontSize:12}}/>
+                      {/* Qty */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:68}}>
+                        <input type="number" min="0" value={line.qty}
+                          onChange={e=>onUpdMat(line.id,"qty",e.target.value)} style={{fontSize:12}}/>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:72}}>
+                      {/* Unit */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:72}}>
                         <select value={lineUnit} onChange={e=>onUpdMat(line.id,"unit",e.target.value)} style={{fontSize:12,width:"100%"}}>
                           {availUnits.map(u=><option key={u} value={u}>{u}</option>)}
                         </select>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:86,textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>{m ? fmt(unitPrice) : "—"}</td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:96}}>
+                      {/* Unit cost — editable, shows library price as placeholder */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:96}}>
+                        <input
+                          type="number" min="0" step="0.01"
+                          value={line.customCost != null ? line.customCost : libraryPrice}
+                          onChange={e => onUpdMat(line.id, "customCost", e.target.value === "" ? null : parseFloat(e.target.value)||0)}
+                          style={{
+                            fontSize:11,fontFamily:"'DM Mono',monospace",width:"100%",
+                            color: line.customCost != null ? "var(--bronze2)" : "var(--ink3)",
+                          }}
+                          title={line.customCost != null ? "Custom price (overriding library)" : "Library price — edit to override"}
+                        />
+                      </td>
+                      {/* Extended */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:90}}>
                         <span style={{color:"var(--bronze)",fontWeight:600,fontFamily:"'DM Mono',monospace",fontSize:12}}>{fmt(ext)}</span>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle"}}>
-                        <input value={line.note} onChange={e=>onUpdMat(line.id,"note",e.target.value)} placeholder="Note" style={{fontSize:12}}/>
+                      {/* Note */}
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle"}}>
+                        <input value={line.note||""} onChange={e=>onUpdMat(line.id,"note",e.target.value)} placeholder="Note" style={{fontSize:12}}/>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:36,textAlign:"center"}}>
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:36,textAlign:"center"}}>
                         <CalcBtn hasCalc={!!(line.calc?.steps?.length)} active={isOpen} onClick={()=>toggleCalc(line.id)}/>
                       </td>
-                      <td style={{padding:"4px 7px",borderBottom: isOpen ? "none" : "1px solid var(--cream3)",verticalAlign:"middle",width:38,textAlign:"center"}}>
+                      <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:38,textAlign:"center"}}>
                         <button className="btn-d" onClick={()=>onDelMat(line.id)}>✕</button>
                       </td>
                     </tr>
@@ -750,7 +904,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                         <td colSpan={8} style={{padding:"0 7px 10px",borderBottom:"1px solid var(--cream3)"}}>
                           <CalcPanel
                             calc={line.calc}
-                            fieldLabel={m?.name || "Qty"}
+                            fieldLabel={line.custom ? (line.customName||"Custom") : (m?.name || "Qty")}
                             fieldUnit="qty"
                             onChange={newCalc => onUpdMat(line.id,"calc",newCalc)}
                             onApply={val => { onUpdMat(line.id,"qty",val); toggleCalc(line.id); }}
@@ -1624,8 +1778,11 @@ export default function App() {
   const addScopeItem = useCallback((estId) => {
     setEsts(p => p.map(e => e.id!==estId ? e : {...e, scopeItems:[...e.scopeItems, blankScopeItem()]}));
   }, []);
-  const updScopeItem = useCallback((estId, itemId, newItem) => {
-    setEsts(p => p.map(e => e.id!==estId ? e : {...e, scopeItems:e.scopeItems.map(i=>i.id===itemId?newItem:i)}));
+  const updScopeItem = useCallback((estId, itemId, newItemOrFn) => {
+    setEsts(p => p.map(e => e.id!==estId ? e : {...e, scopeItems:e.scopeItems.map(i => {
+      if (i.id !== itemId) return i;
+      return typeof newItemOrFn === "function" ? newItemOrFn(i) : newItemOrFn;
+    })}));
   }, []);
   const delScopeItem = useCallback((estId, itemId) => {
     setEsts(p => p.map(e => e.id!==estId ? e : {...e, scopeItems:e.scopeItems.filter(i=>i.id!==itemId)}));
