@@ -96,138 +96,364 @@ const DEFAULT_LABOR_CATEGORIES = [
   },
 ];
 
+const DEFAULT_MAT_CATEGORIES = [
+  "Square Tube","Rectangular Tube","Round HSS","Pipe",
+  "Angle","Flat Bar","Round Bar","Square Bar",
+  "Standard Channel","Misc Channel",
+  "Wide Flange Beam","I-Beam",
+  "Sheet","Plate",
+  "Hardware","Install Materials",
+];
+
 const DEFAULT_MATERIALS = [
-  // ── SQUARE TUBE (A500 / A36) ──────────────────────────────────────────────────
-  { id:"sq01", category:"Square Tube", name:'3/4" × 3/4" Sq Tube 16ga', priceLF:0.84, priceLB:1.02, priceEA:16.8 },
-  { id:"sq02", category:"Square Tube", name:'1" × 1" Sq Tube 16ga', priceLF:1.12, priceLB:1.02, priceEA:22.4 },
-  { id:"sq03", category:"Square Tube", name:'1" × 1" Sq Tube 11ga', priceLF:1.62, priceLB:1.02, priceEA:32.4 },
-  { id:"sq04", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 16ga', priceLF:1.73, priceLB:1.02, priceEA:34.6 },
-  { id:"sq05", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 11ga', priceLF:2.55, priceLB:1.02, priceEA:51.0 },
-  { id:"sq06", category:"Square Tube", name:'1.5" × 1.5" Sq Tube 3/16"', priceLF:3.47, priceLB:1.02, priceEA:69.4 },
-  { id:"sq07", category:"Square Tube", name:'2" × 2" Sq Tube 16ga', priceLF:2.35, priceLB:1.02, priceEA:47.0 },
-  { id:"sq08", category:"Square Tube", name:'2" × 2" Sq Tube 11ga', priceLF:3.57, priceLB:1.02, priceEA:71.4 },
-  { id:"sq09", category:"Square Tube", name:'2" × 2" Sq Tube 3/16"', priceLF:4.8, priceLB:1.02, priceEA:96.0 },
-  { id:"sq10", category:"Square Tube", name:'2" × 2" Sq Tube 1/4"', priceLF:6.22, priceLB:1.02, priceEA:124.4 },
-  { id:"sq11", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 11ga', priceLF:4.49, priceLB:1.02, priceEA:89.8 },
-  { id:"sq12", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 3/16"', priceLF:6.02, priceLB:1.02, priceEA:120.4 },
-  { id:"sq13", category:"Square Tube", name:'2.5" × 2.5" Sq Tube 1/4"', priceLF:7.86, priceLB:1.02, priceEA:157.2 },
-  { id:"sq14", category:"Square Tube", name:'3" × 3" Sq Tube 11ga', priceLF:5.41, priceLB:1.02, priceEA:108.2 },
-  { id:"sq15", category:"Square Tube", name:'3" × 3" Sq Tube 3/16"', priceLF:7.24, priceLB:1.02, priceEA:144.8 },
-  { id:"sq16", category:"Square Tube", name:'3" × 3" Sq Tube 1/4"', priceLF:9.49, priceLB:1.02, priceEA:189.8 },
-  { id:"sq17", category:"Square Tube", name:'4" × 4" Sq Tube 3/16"', priceLF:9.69, priceLB:1.02, priceEA:193.8 },
-  { id:"sq18", category:"Square Tube", name:'4" × 4" Sq Tube 1/4"', priceLF:12.74, priceLB:1.02, priceEA:254.8 },
+  // ── SQUARE TUBE (A500 Gr B / ASTM A1085) lb/ft from AISC, price ~$1.00-1.05/lb PNW ─
+  { id:"sq01", category:"Square Tube", name:'1" × 1" × 14ga (0.083")',    priceLF:1.19, priceLB:1.02, priceEA:23.8  },
+  { id:"sq02", category:"Square Tube", name:'1" × 1" × 11ga (0.120")',    priceLF:1.65, priceLB:1.02, priceEA:33.0  },
+  { id:"sq03", category:"Square Tube", name:'1" × 1" × 3/16"',            priceLF:2.37, priceLB:1.02, priceEA:47.4  },
+  { id:"sq04", category:"Square Tube", name:'1-1/4" × 1-1/4" × 14ga',    priceLF:1.52, priceLB:1.02, priceEA:30.4  },
+  { id:"sq05", category:"Square Tube", name:'1-1/4" × 1-1/4" × 11ga',    priceLF:2.11, priceLB:1.02, priceEA:42.2  },
+  { id:"sq06", category:"Square Tube", name:'1-1/2" × 1-1/2" × 14ga',    priceLF:1.84, priceLB:1.02, priceEA:36.8  },
+  { id:"sq07", category:"Square Tube", name:'1-1/2" × 1-1/2" × 11ga',    priceLF:2.55, priceLB:1.02, priceEA:51.0  },
+  { id:"sq08", category:"Square Tube", name:'1-1/2" × 1-1/2" × 3/16"',   priceLF:3.47, priceLB:1.02, priceEA:69.4  },
+  { id:"sq09", category:"Square Tube", name:'2" × 2" × 14ga',             priceLF:2.45, priceLB:1.02, priceEA:49.0  },
+  { id:"sq10", category:"Square Tube", name:'2" × 2" × 11ga',             priceLF:3.35, priceLB:1.02, priceEA:67.0  },
+  { id:"sq11", category:"Square Tube", name:'2" × 2" × 3/16"',            priceLF:4.80, priceLB:1.02, priceEA:96.0  },
+  { id:"sq12", category:"Square Tube", name:'2" × 2" × 1/4"',             priceLF:6.22, priceLB:1.02, priceEA:124.4 },
+  { id:"sq13", category:"Square Tube", name:'2-1/2" × 2-1/2" × 11ga',    priceLF:4.19, priceLB:1.02, priceEA:83.8  },
+  { id:"sq14", category:"Square Tube", name:'2-1/2" × 2-1/2" × 3/16"',   priceLF:6.02, priceLB:1.02, priceEA:120.4 },
+  { id:"sq15", category:"Square Tube", name:'2-1/2" × 2-1/2" × 1/4"',    priceLF:7.86, priceLB:1.02, priceEA:157.2 },
+  { id:"sq16", category:"Square Tube", name:'3" × 3" × 11ga',             priceLF:5.11, priceLB:1.02, priceEA:102.2 },
+  { id:"sq17", category:"Square Tube", name:'3" × 3" × 3/16"',            priceLF:7.24, priceLB:1.02, priceEA:144.8 },
+  { id:"sq18", category:"Square Tube", name:'3" × 3" × 1/4"',             priceLF:9.49, priceLB:1.02, priceEA:189.8 },
+  { id:"sq19", category:"Square Tube", name:'3" × 3" × 5/16"',            priceLF:11.60,priceLB:1.02, priceEA:232.0 },
+  { id:"sq20", category:"Square Tube", name:'3-1/2" × 3-1/2" × 3/16"',   priceLF:8.47, priceLB:1.02, priceEA:169.4 },
+  { id:"sq21", category:"Square Tube", name:'3-1/2" × 3-1/2" × 1/4"',    priceLF:11.12,priceLB:1.02, priceEA:222.4 },
+  { id:"sq22", category:"Square Tube", name:'4" × 4" × 11ga',             priceLF:6.87, priceLB:1.02, priceEA:137.4 },
+  { id:"sq23", category:"Square Tube", name:'4" × 4" × 3/16"',            priceLF:9.74, priceLB:1.02, priceEA:194.8 },
+  { id:"sq24", category:"Square Tube", name:'4" × 4" × 1/4"',             priceLF:12.74,priceLB:1.02, priceEA:254.8 },
+  { id:"sq25", category:"Square Tube", name:'4" × 4" × 5/16"',            priceLF:15.70,priceLB:1.02, priceEA:314.0 },
+  { id:"sq26", category:"Square Tube", name:'4" × 4" × 3/8"',             priceLF:18.53,priceLB:1.02, priceEA:370.6 },
+  { id:"sq27", category:"Square Tube", name:'5" × 5" × 3/16"',            priceLF:12.26,priceLB:1.02, priceEA:245.2 },
+  { id:"sq28", category:"Square Tube", name:'5" × 5" × 1/4"',             priceLF:16.12,priceLB:1.02, priceEA:322.4 },
+  { id:"sq29", category:"Square Tube", name:'5" × 5" × 5/16"',            priceLF:19.82,priceLB:1.02, priceEA:396.4 },
+  { id:"sq30", category:"Square Tube", name:'6" × 6" × 3/16"',            priceLF:14.78,priceLB:1.02, priceEA:295.6 },
+  { id:"sq31", category:"Square Tube", name:'6" × 6" × 1/4"',             priceLF:19.50,priceLB:1.02, priceEA:390.0 },
+  { id:"sq32", category:"Square Tube", name:'6" × 6" × 3/8"',             priceLF:28.60,priceLB:1.02, priceEA:572.0 },
+  { id:"sq33", category:"Square Tube", name:'6" × 6" × 1/2"',             priceLF:37.27,priceLB:1.02, priceEA:745.4 },
 
-  // ── RECTANGULAR TUBE (A500 / A36) ────────────────────────────────────────────
-  { id:"rt01", category:"Rect Tube", name:'1" × 1/2" Rect Tube 16ga', priceLF:0.82, priceLB:1.02, priceEA:16.4 },
-  { id:"rt02", category:"Rect Tube", name:'1" × 2" Rect Tube 11ga', priceLF:2.65, priceLB:1.02, priceEA:53.0 },
-  { id:"rt03", category:"Rect Tube", name:'1" × 3" Rect Tube 11ga', priceLF:3.57, priceLB:1.02, priceEA:71.4 },
-  { id:"rt04", category:"Rect Tube", name:'1.5" × 3" Rect Tube 11ga', priceLF:4.39, priceLB:1.02, priceEA:87.8 },
-  { id:"rt05", category:"Rect Tube", name:'2" × 3" Rect Tube 11ga', priceLF:5.2, priceLB:1.02, priceEA:104.0 },
-  { id:"rt06", category:"Rect Tube", name:'2" × 3" Rect Tube 3/16"', priceLF:6.94, priceLB:1.02, priceEA:138.8 },
-  { id:"rt07", category:"Rect Tube", name:'2" × 4" Rect Tube 3/16"', priceLF:8.47, priceLB:1.02, priceEA:169.4 },
-  { id:"rt08", category:"Rect Tube", name:'2" × 4" Rect Tube 1/4"', priceLF:11.01, priceLB:1.02, priceEA:220.2 },
-  { id:"rt09", category:"Rect Tube", name:'3" × 5" Rect Tube 3/16"', priceLF:11.53, priceLB:1.02, priceEA:230.6 },
-  { id:"rt10", category:"Rect Tube", name:'3" × 6" Rect Tube 1/4"', priceLF:16.83, priceLB:1.02, priceEA:336.6 },
+  // ── RECTANGULAR TUBE (A500 Gr B) ────────────────────────────────────────────
+  { id:"rt01", category:"Rectangular Tube", name:'1" × 1-1/2" × 11ga',    priceLF:2.04, priceLB:1.02, priceEA:40.8  },
+  { id:"rt02", category:"Rectangular Tube", name:'1" × 2" × 11ga',        priceLF:2.55, priceLB:1.02, priceEA:51.0  },
+  { id:"rt03", category:"Rectangular Tube", name:'1" × 2" × 3/16"',       priceLF:3.47, priceLB:1.02, priceEA:69.4  },
+  { id:"rt04", category:"Rectangular Tube", name:'1-1/2" × 2" × 11ga',    priceLF:2.96, priceLB:1.02, priceEA:59.2  },
+  { id:"rt05", category:"Rectangular Tube", name:'1-1/2" × 3" × 11ga',    priceLF:3.77, priceLB:1.02, priceEA:75.4  },
+  { id:"rt06", category:"Rectangular Tube", name:'1-1/2" × 3" × 3/16"',   priceLF:5.40, priceLB:1.02, priceEA:108.0 },
+  { id:"rt07", category:"Rectangular Tube", name:'2" × 3" × 11ga',        priceLF:4.40, priceLB:1.02, priceEA:88.0  },
+  { id:"rt08", category:"Rectangular Tube", name:'2" × 3" × 3/16"',       priceLF:6.53, priceLB:1.02, priceEA:130.6 },
+  { id:"rt09", category:"Rectangular Tube", name:'2" × 4" × 11ga',        priceLF:5.11, priceLB:1.02, priceEA:102.2 },
+  { id:"rt10", category:"Rectangular Tube", name:'2" × 4" × 3/16"',       priceLF:7.66, priceLB:1.02, priceEA:153.2 },
+  { id:"rt11", category:"Rectangular Tube", name:'2" × 4" × 1/4"',        priceLF:9.96, priceLB:1.02, priceEA:199.2 },
+  { id:"rt12", category:"Rectangular Tube", name:'2" × 6" × 3/16"',       priceLF:10.19,priceLB:1.02, priceEA:203.8 },
+  { id:"rt13", category:"Rectangular Tube", name:'2" × 6" × 1/4"',        priceLF:13.27,priceLB:1.02, priceEA:265.4 },
+  { id:"rt14", category:"Rectangular Tube", name:'2-1/2" × 5" × 3/16"',   priceLF:10.20,priceLB:1.02, priceEA:204.0 },
+  { id:"rt15", category:"Rectangular Tube", name:'3" × 4" × 3/16"',       priceLF:10.20,priceLB:1.02, priceEA:204.0 },
+  { id:"rt16", category:"Rectangular Tube", name:'3" × 4" × 1/4"',        priceLF:13.27,priceLB:1.02, priceEA:265.4 },
+  { id:"rt17", category:"Rectangular Tube", name:'3" × 5" × 3/16"',       priceLF:11.51,priceLB:1.02, priceEA:230.2 },
+  { id:"rt18", category:"Rectangular Tube", name:'3" × 5" × 1/4"',        priceLF:15.04,priceLB:1.02, priceEA:300.8 },
+  { id:"rt19", category:"Rectangular Tube", name:'3" × 6" × 3/16"',       priceLF:12.76,priceLB:1.02, priceEA:255.2 },
+  { id:"rt20", category:"Rectangular Tube", name:'3" × 6" × 1/4"',        priceLF:16.65,priceLB:1.02, priceEA:333.0 },
+  { id:"rt21", category:"Rectangular Tube", name:'4" × 6" × 1/4"',        priceLF:19.32,priceLB:1.02, priceEA:386.4 },
+  { id:"rt22", category:"Rectangular Tube", name:'4" × 6" × 5/16"',       priceLF:23.84,priceLB:1.02, priceEA:476.8 },
+  { id:"rt23", category:"Rectangular Tube", name:'4" × 8" × 1/4"',        priceLF:22.50,priceLB:1.02, priceEA:450.0 },
+  { id:"rt24", category:"Rectangular Tube", name:'4" × 8" × 3/8"',        priceLF:33.10,priceLB:1.02, priceEA:662.0 },
+  { id:"rt25", category:"Rectangular Tube", name:'6" × 8" × 1/4"',        priceLF:28.60,priceLB:1.02, priceEA:572.0 },
+  { id:"rt26", category:"Rectangular Tube", name:'6" × 8" × 3/8"',        priceLF:41.90,priceLB:1.02, priceEA:838.0 },
 
-  // ── ROUND TUBE (A513 ERW) ────────────────────────────────────────────────────
-  { id:"ro01", category:"Round Tube", name:'1/2" OD Round Tube 16ga', priceLF:0.72, priceLB:1.05, priceEA:14.4 },
-  { id:"ro02", category:"Round Tube", name:'3/4" OD Round Tube 16ga', priceLF:0.96, priceLB:1.05, priceEA:19.2 },
-  { id:"ro03", category:"Round Tube", name:'1" OD Round Tube 16ga', priceLF:1.31, priceLB:1.05, priceEA:26.2 },
-  { id:"ro04", category:"Round Tube", name:'1" OD Round Tube 11ga', priceLF:1.97, priceLB:1.05, priceEA:39.4 },
-  { id:"ro05", category:"Round Tube", name:'1.5" OD Round Tube 16ga', priceLF:1.97, priceLB:1.05, priceEA:39.4 },
-  { id:"ro06", category:"Round Tube", name:'1.5" OD Round Tube 11ga', priceLF:2.97, priceLB:1.05, priceEA:59.4 },
-  { id:"ro07", category:"Round Tube", name:'2" OD Round Tube 16ga', priceLF:2.65, priceLB:1.05, priceEA:53.0 },
-  { id:"ro08", category:"Round Tube", name:'2" OD Round Tube 11ga', priceLF:3.97, priceLB:1.05, priceEA:79.4 },
-  { id:"ro09", category:"Round Tube", name:'2.5" OD Round Tube 11ga', priceLF:4.97, priceLB:1.05, priceEA:99.4 },
-  { id:"ro10", category:"Round Tube", name:'3" OD Round Tube 11ga', priceLF:5.97, priceLB:1.05, priceEA:119.4 },
-  { id:"ro11", category:"Round Tube", name:'4" OD Round Tube 3/16"', priceLF:10.18, priceLB:1.05, priceEA:203.6 },
+  // ── ROUND HSS / TUBE (A500 Gr C / A513) ─────────────────────────────────────
+  { id:"rh01", category:"Round HSS", name:'1" OD × 0.083" (14ga)',        priceLF:0.86, priceLB:1.05, priceEA:17.2  },
+  { id:"rh02", category:"Round HSS", name:'1" OD × 0.120" (11ga)',        priceLF:1.20, priceLB:1.05, priceEA:24.0  },
+  { id:"rh03", category:"Round HSS", name:'1-1/4" OD × 0.083"',           priceLF:1.09, priceLB:1.05, priceEA:21.8  },
+  { id:"rh04", category:"Round HSS", name:'1-1/4" OD × 0.120"',           priceLF:1.53, priceLB:1.05, priceEA:30.6  },
+  { id:"rh05", category:"Round HSS", name:'1-1/2" OD × 0.083"',           priceLF:1.31, priceLB:1.05, priceEA:26.2  },
+  { id:"rh06", category:"Round HSS", name:'1-1/2" OD × 0.120"',           priceLF:1.86, priceLB:1.05, priceEA:37.2  },
+  { id:"rh07", category:"Round HSS", name:'1-1/2" OD × 0.188"',           priceLF:2.76, priceLB:1.05, priceEA:55.2  },
+  { id:"rh08", category:"Round HSS", name:'2" OD × 0.083"',               priceLF:1.77, priceLB:1.05, priceEA:35.4  },
+  { id:"rh09", category:"Round HSS", name:'2" OD × 0.120"',               priceLF:2.50, priceLB:1.05, priceEA:50.0  },
+  { id:"rh10", category:"Round HSS", name:'2" OD × 0.188"',               priceLF:3.72, priceLB:1.05, priceEA:74.4  },
+  { id:"rh11", category:"Round HSS", name:'2-1/2" OD × 0.120"',           priceLF:3.16, priceLB:1.05, priceEA:63.2  },
+  { id:"rh12", category:"Round HSS", name:'2-1/2" OD × 0.188"',           priceLF:4.72, priceLB:1.05, priceEA:94.4  },
+  { id:"rh13", category:"Round HSS", name:'3" OD × 0.120"',               priceLF:3.82, priceLB:1.05, priceEA:76.4  },
+  { id:"rh14", category:"Round HSS", name:'3" OD × 0.188"',               priceLF:5.67, priceLB:1.05, priceEA:113.4 },
+  { id:"rh15", category:"Round HSS", name:'3" OD × 0.250"',               priceLF:7.36, priceLB:1.05, priceEA:147.2 },
+  { id:"rh16", category:"Round HSS", name:'3-1/2" OD × 0.188"',           priceLF:6.62, priceLB:1.05, priceEA:132.4 },
+  { id:"rh17", category:"Round HSS", name:'4" OD × 0.120"',               priceLF:5.17, priceLB:1.05, priceEA:103.4 },
+  { id:"rh18", category:"Round HSS", name:'4" OD × 0.188"',               priceLF:7.59, priceLB:1.05, priceEA:151.8 },
+  { id:"rh19", category:"Round HSS", name:'4" OD × 0.250"',               priceLF:9.89, priceLB:1.05, priceEA:197.8 },
+  { id:"rh20", category:"Round HSS", name:'5" OD × 0.188"',               priceLF:9.53, priceLB:1.05, priceEA:190.6 },
+  { id:"rh21", category:"Round HSS", name:'5" OD × 0.250"',               priceLF:12.44,priceLB:1.05, priceEA:248.8 },
+  { id:"rh22", category:"Round HSS", name:'6" OD × 0.188"',               priceLF:11.47,priceLB:1.05, priceEA:229.4 },
+  { id:"rh23", category:"Round HSS", name:'6" OD × 0.250"',               priceLF:15.00,priceLB:1.05, priceEA:300.0 },
 
-  // ── PIPE (A53 Grade B, Sch 40) ───────────────────────────────────────────────
-  { id:"pi01", category:"Pipe", name:'3/4" NPS Pipe Sch 40', priceLF:1.68, priceLB:1.03, priceEA:33.6 },
-  { id:"pi02", category:"Pipe", name:'1" NPS Pipe Sch 40', priceLF:2.37, priceLB:1.03, priceEA:47.4 },
-  { id:"pi03", category:"Pipe", name:'1.25" NPS Pipe Sch 40', priceLF:3.2, priceLB:1.03, priceEA:64.0 },
-  { id:"pi04", category:"Pipe", name:'1.5" NPS Pipe Sch 40', priceLF:3.71, priceLB:1.03, priceEA:74.2 },
-  { id:"pi05", category:"Pipe", name:'2" NPS Pipe Sch 40', priceLF:5.36, priceLB:1.03, priceEA:107.2 },
-  { id:"pi06", category:"Pipe", name:'2.5" NPS Pipe Sch 40', priceLF:7.53, priceLB:1.03, priceEA:150.6 },
-  { id:"pi07", category:"Pipe", name:'3" NPS Pipe Sch 40', priceLF:9.37, priceLB:1.03, priceEA:187.4 },
-  { id:"pi08", category:"Pipe", name:'4" NPS Pipe Sch 40', priceLF:13.85, priceLB:1.03, priceEA:277.0 },
+  // ── PIPE (A53 Gr B, Schedule 40) NPS sizes, weight per foot from AISC ────────
+  { id:"pi01", category:"Pipe", name:'1/2" NPS Sch 40 (0.840" OD)',       priceLF:1.00, priceLB:1.03, priceEA:20.0  },
+  { id:"pi02", category:"Pipe", name:'3/4" NPS Sch 40 (1.050" OD)',       priceLF:1.47, priceLB:1.03, priceEA:29.4  },
+  { id:"pi03", category:"Pipe", name:'1" NPS Sch 40 (1.315" OD)',         priceLF:2.17, priceLB:1.03, priceEA:43.4  },
+  { id:"pi04", category:"Pipe", name:'1-1/4" NPS Sch 40 (1.660" OD)',     priceLF:2.78, priceLB:1.03, priceEA:55.6  },
+  { id:"pi05", category:"Pipe", name:'1-1/2" NPS Sch 40 (1.900" OD)',     priceLF:3.22, priceLB:1.03, priceEA:64.4  },
+  { id:"pi06", category:"Pipe", name:'2" NPS Sch 40 (2.375" OD)',         priceLF:4.76, priceLB:1.03, priceEA:95.2  },
+  { id:"pi07", category:"Pipe", name:'2-1/2" NPS Sch 40 (2.875" OD)',     priceLF:7.24, priceLB:1.03, priceEA:144.8 },
+  { id:"pi08", category:"Pipe", name:'3" NPS Sch 40 (3.500" OD)',         priceLF:9.11, priceLB:1.03, priceEA:182.2 },
+  { id:"pi09", category:"Pipe", name:'3-1/2" NPS Sch 40 (4.000" OD)',     priceLF:11.24,priceLB:1.03, priceEA:224.8 },
+  { id:"pi10", category:"Pipe", name:'4" NPS Sch 40 (4.500" OD)',         priceLF:12.91,priceLB:1.03, priceEA:258.2 },
+  { id:"pi11", category:"Pipe", name:'5" NPS Sch 40 (5.563" OD)',         priceLF:17.84,priceLB:1.03, priceEA:356.8 },
+  { id:"pi12", category:"Pipe", name:'6" NPS Sch 40 (6.625" OD)',         priceLF:24.80,priceLB:1.03, priceEA:496.0 },
+  { id:"pi13", category:"Pipe", name:'1" NPS Sch 80 (1.315" OD)',         priceLF:3.00, priceLB:1.06, priceEA:60.0  },
+  { id:"pi14", category:"Pipe", name:'1-1/2" NPS Sch 80 (1.900" OD)',     priceLF:4.49, priceLB:1.06, priceEA:89.8  },
+  { id:"pi15", category:"Pipe", name:'2" NPS Sch 80 (2.375" OD)',         priceLF:6.41, priceLB:1.06, priceEA:128.2 },
+
+  // ── ANGLE (A36, equal leg) — AISC standard sizes ─────────────────────────────
+  { id:"an01", category:"Angle", name:'L 3/4" × 3/4" × 1/8"',            priceLF:0.59, priceLB:0.82, priceEA:11.8  },
+  { id:"an02", category:"Angle", name:'L 1" × 1" × 1/8"',                priceLF:0.80, priceLB:0.82, priceEA:16.0  },
+  { id:"an03", category:"Angle", name:'L 1" × 1" × 3/16"',               priceLF:1.16, priceLB:0.82, priceEA:23.2  },
+  { id:"an04", category:"Angle", name:'L 1-1/4" × 1-1/4" × 1/8"',       priceLF:1.01, priceLB:0.82, priceEA:20.2  },
+  { id:"an05", category:"Angle", name:'L 1-1/4" × 1-1/4" × 3/16"',      priceLF:1.48, priceLB:0.82, priceEA:29.6  },
+  { id:"an06", category:"Angle", name:'L 1-1/2" × 1-1/2" × 1/8"',       priceLF:1.23, priceLB:0.82, priceEA:24.6  },
+  { id:"an07", category:"Angle", name:'L 1-1/2" × 1-1/2" × 3/16"',      priceLF:1.80, priceLB:0.82, priceEA:36.0  },
+  { id:"an08", category:"Angle", name:'L 1-1/2" × 1-1/2" × 1/4"',       priceLF:2.34, priceLB:0.82, priceEA:46.8  },
+  { id:"an09", category:"Angle", name:'L 2" × 2" × 1/8"',                priceLF:1.65, priceLB:0.82, priceEA:33.0  },
+  { id:"an10", category:"Angle", name:'L 2" × 2" × 3/16"',               priceLF:2.44, priceLB:0.82, priceEA:48.8  },
+  { id:"an11", category:"Angle", name:'L 2" × 2" × 1/4"',                priceLF:3.19, priceLB:0.82, priceEA:63.8  },
+  { id:"an12", category:"Angle", name:'L 2" × 2" × 5/16"',               priceLF:3.92, priceLB:0.82, priceEA:78.4  },
+  { id:"an13", category:"Angle", name:'L 2-1/2" × 2-1/2" × 3/16"',      priceLF:3.07, priceLB:0.82, priceEA:61.4  },
+  { id:"an14", category:"Angle", name:'L 2-1/2" × 2-1/2" × 1/4"',       priceLF:4.10, priceLB:0.82, priceEA:82.0  },
+  { id:"an15", category:"Angle", name:'L 2-1/2" × 2-1/2" × 5/16"',      priceLF:5.00, priceLB:0.82, priceEA:100.0 },
+  { id:"an16", category:"Angle", name:'L 2-1/2" × 2-1/2" × 3/8"',       priceLF:5.90, priceLB:0.82, priceEA:118.0 },
+  { id:"an17", category:"Angle", name:'L 3" × 3" × 3/16"',               priceLF:3.71, priceLB:0.82, priceEA:74.2  },
+  { id:"an18", category:"Angle", name:'L 3" × 3" × 1/4"',                priceLF:4.90, priceLB:0.82, priceEA:98.0  },
+  { id:"an19", category:"Angle", name:'L 3" × 3" × 5/16"',               priceLF:6.10, priceLB:0.82, priceEA:122.0 },
+  { id:"an20", category:"Angle", name:'L 3" × 3" × 3/8"',                priceLF:7.20, priceLB:0.82, priceEA:144.0 },
+  { id:"an21", category:"Angle", name:'L 3-1/2" × 3-1/2" × 1/4"',       priceLF:5.80, priceLB:0.82, priceEA:116.0 },
+  { id:"an22", category:"Angle", name:'L 3-1/2" × 3-1/2" × 5/16"',      priceLF:7.20, priceLB:0.82, priceEA:144.0 },
+  { id:"an23", category:"Angle", name:'L 3-1/2" × 3-1/2" × 3/8"',       priceLF:8.50, priceLB:0.82, priceEA:170.0 },
+  { id:"an24", category:"Angle", name:'L 4" × 4" × 1/4"',                priceLF:6.60, priceLB:0.82, priceEA:132.0 },
+  { id:"an25", category:"Angle", name:'L 4" × 4" × 5/16"',               priceLF:8.20, priceLB:0.82, priceEA:164.0 },
+  { id:"an26", category:"Angle", name:'L 4" × 4" × 3/8"',                priceLF:9.80, priceLB:0.82, priceEA:196.0 },
+  { id:"an27", category:"Angle", name:'L 4" × 4" × 1/2"',                priceLF:12.80,priceLB:0.82, priceEA:256.0 },
+  { id:"an28", category:"Angle", name:'L 5" × 5" × 5/16"',               priceLF:10.40,priceLB:0.82, priceEA:208.0 },
+  { id:"an29", category:"Angle", name:'L 5" × 5" × 3/8"',                priceLF:12.30,priceLB:0.82, priceEA:246.0 },
+  { id:"an30", category:"Angle", name:'L 5" × 5" × 1/2"',                priceLF:16.20,priceLB:0.82, priceEA:324.0 },
+  { id:"an31", category:"Angle", name:'L 6" × 6" × 3/8"',                priceLF:14.90,priceLB:0.82, priceEA:298.0 },
+  { id:"an32", category:"Angle", name:'L 6" × 6" × 1/2"',                priceLF:19.60,priceLB:0.82, priceEA:392.0 },
+  // Unequal leg angles
+  { id:"an33", category:"Angle", name:'L 2" × 1-1/2" × 3/16"',           priceLF:2.12, priceLB:0.82, priceEA:42.4  },
+  { id:"an34", category:"Angle", name:'L 2" × 1-1/2" × 1/4"',            priceLF:2.75, priceLB:0.82, priceEA:55.0  },
+  { id:"an35", category:"Angle", name:'L 3" × 2" × 1/4"',                priceLF:4.10, priceLB:0.82, priceEA:82.0  },
+  { id:"an36", category:"Angle", name:'L 3" × 2" × 3/8"',                priceLF:6.10, priceLB:0.82, priceEA:122.0 },
+  { id:"an37", category:"Angle", name:'L 4" × 3" × 1/4"',                priceLF:5.80, priceLB:0.82, priceEA:116.0 },
+  { id:"an38", category:"Angle", name:'L 4" × 3" × 3/8"',                priceLF:8.50, priceLB:0.82, priceEA:170.0 },
 
   // ── FLAT BAR (A36, hot-rolled) ───────────────────────────────────────────────
-  { id:"fb01", category:"Flat Bar", name:'1/8" × 1" Flat Bar', priceLF:0.46, priceLB:0.82, priceEA:9.2 },
-  { id:"fb02", category:"Flat Bar", name:'1/8" × 1.5" Flat Bar', priceLF:0.69, priceLB:0.82, priceEA:13.8 },
-  { id:"fb03", category:"Flat Bar", name:'1/8" × 2" Flat Bar', priceLF:0.92, priceLB:0.82, priceEA:18.4 },
-  { id:"fb04", category:"Flat Bar", name:'1/8" × 3" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
-  { id:"fb05", category:"Flat Bar", name:'3/16" × 1" Flat Bar', priceLF:0.69, priceLB:0.82, priceEA:13.8 },
-  { id:"fb06", category:"Flat Bar", name:'3/16" × 1.5" Flat Bar', priceLF:1.04, priceLB:0.82, priceEA:20.8 },
-  { id:"fb07", category:"Flat Bar", name:'3/16" × 2" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
-  { id:"fb08", category:"Flat Bar", name:'3/16" × 3" Flat Bar', priceLF:2.07, priceLB:0.82, priceEA:41.4 },
-  { id:"fb09", category:"Flat Bar", name:'1/4" × 1" Flat Bar', priceLF:0.92, priceLB:0.82, priceEA:18.4 },
-  { id:"fb10", category:"Flat Bar", name:'1/4" × 1.5" Flat Bar', priceLF:1.38, priceLB:0.82, priceEA:27.6 },
-  { id:"fb11", category:"Flat Bar", name:'1/4" × 2" Flat Bar', priceLF:1.84, priceLB:0.82, priceEA:36.8 },
-  { id:"fb12", category:"Flat Bar", name:'1/4" × 3" Flat Bar', priceLF:2.76, priceLB:0.82, priceEA:55.2 },
-  { id:"fb13", category:"Flat Bar", name:'1/4" × 4" Flat Bar', priceLF:3.67, priceLB:0.82, priceEA:73.4 },
-  { id:"fb14", category:"Flat Bar", name:'3/8" × 2" Flat Bar', priceLF:2.76, priceLB:0.82, priceEA:55.2 },
-  { id:"fb15", category:"Flat Bar", name:'3/8" × 3" Flat Bar', priceLF:4.14, priceLB:0.82, priceEA:82.8 },
-  { id:"fb16", category:"Flat Bar", name:'1/2" × 2" Flat Bar', priceLF:3.67, priceLB:0.82, priceEA:73.4 },
-  { id:"fb17", category:"Flat Bar", name:'1/2" × 3" Flat Bar', priceLF:5.51, priceLB:0.82, priceEA:110.2 },
+  { id:"fb01", category:"Flat Bar", name:'1/8" × 3/4"',                   priceLF:0.32, priceLB:0.82, priceEA:6.4   },
+  { id:"fb02", category:"Flat Bar", name:'1/8" × 1"',                     priceLF:0.43, priceLB:0.82, priceEA:8.6   },
+  { id:"fb03", category:"Flat Bar", name:'1/8" × 1-1/4"',                 priceLF:0.54, priceLB:0.82, priceEA:10.8  },
+  { id:"fb04", category:"Flat Bar", name:'1/8" × 1-1/2"',                 priceLF:0.65, priceLB:0.82, priceEA:13.0  },
+  { id:"fb05", category:"Flat Bar", name:'1/8" × 2"',                     priceLF:0.87, priceLB:0.82, priceEA:17.4  },
+  { id:"fb06", category:"Flat Bar", name:'1/8" × 2-1/2"',                 priceLF:1.09, priceLB:0.82, priceEA:21.8  },
+  { id:"fb07", category:"Flat Bar", name:'1/8" × 3"',                     priceLF:1.31, priceLB:0.82, priceEA:26.2  },
+  { id:"fb08", category:"Flat Bar", name:'3/16" × 1"',                    priceLF:0.65, priceLB:0.82, priceEA:13.0  },
+  { id:"fb09", category:"Flat Bar", name:'3/16" × 1-1/2"',                priceLF:0.97, priceLB:0.82, priceEA:19.4  },
+  { id:"fb10", category:"Flat Bar", name:'3/16" × 2"',                    priceLF:1.31, priceLB:0.82, priceEA:26.2  },
+  { id:"fb11", category:"Flat Bar", name:'3/16" × 2-1/2"',                priceLF:1.63, priceLB:0.82, priceEA:32.6  },
+  { id:"fb12", category:"Flat Bar", name:'3/16" × 3"',                    priceLF:1.96, priceLB:0.82, priceEA:39.2  },
+  { id:"fb13", category:"Flat Bar", name:'3/16" × 4"',                    priceLF:2.61, priceLB:0.82, priceEA:52.2  },
+  { id:"fb14", category:"Flat Bar", name:'1/4" × 1"',                     priceLF:0.87, priceLB:0.82, priceEA:17.4  },
+  { id:"fb15", category:"Flat Bar", name:'1/4" × 1-1/2"',                 priceLF:1.31, priceLB:0.82, priceEA:26.2  },
+  { id:"fb16", category:"Flat Bar", name:'1/4" × 2"',                     priceLF:1.74, priceLB:0.82, priceEA:34.8  },
+  { id:"fb17", category:"Flat Bar", name:'1/4" × 2-1/2"',                 priceLF:2.17, priceLB:0.82, priceEA:43.4  },
+  { id:"fb18", category:"Flat Bar", name:'1/4" × 3"',                     priceLF:2.61, priceLB:0.82, priceEA:52.2  },
+  { id:"fb19", category:"Flat Bar", name:'1/4" × 4"',                     priceLF:3.47, priceLB:0.82, priceEA:69.4  },
+  { id:"fb20", category:"Flat Bar", name:'1/4" × 5"',                     priceLF:4.34, priceLB:0.82, priceEA:86.8  },
+  { id:"fb21", category:"Flat Bar", name:'1/4" × 6"',                     priceLF:5.21, priceLB:0.82, priceEA:104.2 },
+  { id:"fb22", category:"Flat Bar", name:'3/8" × 1-1/2"',                 priceLF:1.96, priceLB:0.82, priceEA:39.2  },
+  { id:"fb23", category:"Flat Bar", name:'3/8" × 2"',                     priceLF:2.61, priceLB:0.82, priceEA:52.2  },
+  { id:"fb24", category:"Flat Bar", name:'3/8" × 3"',                     priceLF:3.92, priceLB:0.82, priceEA:78.4  },
+  { id:"fb25", category:"Flat Bar", name:'3/8" × 4"',                     priceLF:5.21, priceLB:0.82, priceEA:104.2 },
+  { id:"fb26", category:"Flat Bar", name:'3/8" × 6"',                     priceLF:7.82, priceLB:0.82, priceEA:156.4 },
+  { id:"fb27", category:"Flat Bar", name:'1/2" × 1-1/2"',                 priceLF:2.61, priceLB:0.82, priceEA:52.2  },
+  { id:"fb28", category:"Flat Bar", name:'1/2" × 2"',                     priceLF:3.47, priceLB:0.82, priceEA:69.4  },
+  { id:"fb29", category:"Flat Bar", name:'1/2" × 3"',                     priceLF:5.21, priceLB:0.82, priceEA:104.2 },
+  { id:"fb30", category:"Flat Bar", name:'1/2" × 4"',                     priceLF:6.94, priceLB:0.82, priceEA:138.8 },
+  { id:"fb31", category:"Flat Bar", name:'1/2" × 6"',                     priceLF:10.42,priceLB:0.82, priceEA:208.4 },
 
   // ── ROUND BAR (A36, hot-rolled) ──────────────────────────────────────────────
-  { id:"rb01", category:"Round Bar", name:'1/2" Round Bar', priceLF:0.57, priceLB:0.85, priceEA:11.4 },
-  { id:"rb02", category:"Round Bar", name:'5/8" Round Bar', priceLF:0.89, priceLB:0.85, priceEA:17.8 },
-  { id:"rb03", category:"Round Bar", name:'3/4" Round Bar', priceLF:1.28, priceLB:0.85, priceEA:25.6 },
-  { id:"rb04", category:"Round Bar", name:'7/8" Round Bar', priceLF:1.75, priceLB:0.85, priceEA:35.0 },
-  { id:"rb05", category:"Round Bar", name:'1" Round Bar', priceLF:2.28, priceLB:0.85, priceEA:45.6 },
-  { id:"rb06", category:"Round Bar", name:'1.25" Round Bar', priceLF:3.57, priceLB:0.85, priceEA:71.4 },
-  { id:"rb07", category:"Round Bar", name:'1.5" Round Bar', priceLF:5.14, priceLB:0.85, priceEA:102.8 },
-  { id:"rb08", category:"Round Bar", name:'2" Round Bar', priceLF:9.14, priceLB:0.85, priceEA:182.8 },
+  { id:"rb01", category:"Round Bar", name:'1/4" Round Bar',                priceLF:0.14, priceLB:0.85, priceEA:2.8   },
+  { id:"rb02", category:"Round Bar", name:'5/16" Round Bar',               priceLF:0.22, priceLB:0.85, priceEA:4.4   },
+  { id:"rb03", category:"Round Bar", name:'3/8" Round Bar',                priceLF:0.32, priceLB:0.85, priceEA:6.4   },
+  { id:"rb04", category:"Round Bar", name:'1/2" Round Bar',                priceLF:0.57, priceLB:0.85, priceEA:11.4  },
+  { id:"rb05", category:"Round Bar", name:'5/8" Round Bar',                priceLF:0.89, priceLB:0.85, priceEA:17.8  },
+  { id:"rb06", category:"Round Bar", name:'3/4" Round Bar',                priceLF:1.28, priceLB:0.85, priceEA:25.6  },
+  { id:"rb07", category:"Round Bar", name:'7/8" Round Bar',                priceLF:1.75, priceLB:0.85, priceEA:35.0  },
+  { id:"rb08", category:"Round Bar", name:'1" Round Bar',                  priceLF:2.28, priceLB:0.85, priceEA:45.6  },
+  { id:"rb09", category:"Round Bar", name:'1-1/8" Round Bar',              priceLF:2.89, priceLB:0.85, priceEA:57.8  },
+  { id:"rb10", category:"Round Bar", name:'1-1/4" Round Bar',              priceLF:3.56, priceLB:0.85, priceEA:71.2  },
+  { id:"rb11", category:"Round Bar", name:'1-1/2" Round Bar',              priceLF:5.13, priceLB:0.85, priceEA:102.6 },
+  { id:"rb12", category:"Round Bar", name:'1-3/4" Round Bar',              priceLF:6.97, priceLB:0.85, priceEA:139.4 },
+  { id:"rb13", category:"Round Bar", name:'2" Round Bar',                  priceLF:9.10, priceLB:0.85, priceEA:182.0 },
+  { id:"rb14", category:"Round Bar", name:'2-1/2" Round Bar',              priceLF:14.22,priceLB:0.85, priceEA:284.4 },
+  { id:"rb15", category:"Round Bar", name:'3" Round Bar',                  priceLF:20.48,priceLB:0.85, priceEA:409.6 },
 
-  // ── ANGLE (A36, equal leg) ───────────────────────────────────────────────────
-  { id:"an01", category:"Angle", name:'L 1" × 1" × 1/8"', priceLF:0.82, priceLB:0.82, priceEA:16.4 },
-  { id:"an02", category:"Angle", name:'L 1.5" × 1.5" × 1/8"', priceLF:1.24, priceLB:0.82, priceEA:24.8 },
-  { id:"an03", category:"Angle", name:'L 1.5" × 1.5" × 3/16"', priceLF:1.84, priceLB:0.82, priceEA:36.8 },
-  { id:"an04", category:"Angle", name:'L 2" × 2" × 1/8"', priceLF:1.66, priceLB:0.82, priceEA:33.2 },
-  { id:"an05", category:"Angle", name:'L 2" × 2" × 3/16"', priceLF:2.46, priceLB:0.82, priceEA:49.2 },
-  { id:"an06", category:"Angle", name:'L 2" × 2" × 1/4"', priceLF:3.28, priceLB:0.82, priceEA:65.6 },
-  { id:"an07", category:"Angle", name:'L 2.5" × 2.5" × 3/16"', priceLF:3.08, priceLB:0.82, priceEA:61.6 },
-  { id:"an08", category:"Angle", name:'L 2.5" × 2.5" × 1/4"', priceLF:4.1, priceLB:0.82, priceEA:82.0 },
-  { id:"an09", category:"Angle", name:'L 3" × 3" × 3/16"', priceLF:3.69, priceLB:0.82, priceEA:73.8 },
-  { id:"an10", category:"Angle", name:'L 3" × 3" × 1/4"', priceLF:4.92, priceLB:0.82, priceEA:98.4 },
-  { id:"an11", category:"Angle", name:'L 3" × 3" × 3/8"', priceLF:7.3, priceLB:0.82, priceEA:146.0 },
-  { id:"an12", category:"Angle", name:'L 4" × 4" × 1/4"', priceLF:6.56, priceLB:0.82, priceEA:131.2 },
-  { id:"an13", category:"Angle", name:'L 4" × 4" × 3/8"', priceLF:9.76, priceLB:0.82, priceEA:195.2 },
+  // ── SQUARE BAR (A36, hot-rolled) ─────────────────────────────────────────────
+  { id:"sb01", category:"Square Bar", name:'1/4" Square Bar',              priceLF:0.18, priceLB:0.85, priceEA:3.6   },
+  { id:"sb02", category:"Square Bar", name:'3/8" Square Bar',              priceLF:0.41, priceLB:0.85, priceEA:8.2   },
+  { id:"sb03", category:"Square Bar", name:'1/2" Square Bar',              priceLF:0.73, priceLB:0.85, priceEA:14.6  },
+  { id:"sb04", category:"Square Bar", name:'5/8" Square Bar',              priceLF:1.14, priceLB:0.85, priceEA:22.8  },
+  { id:"sb05", category:"Square Bar", name:'3/4" Square Bar',              priceLF:1.64, priceLB:0.85, priceEA:32.8  },
+  { id:"sb06", category:"Square Bar", name:'7/8" Square Bar',              priceLF:2.23, priceLB:0.85, priceEA:44.6  },
+  { id:"sb07", category:"Square Bar", name:'1" Square Bar',                priceLF:2.91, priceLB:0.85, priceEA:58.2  },
+  { id:"sb08", category:"Square Bar", name:'1-1/4" Square Bar',            priceLF:4.54, priceLB:0.85, priceEA:90.8  },
+  { id:"sb09", category:"Square Bar", name:'1-1/2" Square Bar',            priceLF:6.56, priceLB:0.85, priceEA:131.2 },
+  { id:"sb10", category:"Square Bar", name:'2" Square Bar',                priceLF:11.65,priceLB:0.85, priceEA:233.0 },
 
-  // ── SHEET (A36/A1011, hot-rolled) ────────────────────────────────────────────
-  { id:"sh01", category:"Sheet", name:'Sheet 10ga (0.135")', priceSF:7.02, priceLB:0.78, priceEA:0 },
-  { id:"sh02", category:"Sheet", name:'Sheet 11ga (0.120")', priceSF:6.24, priceLB:0.78, priceEA:0 },
-  { id:"sh03", category:"Sheet", name:'Sheet 12ga (0.105")', priceSF:5.46, priceLB:0.78, priceEA:0 },
-  { id:"sh04", category:"Sheet", name:'Sheet 14ga (0.075")', priceSF:3.9, priceLB:0.78, priceEA:0 },
-  { id:"sh05", category:"Sheet", name:'Sheet 16ga (0.060")', priceSF:3.12, priceLB:0.78, priceEA:0 },
+  // ── STANDARD CHANNEL (A36, C-shape, tapered flanges) ─────────────────────────
+  { id:"sc01", category:"Standard Channel", name:'C 3 × 4.1',             priceLF:3.36, priceLB:0.82, priceEA:67.2  },
+  { id:"sc02", category:"Standard Channel", name:'C 3 × 5.0',             priceLF:4.10, priceLB:0.82, priceEA:82.0  },
+  { id:"sc03", category:"Standard Channel", name:'C 4 × 5.4',             priceLF:4.43, priceLB:0.82, priceEA:88.6  },
+  { id:"sc04", category:"Standard Channel", name:'C 4 × 7.25',            priceLF:5.95, priceLB:0.82, priceEA:119.0 },
+  { id:"sc05", category:"Standard Channel", name:'C 5 × 6.7',             priceLF:5.49, priceLB:0.82, priceEA:109.8 },
+  { id:"sc06", category:"Standard Channel", name:'C 5 × 9.0',             priceLF:7.38, priceLB:0.82, priceEA:147.6 },
+  { id:"sc07", category:"Standard Channel", name:'C 6 × 8.2',             priceLF:6.72, priceLB:0.82, priceEA:134.4 },
+  { id:"sc08", category:"Standard Channel", name:'C 6 × 10.5',            priceLF:8.61, priceLB:0.82, priceEA:172.2 },
+  { id:"sc09", category:"Standard Channel", name:'C 6 × 13',              priceLF:10.66,priceLB:0.82, priceEA:213.2 },
+  { id:"sc10", category:"Standard Channel", name:'C 7 × 9.8',             priceLF:8.04, priceLB:0.82, priceEA:160.8 },
+  { id:"sc11", category:"Standard Channel", name:'C 7 × 12.25',           priceLF:10.05,priceLB:0.82, priceEA:201.0 },
+  { id:"sc12", category:"Standard Channel", name:'C 8 × 11.5',            priceLF:9.43, priceLB:0.82, priceEA:188.6 },
+  { id:"sc13", category:"Standard Channel", name:'C 8 × 13.75',           priceLF:11.28,priceLB:0.82, priceEA:225.6 },
+  { id:"sc14", category:"Standard Channel", name:'C 8 × 18.75',           priceLF:15.38,priceLB:0.82, priceEA:307.6 },
+  { id:"sc15", category:"Standard Channel", name:'C 9 × 13.4',            priceLF:10.99,priceLB:0.82, priceEA:219.8 },
+  { id:"sc16", category:"Standard Channel", name:'C 9 × 20',              priceLF:16.40,priceLB:0.82, priceEA:328.0 },
+  { id:"sc17", category:"Standard Channel", name:'C 10 × 15.3',           priceLF:12.55,priceLB:0.82, priceEA:251.0 },
+  { id:"sc18", category:"Standard Channel", name:'C 10 × 20',             priceLF:16.40,priceLB:0.82, priceEA:328.0 },
+  { id:"sc19", category:"Standard Channel", name:'C 10 × 25',             priceLF:20.50,priceLB:0.82, priceEA:410.0 },
+  { id:"sc20", category:"Standard Channel", name:'C 12 × 20.7',           priceLF:16.97,priceLB:0.82, priceEA:339.4 },
+  { id:"sc21", category:"Standard Channel", name:'C 12 × 25',             priceLF:20.50,priceLB:0.82, priceEA:410.0 },
+  { id:"sc22", category:"Standard Channel", name:'C 12 × 30',             priceLF:24.60,priceLB:0.82, priceEA:492.0 },
+  { id:"sc23", category:"Standard Channel", name:'C 15 × 33.9',           priceLF:27.80,priceLB:0.82, priceEA:556.0 },
+  { id:"sc24", category:"Standard Channel", name:'C 15 × 40',             priceLF:32.80,priceLB:0.82, priceEA:656.0 },
+  { id:"sc25", category:"Standard Channel", name:'C 15 × 50',             priceLF:41.00,priceLB:0.82, priceEA:820.0 },
 
-  // ── PLATE (A36, hot-rolled) ──────────────────────────────────────────────────
-  { id:"pl01", category:"Plate", name:'Plate 3/16" (0.188")', priceSF:11.52, priceLB:0.8, priceEA:0 },
-  { id:"pl02", category:"Plate", name:'Plate 1/4" (0.250")', priceSF:15.36, priceLB:0.8, priceEA:0 },
-  { id:"pl03", category:"Plate", name:'Plate 3/8" (0.375")', priceSF:23.04, priceLB:0.8, priceEA:0 },
-  { id:"pl04", category:"Plate", name:'Plate 1/2" (0.500")', priceSF:30.72, priceLB:0.8, priceEA:0 },
-  { id:"pl05", category:"Plate", name:'Plate 5/8" (0.625")', priceSF:38.4, priceLB:0.8, priceEA:0 },
-  { id:"pl06", category:"Plate", name:'Plate 3/4" (0.750")', priceSF:46.08, priceLB:0.8, priceEA:0 },
-  { id:"pl07", category:"Plate", name:'Plate 1" (1.000")', priceSF:61.44, priceLB:0.8, priceEA:0 },
+  // ── MISC CHANNEL (A36, MC-shape) ─────────────────────────────────────────────
+  { id:"mc01", category:"Misc Channel", name:'MC 3 × 7.1',                priceLF:5.82, priceLB:0.82, priceEA:116.4 },
+  { id:"mc02", category:"Misc Channel", name:'MC 4 × 13.8',               priceLF:11.32,priceLB:0.82, priceEA:226.4 },
+  { id:"mc03", category:"Misc Channel", name:'MC 6 × 12',                 priceLF:9.84, priceLB:0.82, priceEA:196.8 },
+  { id:"mc04", category:"Misc Channel", name:'MC 6 × 15.3',               priceLF:12.55,priceLB:0.82, priceEA:251.0 },
+  { id:"mc05", category:"Misc Channel", name:'MC 6 × 18',                 priceLF:14.76,priceLB:0.82, priceEA:295.2 },
+  { id:"mc06", category:"Misc Channel", name:'MC 8 × 18.7',               priceLF:15.33,priceLB:0.82, priceEA:306.6 },
+  { id:"mc07", category:"Misc Channel", name:'MC 8 × 22.8',               priceLF:18.70,priceLB:0.82, priceEA:374.0 },
+  { id:"mc08", category:"Misc Channel", name:'MC 10 × 22',                priceLF:18.04,priceLB:0.82, priceEA:360.8 },
+  { id:"mc09", category:"Misc Channel", name:'MC 10 × 28.5',              priceLF:23.37,priceLB:0.82, priceEA:467.4 },
+  { id:"mc10", category:"Misc Channel", name:'MC 12 × 35',                priceLF:28.70,priceLB:0.82, priceEA:574.0 },
+  { id:"mc11", category:"Misc Channel", name:'MC 12 × 40',                priceLF:32.80,priceLB:0.82, priceEA:656.0 },
+  { id:"mc12", category:"Misc Channel", name:'MC 18 × 42.7',              priceLF:35.01,priceLB:0.82, priceEA:700.2 },
+  { id:"mc13", category:"Misc Channel", name:'MC 18 × 51.9',              priceLF:42.56,priceLB:0.82, priceEA:851.2 },
+
+  // ── WIDE FLANGE BEAM (A992) ───────────────────────────────────────────────────
+  { id:"wf01", category:"Wide Flange Beam", name:'W 4 × 13',              priceLF:10.66,priceLB:0.82, priceEA:213.2 },
+  { id:"wf02", category:"Wide Flange Beam", name:'W 5 × 16',              priceLF:13.12,priceLB:0.82, priceEA:262.4 },
+  { id:"wf03", category:"Wide Flange Beam", name:'W 5 × 19',              priceLF:15.58,priceLB:0.82, priceEA:311.6 },
+  { id:"wf04", category:"Wide Flange Beam", name:'W 6 × 9',               priceLF:7.38, priceLB:0.82, priceEA:147.6 },
+  { id:"wf05", category:"Wide Flange Beam", name:'W 6 × 12',              priceLF:9.84, priceLB:0.82, priceEA:196.8 },
+  { id:"wf06", category:"Wide Flange Beam", name:'W 6 × 15',              priceLF:12.30,priceLB:0.82, priceEA:246.0 },
+  { id:"wf07", category:"Wide Flange Beam", name:'W 6 × 20',              priceLF:16.40,priceLB:0.82, priceEA:328.0 },
+  { id:"wf08", category:"Wide Flange Beam", name:'W 6 × 25',              priceLF:20.50,priceLB:0.82, priceEA:410.0 },
+  { id:"wf09", category:"Wide Flange Beam", name:'W 8 × 10',              priceLF:8.20, priceLB:0.82, priceEA:164.0 },
+  { id:"wf10", category:"Wide Flange Beam", name:'W 8 × 13',              priceLF:10.66,priceLB:0.82, priceEA:213.2 },
+  { id:"wf11", category:"Wide Flange Beam", name:'W 8 × 15',              priceLF:12.30,priceLB:0.82, priceEA:246.0 },
+  { id:"wf12", category:"Wide Flange Beam", name:'W 8 × 18',              priceLF:14.76,priceLB:0.82, priceEA:295.2 },
+  { id:"wf13", category:"Wide Flange Beam", name:'W 8 × 21',              priceLF:17.22,priceLB:0.82, priceEA:344.4 },
+  { id:"wf14", category:"Wide Flange Beam", name:'W 8 × 24',              priceLF:19.68,priceLB:0.82, priceEA:393.6 },
+  { id:"wf15", category:"Wide Flange Beam", name:'W 8 × 28',              priceLF:22.96,priceLB:0.82, priceEA:459.2 },
+  { id:"wf16", category:"Wide Flange Beam", name:'W 8 × 31',              priceLF:25.42,priceLB:0.82, priceEA:508.4 },
+  { id:"wf17", category:"Wide Flange Beam", name:'W 10 × 12',             priceLF:9.84, priceLB:0.82, priceEA:196.8 },
+  { id:"wf18", category:"Wide Flange Beam", name:'W 10 × 15',             priceLF:12.30,priceLB:0.82, priceEA:246.0 },
+  { id:"wf19", category:"Wide Flange Beam", name:'W 10 × 17',             priceLF:13.94,priceLB:0.82, priceEA:278.8 },
+  { id:"wf20", category:"Wide Flange Beam", name:'W 10 × 19',             priceLF:15.58,priceLB:0.82, priceEA:311.6 },
+  { id:"wf21", category:"Wide Flange Beam", name:'W 10 × 22',             priceLF:18.04,priceLB:0.82, priceEA:360.8 },
+  { id:"wf22", category:"Wide Flange Beam", name:'W 10 × 26',             priceLF:21.32,priceLB:0.82, priceEA:426.4 },
+  { id:"wf23", category:"Wide Flange Beam", name:'W 10 × 30',             priceLF:24.60,priceLB:0.82, priceEA:492.0 },
+  { id:"wf24", category:"Wide Flange Beam", name:'W 10 × 33',             priceLF:27.06,priceLB:0.82, priceEA:541.2 },
+  { id:"wf25", category:"Wide Flange Beam", name:'W 12 × 14',             priceLF:11.48,priceLB:0.82, priceEA:229.6 },
+  { id:"wf26", category:"Wide Flange Beam", name:'W 12 × 16',             priceLF:13.12,priceLB:0.82, priceEA:262.4 },
+  { id:"wf27", category:"Wide Flange Beam", name:'W 12 × 19',             priceLF:15.58,priceLB:0.82, priceEA:311.6 },
+  { id:"wf28", category:"Wide Flange Beam", name:'W 12 × 22',             priceLF:18.04,priceLB:0.82, priceEA:360.8 },
+  { id:"wf29", category:"Wide Flange Beam", name:'W 12 × 26',             priceLF:21.32,priceLB:0.82, priceEA:426.4 },
+  { id:"wf30", category:"Wide Flange Beam", name:'W 12 × 30',             priceLF:24.60,priceLB:0.82, priceEA:492.0 },
+  { id:"wf31", category:"Wide Flange Beam", name:'W 12 × 35',             priceLF:28.70,priceLB:0.82, priceEA:574.0 },
+  { id:"wf32", category:"Wide Flange Beam", name:'W 12 × 40',             priceLF:32.80,priceLB:0.82, priceEA:656.0 },
+  { id:"wf33", category:"Wide Flange Beam", name:'W 14 × 22',             priceLF:18.04,priceLB:0.82, priceEA:360.8 },
+  { id:"wf34", category:"Wide Flange Beam", name:'W 14 × 26',             priceLF:21.32,priceLB:0.82, priceEA:426.4 },
+  { id:"wf35", category:"Wide Flange Beam", name:'W 14 × 30',             priceLF:24.60,priceLB:0.82, priceEA:492.0 },
+  { id:"wf36", category:"Wide Flange Beam", name:'W 14 × 34',             priceLF:27.88,priceLB:0.82, priceEA:557.6 },
+
+  // ── I-BEAM / S-SHAPE (A36) ────────────────────────────────────────────────────
+  { id:"ib01", category:"I-Beam", name:'S 3 × 5.7',                       priceLF:4.67, priceLB:0.82, priceEA:93.4  },
+  { id:"ib02", category:"I-Beam", name:'S 3 × 7.5',                       priceLF:6.15, priceLB:0.82, priceEA:123.0 },
+  { id:"ib03", category:"I-Beam", name:'S 4 × 7.7',                       priceLF:6.31, priceLB:0.82, priceEA:126.2 },
+  { id:"ib04", category:"I-Beam", name:'S 4 × 9.5',                       priceLF:7.79, priceLB:0.82, priceEA:155.8 },
+  { id:"ib05", category:"I-Beam", name:'S 5 × 10',                        priceLF:8.20, priceLB:0.82, priceEA:164.0 },
+  { id:"ib06", category:"I-Beam", name:'S 5 × 14.75',                     priceLF:12.10,priceLB:0.82, priceEA:242.0 },
+  { id:"ib07", category:"I-Beam", name:'S 6 × 12.5',                      priceLF:10.25,priceLB:0.82, priceEA:205.0 },
+  { id:"ib08", category:"I-Beam", name:'S 6 × 17.25',                     priceLF:14.15,priceLB:0.82, priceEA:283.0 },
+  { id:"ib09", category:"I-Beam", name:'S 7 × 15.3',                      priceLF:12.55,priceLB:0.82, priceEA:251.0 },
+  { id:"ib10", category:"I-Beam", name:'S 7 × 20',                        priceLF:16.40,priceLB:0.82, priceEA:328.0 },
+  { id:"ib11", category:"I-Beam", name:'S 8 × 18.4',                      priceLF:15.09,priceLB:0.82, priceEA:301.8 },
+  { id:"ib12", category:"I-Beam", name:'S 8 × 23',                        priceLF:18.86,priceLB:0.82, priceEA:377.2 },
+  { id:"ib13", category:"I-Beam", name:'S 10 × 25.4',                     priceLF:20.83,priceLB:0.82, priceEA:416.6 },
+  { id:"ib14", category:"I-Beam", name:'S 10 × 35',                       priceLF:28.70,priceLB:0.82, priceEA:574.0 },
+  { id:"ib15", category:"I-Beam", name:'S 12 × 31.8',                     priceLF:26.08,priceLB:0.82, priceEA:521.6 },
+  { id:"ib16", category:"I-Beam", name:'S 12 × 40.8',                     priceLF:33.46,priceLB:0.82, priceEA:669.2 },
+  { id:"ib17", category:"I-Beam", name:'S 12 × 50',                       priceLF:41.00,priceLB:0.82, priceEA:820.0 },
+
+  // ── SHEET (A36/A1011, hot-rolled) — priced per SqFt ─────────────────────────
+  { id:"sh01", category:"Sheet", name:'Hot Rolled Sheet 7ga (0.179")',     priceSF:9.30, priceLB:0.78, priceEA:0 },
+  { id:"sh02", category:"Sheet", name:'Hot Rolled Sheet 8ga (0.164")',     priceSF:8.52, priceLB:0.78, priceEA:0 },
+  { id:"sh03", category:"Sheet", name:'Hot Rolled Sheet 10ga (0.135")',    priceSF:7.02, priceLB:0.78, priceEA:0 },
+  { id:"sh04", category:"Sheet", name:'Hot Rolled Sheet 11ga (0.120")',    priceSF:6.24, priceLB:0.78, priceEA:0 },
+  { id:"sh05", category:"Sheet", name:'Hot Rolled Sheet 12ga (0.105")',    priceSF:5.46, priceLB:0.78, priceEA:0 },
+  { id:"sh06", category:"Sheet", name:'Hot Rolled Sheet 14ga (0.075")',    priceSF:3.90, priceLB:0.78, priceEA:0 },
+  { id:"sh07", category:"Sheet", name:'Hot Rolled Sheet 16ga (0.060")',    priceSF:3.12, priceLB:0.78, priceEA:0 },
+  { id:"sh08", category:"Sheet", name:'Cold Rolled Sheet 18ga (0.048")',   priceSF:2.80, priceLB:0.82, priceEA:0 },
+  { id:"sh09", category:"Sheet", name:'Cold Rolled Sheet 20ga (0.036")',   priceSF:2.10, priceLB:0.82, priceEA:0 },
+
+  // ── PLATE (A36, hot-rolled) — priced per SqFt ────────────────────────────────
+  { id:"pl01", category:"Plate", name:'Plate 1/8" (0.125")',               priceSF:7.68, priceLB:0.80, priceEA:0 },
+  { id:"pl02", category:"Plate", name:'Plate 3/16" (0.188")',              priceSF:11.52,priceLB:0.80, priceEA:0 },
+  { id:"pl03", category:"Plate", name:'Plate 1/4" (0.250")',               priceSF:15.36,priceLB:0.80, priceEA:0 },
+  { id:"pl04", category:"Plate", name:'Plate 5/16" (0.313")',              priceSF:19.20,priceLB:0.80, priceEA:0 },
+  { id:"pl05", category:"Plate", name:'Plate 3/8" (0.375")',               priceSF:23.04,priceLB:0.80, priceEA:0 },
+  { id:"pl06", category:"Plate", name:'Plate 1/2" (0.500")',               priceSF:30.72,priceLB:0.80, priceEA:0 },
+  { id:"pl07", category:"Plate", name:'Plate 5/8" (0.625")',               priceSF:38.40,priceLB:0.80, priceEA:0 },
+  { id:"pl08", category:"Plate", name:'Plate 3/4" (0.750")',               priceSF:46.08,priceLB:0.80, priceEA:0 },
+  { id:"pl09", category:"Plate", name:'Plate 1" (1.000")',                 priceSF:61.44,priceLB:0.80, priceEA:0 },
+  { id:"pl10", category:"Plate", name:'Floor Plate 1/8"',                  priceSF:8.40, priceLB:0.80, priceEA:0 },
+  { id:"pl11", category:"Plate", name:'Floor Plate 3/16"',                 priceSF:12.48,priceLB:0.80, priceEA:0 },
+  { id:"pl12", category:"Plate", name:'Floor Plate 1/4"',                  priceSF:16.64,priceLB:0.80, priceEA:0 },
 
   // ── HARDWARE ─────────────────────────────────────────────────────────────────
-  { id:"hw01", category:"Hardware", name:'Post Base Plate 4"×4"', priceLF:0, priceLB:0, priceEA:8.75 },
-  { id:"hw02", category:"Hardware", name:'Post Base Plate 6"×6"', priceLF:0, priceLB:0, priceEA:14.5 },
-  { id:"hw03", category:"Hardware", name:'Lag Screw 1/2" × 3"', priceLF:0, priceLB:0, priceEA:0.85 },
-  { id:"hw04", category:"Hardware", name:'Lag Screw 1/2" × 4"', priceLF:0, priceLB:0, priceEA:1.05 },
-  { id:"hw05", category:"Hardware", name:'Wedge Anchor 3/8" × 3"', priceLF:0, priceLB:0, priceEA:0.95 },
-  { id:"hw06", category:"Hardware", name:'Wedge Anchor 1/2" × 3.75"', priceLF:0, priceLB:0, priceEA:1.25 },
-  { id:"hw07", category:"Hardware", name:'Hex Bolt 1/2" × 1.5"', priceLF:0, priceLB:0, priceEA:0.55 },
-  { id:"hw08", category:"Hardware", name:'Stainless Cable Assy 1/8"', priceLF:0, priceLB:0, priceEA:22.0 },
-  { id:"hw09", category:"Hardware", name:'Stainless Cable Assy 3/16"', priceLF:0, priceLB:0, priceEA:28.5 },
+  { id:"hw01", category:"Hardware", name:'Post Base Plate 4"×4"',          priceLF:0, priceLB:0, priceEA:8.75  },
+  { id:"hw02", category:"Hardware", name:'Post Base Plate 6"×6"',          priceLF:0, priceLB:0, priceEA:14.50 },
+  { id:"hw03", category:"Hardware", name:'Lag Screw 1/2" × 3"',            priceLF:0, priceLB:0, priceEA:0.85  },
+  { id:"hw04", category:"Hardware", name:'Lag Screw 1/2" × 4"',            priceLF:0, priceLB:0, priceEA:1.05  },
+  { id:"hw05", category:"Hardware", name:'Wedge Anchor 3/8" × 3"',         priceLF:0, priceLB:0, priceEA:0.95  },
+  { id:"hw06", category:"Hardware", name:'Wedge Anchor 1/2" × 3-3/4"',     priceLF:0, priceLB:0, priceEA:1.25  },
+  { id:"hw07", category:"Hardware", name:'Hex Bolt 1/2" × 1-1/2"',         priceLF:0, priceLB:0, priceEA:0.55  },
+  { id:"hw08", category:"Hardware", name:'Stainless Cable Assy 1/8"',       priceLF:0, priceLB:0, priceEA:22.00 },
+  { id:"hw09", category:"Hardware", name:'Stainless Cable Assy 3/16"',      priceLF:0, priceLB:0, priceEA:28.50 },
 
   // ── INSTALL MATERIALS ─────────────────────────────────────────────────────────
-  { id:"im01", category:"Install Materials", name:'Concrete Anchor — 3/8"', priceLF:0, priceLB:0, priceEA:2.4 },
-  { id:"im02", category:"Install Materials", name:'Concrete Anchor — 1/2"', priceLF:0, priceLB:0, priceEA:3.2 },
-  { id:"im03", category:"Install Materials", name:'Threaded Rod 1/2" × 12"', priceLF:0, priceLB:0, priceEA:3.75 },
-  { id:"im04", category:"Install Materials", name:'Threaded Rod 5/8" × 12"', priceLF:0, priceLB:0, priceEA:5.25 },
+  { id:"im01", category:"Install Materials", name:'Concrete Anchor — 3/8"', priceLF:0, priceLB:0, priceEA:2.40  },
+  { id:"im02", category:"Install Materials", name:'Concrete Anchor — 1/2"', priceLF:0, priceLB:0, priceEA:3.20  },
+  { id:"im03", category:"Install Materials", name:'Threaded Rod 1/2" × 12"',priceLF:0, priceLB:0, priceEA:3.75  },
+  { id:"im04", category:"Install Materials", name:'Threaded Rod 5/8" × 12"',priceLF:0, priceLB:0, priceEA:5.25  },
 ];
 
 const DEFAULT_FINISHES = [
@@ -805,7 +1031,7 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
 // ── Reusable lines editor (materials + labor in one panel) ───────────────────
 function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, onDelMat, onAddMat,
   onUpdLab, onDelLab, onAddLab, matCategory, matCategories }) {
-  const MAT_CATS = matCategories || ["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"];
+  const MAT_CATS = matCategories || DEFAULT_MAT_CATEGORIES;
   const firstMatId = matCategory
     ? (mats.find(x=>x.category===matCategory)||mats[0]).id
     : mats[0].id;
@@ -1542,6 +1768,28 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 
 .main{flex:1;overflow-y:auto;background:var(--cream);display:flex;flex-direction:column;}
 .mi{padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1100px;}
+/* Materials library paged layout */
+.mat-lib{display:flex;gap:0;min-height:600px;}
+.mat-nav{width:196px;flex-shrink:0;border-right:2px solid var(--ink);background:var(--cream);}
+.mat-nav-group{padding:10px 0 4px;border-bottom:1px solid var(--border);}
+.mat-nav-group-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding:0 14px 4px;font-family:'DM Sans',sans-serif;}
+.mat-nav-btn{display:block;width:100%;text-align:left;background:none;border:none;padding:6px 14px;font-size:12.5px;font-family:'DM Sans',sans-serif;color:var(--ink2);cursor:pointer;border-left:3px solid transparent;transition:background .12s;}
+.mat-nav-btn:hover{background:rgba(140,109,63,.08);}
+.mat-nav-btn.active{background:rgba(140,109,63,.13);color:var(--ink);font-weight:600;border-left:3px solid var(--bronze);}
+.mat-page{flex:1;padding:20px 24px;overflow-x:auto;}
+.mat-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+.mat-page-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);}
+.mat-page-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+.mat-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.mat-tbl th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1.5px solid var(--ink);background:var(--cream2);white-space:nowrap;}
+.mat-tbl th.r{text-align:right;}
+.mat-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.mat-tbl tr:hover td{background:rgba(140,109,63,.05);}
+.mat-tbl input{width:100%;font-size:12px;font-family:'DM Mono',monospace;background:transparent;border:none;border-bottom:1px dashed transparent;padding:2px 4px;color:var(--ink);}
+.mat-tbl input:focus{border-bottom-color:var(--bronze);outline:none;background:#fff;}
+.mat-tbl input.num{text-align:right;width:88px;}
+.mat-cat-mgr{padding:16px 24px;border-top:1px solid var(--border);}
+.mat-cat-mgr-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--ink3);text-align:center;}
 .empty h2{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--cream3);}
 .card{background:var(--white);border:1px solid var(--border);border-radius:3px;box-shadow:0 1px 4px var(--sh);}
@@ -1667,7 +1915,8 @@ export default function App() {
   const [finishes, setFinishes]       = useState(DEFAULT_FINISHES);
   const [exclusionOptions, setExclusionOptions] = useState(DEFAULT_EXCLUSION_OPTIONS);
   const [estimators, setEstimators]   = useState(ESTIMATORS);
-  const [matCategories, setMatCategories] = useState(["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"]);
+  const [matCategories, setMatCategories] = useState(DEFAULT_MAT_CATEGORIES);
+  const [matActiveCat,  setMatActiveCat]  = useState(DEFAULT_MAT_CATEGORIES[0]);
   const [showAddMat, setShowAddMat]   = useState(false);
   const [addMatTargetItemId, setAddMatTargetItemId] = useState(null); // scope item to add line to after saving
   const [newMatForm, setNewMatForm]   = useState({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
@@ -1689,7 +1938,7 @@ export default function App() {
 
   // Bump this any time DEFAULT_MATERIALS or DEFAULT_LABOR_CATEGORIES changes.
   // On load, if Supabase has an older version the defaults are pushed to the DB.
-  const CONFIG_VERSION = 3;
+  const CONFIG_VERSION = 4;
 
   // Load on mount
   useEffect(() => {
@@ -1720,12 +1969,12 @@ export default function App() {
           const newConfig = [
             { key:"config_version",  value: CONFIG_VERSION },
             { key:"mats",            value: DEFAULT_MATERIALS },
-            { key:"matCategories",   value: ["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"] },
+            { key:"matCategories",   value: DEFAULT_MAT_CATEGORIES },
             { key:"laborCats",       value: DEFAULT_LABOR_CATEGORIES },
           ];
           await supabase.from("config").upsert(newConfig, { onConflict: "key" });
           setMats(DEFAULT_MATERIALS);
-          setMatCategories(["Square Tube","Rect Tube","Round Tube","Pipe","Flat Bar","Round Bar","Angle","C Channel","W Beam","Sheet","Plate","Hardware","Install Materials"]);
+          setMatCategories(DEFAULT_MAT_CATEGORIES);
           setLaborCats(DEFAULT_LABOR_CATEGORIES);
           // Still load any user-saved lists that aren't being reset
           if (get("itemTypes"))        setItemTypes(get("itemTypes"));
@@ -2094,65 +2343,163 @@ export default function App() {
             )}
 
             {/* ── MATERIALS TAB ── */}
-            {tab==="materials" && (
-              <div className="mi">
-                <div className="card">
-                  <div className="ch">
-                    <h3>Material Price List</h3>
-                    <button className="btn-b btn-s" onClick={()=>setShowAddMat(true)}>+ Add New Material</button>
-                  </div>
-                  <div style={{padding:0,overflowX:"auto"}}>
-                    <table className="rt">
-                      <thead><tr>
-                        <th>Category</th>
-                        <th>Name</th>
-                        <th style={{textAlign:"right"}}>$/LF or $/SqFt</th>
-                        <th style={{textAlign:"right"}}>$/LB</th>
-                        <th style={{textAlign:"right"}}>$/EA (20' stick)</th>
-                        <th/>
-                      </tr></thead>
-                      <tbody>{mats.map(m=>(
-                        <tr key={m.id}>
-                          <td>
-                            <select value={m.category} onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,category:e.target.value}:x))}>
-                              {matCategories.map(c=><option key={c}>{c}</option>)}
-                            </select>
-                          </td>
-                          <td><input value={m.name} onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,name:e.target.value}:x))}/></td>
-                          <td><input type="number" value={m.priceLF ?? m.priceSF ?? 0} step="0.01" style={{width:90,textAlign:"right"}}
-                            onChange={e=>{
-                              const v = parseFloat(e.target.value)||0;
-                              setMats(p=>p.map(x=>x.id===m.id ? (x.priceSF !== undefined ? {...x,priceSF:v} : {...x,priceLF:v}) : x));
-                            }}/></td>
-                          <td><input type="number" value={m.priceLB ?? 0} step="0.01" style={{width:90,textAlign:"right"}}
-                            onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,priceLB:parseFloat(e.target.value)||0}:x))}/></td>
-                          <td><input type="number" value={m.priceEA ?? 0} step="0.01" style={{width:100,textAlign:"right"}}
-                            onChange={e=>setMats(p=>p.map(x=>x.id===m.id?{...x,priceEA:parseFloat(e.target.value)||0}:x))}/></td>
-                          <td><button className="btn-d" onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button></td>
-                        </tr>
-                      ))}</tbody>
-                    </table>
-                  </div>
-                </div>
+            {tab==="materials" && (() => {
+              // Group nav items into sections matching Saginaw structure
+              const NAV_GROUPS = [
+                { label:"Tubing", cats:["Square Tube","Rectangular Tube","Round HSS"] },
+                { label:"Bar", cats:["Flat Bar","Round Bar","Square Bar"] },
+                { label:"Structural", cats:["Angle","Wide Flange Beam","I-Beam","Standard Channel","Misc Channel"] },
+                { label:"Pipe & Sheet", cats:["Pipe","Sheet","Plate"] },
+                { label:"Other", cats:[] }, // catch-all for categories not in above groups
+              ];
+              // Find "Other" cats = any matCategory not already in a named group
+              const groupedCats = new Set(NAV_GROUPS.flatMap(g=>g.cats));
+              NAV_GROUPS[NAV_GROUPS.length-1].cats = matCategories.filter(c=>!groupedCats.has(c));
 
-                {/* Material Categories */}
-                <div className="card">
-                  <div className="ch">
-                    <h3>Material Categories</h3>
-                    <button className="btn-g btn-s" onClick={()=>setMatCategories(p=>[...p,"New Category"])}>+ Add Category</button>
-                  </div>
-                  <div style={{padding:18,display:"flex",flexDirection:"column",gap:8}}>
-                    {matCategories.map((cat,i)=>(
-                      <div key={i} style={{display:"flex",gap:8,alignItems:"center"}}>
-                        <input value={cat} onChange={e=>setMatCategories(p=>p.map((x,j)=>j===i?e.target.value:x))}/>
-                        <button className="btn-d btn-s" style={{flexShrink:0}}
-                          onClick={()=>setMatCategories(p=>p.filter((_,j)=>j!==i))}>✕</button>
+              const activeCat = matActiveCat || matCategories[0];
+              const pageMats  = mats.filter(m=>m.category===activeCat);
+              const isSF      = pageMats.some(m=>m.priceSF !== undefined);
+              const isEA      = pageMats.some(m=>(m.priceEA||0)>0);
+
+              const updM = (id, patch) => setMats(p=>p.map(x=>x.id===id?{...x,...patch}:x));
+
+              return (
+                <div className="card" style={{padding:0,overflow:"hidden"}}>
+                  <div className="mat-lib">
+
+                    {/* ── Left nav ── */}
+                    <nav className="mat-nav">
+                      {NAV_GROUPS.filter(g=>g.cats.length>0).map(group=>(
+                        <div key={group.label} className="mat-nav-group">
+                          <div className="mat-nav-group-label">{group.label}</div>
+                          {group.cats.map(cat=>(
+                            <button key={cat}
+                              className={"mat-nav-btn"+(activeCat===cat?" active":"")}
+                              onClick={()=>setMatActiveCat(cat)}>
+                              {cat}
+                              <span style={{float:"right",fontSize:10,color:"var(--ink3)",fontWeight:400,fontFamily:"'DM Mono',monospace"}}>
+                                {mats.filter(m=>m.category===cat).length}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      ))}
+                      {/* Add category */}
+                      <div style={{padding:"10px 14px"}}>
+                        <button className="btn-g btn-s" style={{width:"100%",fontSize:11}}
+                          onClick={()=>{
+                            const name="New Category";
+                            setMatCategories(p=>[...p,name]);
+                            setMatActiveCat(name);
+                          }}>+ Category</button>
                       </div>
-                    ))}
+                    </nav>
+
+                    {/* ── Right page ── */}
+                    <div className="mat-page">
+                      <div className="mat-page-header">
+                        <div>
+                          <div className="mat-page-title">{activeCat}</div>
+                          <div className="mat-page-sub">{pageMats.length} item{pageMats.length!==1?"s":""} — click any cell to edit price</div>
+                        </div>
+                        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                          <button className="btn-b btn-s"
+                            onClick={()=>{
+                              const newMat = {
+                                id: uid(), category: activeCat,
+                                name:"New Item",
+                                priceLF: isSF?undefined:0,
+                                priceSF: isSF?0:undefined,
+                                priceLB:0, priceEA:0
+                              };
+                              setMats(p=>[...p,newMat]);
+                            }}>+ Add Row</button>
+                          <button className="btn-b btn-s" onClick={()=>setShowAddMat(true)}>+ Add to Library</button>
+                        </div>
+                      </div>
+
+                      {pageMats.length===0 ? (
+                        <div style={{padding:"48px 0",textAlign:"center",color:"var(--ink3)",fontSize:13}}>
+                          No items in this category yet.<br/>
+                          <button className="btn-b btn-s" style={{marginTop:12}}
+                            onClick={()=>{
+                              const newMat={id:uid(),category:activeCat,name:"New Item",priceLF:0,priceLB:0,priceEA:0};
+                              setMats(p=>[...p,newMat]);
+                            }}>+ Add First Item</button>
+                        </div>
+                      ) : (
+                        <table className="mat-tbl">
+                          <thead><tr>
+                            <th style={{width:"45%"}}>Size / Description</th>
+                            <th className="r">{isSF?"$/SqFt":"$/LF"}</th>
+                            <th className="r">$/LB</th>
+                            {isEA && <th className="r">$/EA (20' stick)</th>}
+                            <th style={{width:28}}/>
+                          </tr></thead>
+                          <tbody>
+                            {pageMats.map(m=>(
+                              <tr key={m.id}>
+                                <td><input value={m.name}
+                                  onChange={e=>updM(m.id,{name:e.target.value})}/></td>
+                                <td>
+                                  <input type="number" className="num"
+                                    value={isSF ? (m.priceSF??0) : (m.priceLF??0)}
+                                    step="0.01" min="0"
+                                    onChange={e=>{
+                                      const v=parseFloat(e.target.value)||0;
+                                      updM(m.id, isSF?{priceSF:v}:{priceLF:v});
+                                    }}/>
+                                </td>
+                                <td>
+                                  <input type="number" className="num"
+                                    value={m.priceLB??0} step="0.01" min="0"
+                                    onChange={e=>updM(m.id,{priceLB:parseFloat(e.target.value)||0})}/>
+                                </td>
+                                {isEA && (
+                                  <td>
+                                    <input type="number" className="num"
+                                      value={m.priceEA??0} step="0.01" min="0"
+                                      onChange={e=>updM(m.id,{priceEA:parseFloat(e.target.value)||0})}/>
+                                  </td>
+                                )}
+                                <td>
+                                  <button className="btn-d" style={{padding:"2px 6px",fontSize:11}}
+                                    onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+
+                      {/* Category rename / delete controls */}
+                      <div className="mat-cat-mgr">
+                        <div className="mat-cat-mgr-title">Category settings</div>
+                        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                          <input value={activeCat} style={{maxWidth:200,fontSize:12}}
+                            onChange={e=>{
+                              const newName=e.target.value;
+                              setMatCategories(p=>p.map(c=>c===activeCat?newName:c));
+                              setMats(p=>p.map(m=>m.category===activeCat?{...m,category:newName}:m));
+                              setMatActiveCat(newName);
+                            }}/>
+                          <button className="btn-d btn-s" style={{fontSize:11}}
+                            onClick={()=>{
+                              if(pageMats.length>0 && !window.confirm(`Delete "${activeCat}" and its ${pageMats.length} item(s)?`)) return;
+                              setMats(p=>p.filter(m=>m.category!==activeCat));
+                              setMatCategories(p=>{
+                                const next=p.filter(c=>c!==activeCat);
+                                setMatActiveCat(next[0]||"");
+                                return next;
+                              });
+                            }}>Delete Category</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* ── LABOR RATES TAB ── */}
             {tab==="labor" && (
