@@ -414,29 +414,29 @@ const DEFAULT_MATERIALS = [
   { id:"ib17", category:"I-Beam", name:'S 12 × 50',                       priceLF:41.00,priceLB:0.82, priceEA:820.0 },
 
   // ── SHEET (A36/A1011, hot-rolled) — priced per SqFt ─────────────────────────
-  { id:"sh01", category:"Sheet", name:'Hot Rolled Sheet 7ga (0.179")',     priceSF:9.30, priceLB:0.78, priceEA:0 },
-  { id:"sh02", category:"Sheet", name:'Hot Rolled Sheet 8ga (0.164")',     priceSF:8.52, priceLB:0.78, priceEA:0 },
-  { id:"sh03", category:"Sheet", name:'Hot Rolled Sheet 10ga (0.135")',    priceSF:7.02, priceLB:0.78, priceEA:0 },
-  { id:"sh04", category:"Sheet", name:'Hot Rolled Sheet 11ga (0.120")',    priceSF:6.24, priceLB:0.78, priceEA:0 },
-  { id:"sh05", category:"Sheet", name:'Hot Rolled Sheet 12ga (0.105")',    priceSF:5.46, priceLB:0.78, priceEA:0 },
-  { id:"sh06", category:"Sheet", name:'Hot Rolled Sheet 14ga (0.075")',    priceSF:3.90, priceLB:0.78, priceEA:0 },
-  { id:"sh07", category:"Sheet", name:'Hot Rolled Sheet 16ga (0.060")',    priceSF:3.12, priceLB:0.78, priceEA:0 },
-  { id:"sh08", category:"Sheet", name:'Cold Rolled Sheet 18ga (0.048")',   priceSF:2.80, priceLB:0.82, priceEA:0 },
-  { id:"sh09", category:"Sheet", name:'Cold Rolled Sheet 20ga (0.036")',   priceSF:2.10, priceLB:0.82, priceEA:0 },
+  { id:"sh01", category:"Sheet", name:'Hot Rolled Sheet 7ga (0.179")',     priceSF:9.30, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh02", category:"Sheet", name:'Hot Rolled Sheet 8ga (0.164")',     priceSF:8.52, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh03", category:"Sheet", name:'Hot Rolled Sheet 10ga (0.135")',    priceSF:7.02, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh04", category:"Sheet", name:'Hot Rolled Sheet 11ga (0.120")',    priceSF:6.24, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh05", category:"Sheet", name:'Hot Rolled Sheet 12ga (0.105")',    priceSF:5.46, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh06", category:"Sheet", name:'Hot Rolled Sheet 14ga (0.075")',    priceSF:3.90, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh07", category:"Sheet", name:'Hot Rolled Sheet 16ga (0.060")',    priceSF:3.12, priceLB:0.78, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh08", category:"Sheet", name:'Cold Rolled Sheet 18ga (0.048")',   priceSF:2.80, priceLB:0.82, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"sh09", category:"Sheet", name:'Cold Rolled Sheet 20ga (0.036")',   priceSF:2.10, priceLB:0.82, priceEA:0, sheetSize:"4' × 8'" },
 
   // ── PLATE (A36, hot-rolled) — priced per SqFt ────────────────────────────────
-  { id:"pl01", category:"Plate", name:'Plate 1/8" (0.125")',               priceSF:7.68, priceLB:0.80, priceEA:0 },
-  { id:"pl02", category:"Plate", name:'Plate 3/16" (0.188")',              priceSF:11.52,priceLB:0.80, priceEA:0 },
-  { id:"pl03", category:"Plate", name:'Plate 1/4" (0.250")',               priceSF:15.36,priceLB:0.80, priceEA:0 },
-  { id:"pl04", category:"Plate", name:'Plate 5/16" (0.313")',              priceSF:19.20,priceLB:0.80, priceEA:0 },
-  { id:"pl05", category:"Plate", name:'Plate 3/8" (0.375")',               priceSF:23.04,priceLB:0.80, priceEA:0 },
-  { id:"pl06", category:"Plate", name:'Plate 1/2" (0.500")',               priceSF:30.72,priceLB:0.80, priceEA:0 },
-  { id:"pl07", category:"Plate", name:'Plate 5/8" (0.625")',               priceSF:38.40,priceLB:0.80, priceEA:0 },
-  { id:"pl08", category:"Plate", name:'Plate 3/4" (0.750")',               priceSF:46.08,priceLB:0.80, priceEA:0 },
-  { id:"pl09", category:"Plate", name:'Plate 1" (1.000")',                 priceSF:61.44,priceLB:0.80, priceEA:0 },
-  { id:"pl10", category:"Plate", name:'Floor Plate 1/8"',                  priceSF:8.40, priceLB:0.80, priceEA:0 },
-  { id:"pl11", category:"Plate", name:'Floor Plate 3/16"',                 priceSF:12.48,priceLB:0.80, priceEA:0 },
-  { id:"pl12", category:"Plate", name:'Floor Plate 1/4"',                  priceSF:16.64,priceLB:0.80, priceEA:0 },
+  { id:"pl01", category:"Plate", name:'Plate 1/8" (0.125")',               priceSF:7.68, priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl02", category:"Plate", name:'Plate 3/16" (0.188")',              priceSF:11.52,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl03", category:"Plate", name:'Plate 1/4" (0.250")',               priceSF:15.36,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl04", category:"Plate", name:'Plate 5/16" (0.313")',              priceSF:19.20,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl05", category:"Plate", name:'Plate 3/8" (0.375")',               priceSF:23.04,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl06", category:"Plate", name:'Plate 1/2" (0.500")',               priceSF:30.72,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl07", category:"Plate", name:'Plate 5/8" (0.625")',               priceSF:38.40,priceLB:0.80, priceEA:0, sheetSize:"4' × 10'" },
+  { id:"pl08", category:"Plate", name:'Plate 3/4" (0.750")',               priceSF:46.08,priceLB:0.80, priceEA:0, sheetSize:"4' × 10'" },
+  { id:"pl09", category:"Plate", name:'Plate 1" (1.000")',                 priceSF:61.44,priceLB:0.80, priceEA:0, sheetSize:"5' × 10'" },
+  { id:"pl10", category:"Plate", name:'Floor Plate 1/8"',                  priceSF:8.40, priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl11", category:"Plate", name:'Floor Plate 3/16"',                 priceSF:12.48,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
+  { id:"pl12", category:"Plate", name:'Floor Plate 1/4"',                  priceSF:16.64,priceLB:0.80, priceEA:0, sheetSize:"4' × 8'" },
 
   // ── HARDWARE ─────────────────────────────────────────────────────────────────
   { id:"hw01", category:"Hardware", name:'Post Base Plate 4"×4"',          priceLF:0, priceLB:0, priceEA:8.75  },
@@ -1811,27 +1811,38 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .main{flex:1;overflow-y:auto;background:var(--cream);display:flex;flex-direction:column;}
 .mi{padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1100px;}
 /* Materials library paged layout */
-.mat-lib{display:flex;gap:0;min-height:600px;}
-.mat-nav{width:196px;flex-shrink:0;border-right:2px solid var(--ink);background:var(--cream);}
-.mat-nav-group{padding:10px 0 4px;border-bottom:1px solid var(--border);}
-.mat-nav-group-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding:0 14px 4px;font-family:'DM Sans',sans-serif;}
-.mat-nav-btn{display:block;width:100%;text-align:left;background:none;border:none;padding:6px 14px;font-size:12.5px;font-family:'DM Sans',sans-serif;color:var(--ink2);cursor:pointer;border-left:3px solid transparent;transition:background .12s;}
+.mat-lib{display:flex;gap:0;height:680px;}
+.mat-nav{width:210px;flex-shrink:0;border-right:2px solid var(--ink);background:var(--cream);display:flex;flex-direction:column;overflow:hidden;}
+.mat-nav-scroll{flex:1;overflow-y:auto;}
+.mat-nav-group{padding:8px 0 2px;border-bottom:1px solid var(--border);}
+.mat-nav-group-header{display:flex;align-items:center;justify-content:space-between;padding:0 8px 2px 14px;gap:4px;}
+.mat-nav-group-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);font-family:'DM Sans',sans-serif;flex:1;cursor:text;}
+.mat-nav-group-label input{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);background:transparent;border:none;border-bottom:1px dashed var(--border2);width:100%;padding:0;font-family:'DM Sans',sans-serif;}
+.mat-nav-group-label input:focus{outline:none;color:var(--ink);}
+.mat-nav-group-del{font-size:9px;color:var(--ink3);background:none;border:none;cursor:pointer;padding:1px 3px;opacity:.5;flex-shrink:0;}
+.mat-nav-group-del:hover{opacity:1;color:#c0392b;}
+.mat-nav-btn{display:block;width:100%;text-align:left;background:none;border:none;padding:5px 14px;font-size:12.5px;font-family:'DM Sans',sans-serif;color:var(--ink2);cursor:pointer;border-left:3px solid transparent;transition:background .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .mat-nav-btn:hover{background:rgba(140,109,63,.08);}
 .mat-nav-btn.active{background:rgba(140,109,63,.13);color:var(--ink);font-weight:600;border-left:3px solid var(--bronze);}
-.mat-page{flex:1;padding:20px 24px;overflow-x:auto;}
-.mat-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+.mat-nav-footer{padding:8px 10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.mat-page{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.mat-page-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;gap:12px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .mat-page-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);}
 .mat-page-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+.mat-page-body{flex:1;overflow-y:auto;padding:0 20px 12px;}
 .mat-tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.mat-tbl th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1.5px solid var(--ink);background:var(--cream2);white-space:nowrap;}
+.mat-tbl th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1.5px solid var(--ink);background:var(--cream2);white-space:nowrap;position:sticky;top:0;z-index:2;}
 .mat-tbl th.r{text-align:right;}
+.mat-tbl th.sortable{cursor:pointer;user-select:none;}
+.mat-tbl th.sortable:hover{color:var(--ink);}
 .mat-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .mat-tbl tr:hover td{background:rgba(140,109,63,.05);}
 .mat-tbl input{width:100%;font-size:12px;font-family:'DM Mono',monospace;background:transparent;border:none;border-bottom:1px dashed transparent;padding:2px 4px;color:var(--ink);}
 .mat-tbl input:focus{border-bottom-color:var(--bronze);outline:none;background:#fff;}
 .mat-tbl input.num{text-align:right;width:88px;}
-.mat-cat-mgr{padding:16px 24px;border-top:1px solid var(--border);}
-.mat-cat-mgr-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.mat-tbl select.sheet-size{font-size:11px;padding:2px 4px;background:var(--cream);border:1px solid var(--border2);border-radius:2px;color:var(--ink2);width:100%;}
+.mat-cat-mgr{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--cream2);}
+.mat-cat-mgr-title{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--ink3);text-align:center;}
 .empty h2{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--cream3);}
 .card{background:var(--white);border:1px solid var(--border);border-radius:3px;box-shadow:0 1px 4px var(--sh);}
@@ -1959,6 +1970,16 @@ export default function App() {
   const [estimators, setEstimators]   = useState(ESTIMATORS);
   const [matCategories, setMatCategories] = useState(DEFAULT_MAT_CATEGORIES);
   const [matActiveCat,  setMatActiveCat]  = useState(DEFAULT_MAT_CATEGORIES[0]);
+  const DEFAULT_NAV_GROUPS = [
+    { id:"g1", label:"Tubing",        cats:["Square Tube","Rectangular Tube","Round HSS"] },
+    { id:"g2", label:"Bar",           cats:["Flat Bar","Round Bar","Square Bar"] },
+    { id:"g3", label:"Structural",    cats:["Angle","Wide Flange Beam","I-Beam","Standard Channel","Misc Channel"] },
+    { id:"g4", label:"Pipe",          cats:["Pipe"] },
+    { id:"g5", label:"Sheet & Plate", cats:["Sheet","Plate"] },
+    { id:"g6", label:"Other",         cats:[] },
+  ];
+  const [matNavGroups,  setMatNavGroups]  = useState(DEFAULT_NAV_GROUPS);
+  const [matSortDir,    setMatSortDir]    = useState("asc"); // "asc"|"desc"|"none"
   const [showAddMat, setShowAddMat]   = useState(false);
   const [addMatTargetItemId, setAddMatTargetItemId] = useState(null); // scope item to add line to after saving
   const [newMatForm, setNewMatForm]   = useState({name:"",category:"Hardware",priceLF:"",priceLB:"",priceEA:""});
@@ -1980,7 +2001,7 @@ export default function App() {
 
   // Bump this any time DEFAULT_MATERIALS or DEFAULT_LABOR_CATEGORIES changes.
   // On load, if Supabase has an older version the defaults are pushed to the DB.
-  const CONFIG_VERSION = 5;
+  const CONFIG_VERSION = 6;
 
   // Load on mount
   useEffect(() => {
@@ -2012,11 +2033,13 @@ export default function App() {
             { key:"config_version",  value: CONFIG_VERSION },
             { key:"mats",            value: DEFAULT_MATERIALS },
             { key:"matCategories",   value: DEFAULT_MAT_CATEGORIES },
+            { key:"matNavGroups",    value: DEFAULT_NAV_GROUPS },
             { key:"laborCats",       value: DEFAULT_LABOR_CATEGORIES },
           ];
           await supabase.from("config").upsert(newConfig, { onConflict: "key" });
           setMats(DEFAULT_MATERIALS);
           setMatCategories(DEFAULT_MAT_CATEGORIES);
+          setMatNavGroups(DEFAULT_NAV_GROUPS);
           setLaborCats(DEFAULT_LABOR_CATEGORIES);
           // Still load any user-saved lists that aren't being reset
           if (get("itemTypes"))        setItemTypes(get("itemTypes"));
@@ -2034,6 +2057,7 @@ export default function App() {
           if (get("exclusionOptions") !== undefined) setExclusionOptions(get("exclusionOptions"));
           if (get("estimators")       !== undefined) setEstimators(get("estimators"));
           if (get("matCategories")    !== undefined) setMatCategories(get("matCategories"));
+          if (get("matNavGroups")     !== undefined) setMatNavGroups(get("matNavGroups"));
         }
       } catch(e) {
         console.error("Supabase load error:", e);
@@ -2075,10 +2099,11 @@ export default function App() {
           { key:"exclusionOptions", value: exclusionOptions },
           { key:"estimators",       value: estimators },
           { key:"matCategories",    value: matCategories },
+          { key:"matNavGroups",     value: matNavGroups },
         ], { onConflict: "key" });
       } catch(e) { console.error("Supabase config save error:", e); }
     })();
-  }, [mats, laborCats, itemTypes, clients, finishes, exclusionOptions, estimators, matCategories, dbReady]);
+  }, [mats, laborCats, itemTypes, clients, finishes, exclusionOptions, estimators, matCategories, matNavGroups, dbReady]);
 
   // ── Callbacks and derived values (ALL hooks/callbacks must come before any return) ──
   const activeEst = ests.find(e => e.id === actId) || null;
@@ -2389,25 +2414,35 @@ export default function App() {
 
             {/* ── MATERIALS TAB ── */}
             {tab==="materials" && (() => {
-              // Group nav items into sections matching Saginaw structure
-              const NAV_GROUPS = [
-                { label:"Tubing",     cats:["Square Tube","Rectangular Tube","Round HSS"] },
-                { label:"Bar",        cats:["Flat Bar","Round Bar","Square Bar"] },
-                { label:"Structural", cats:["Angle","Wide Flange Beam","I-Beam","Standard Channel","Misc Channel"] },
-                { label:"Pipe",       cats:["Pipe"] },
-                { label:"Sheet & Plate", cats:["Sheet","Plate"] },
-                { label:"Other",      cats:[] }, // catch-all
-              ];
-              // Find "Other" cats = any matCategory not already in a named group
-              const groupedCats = new Set(NAV_GROUPS.flatMap(g=>g.cats));
-              NAV_GROUPS[NAV_GROUPS.length-1].cats = matCategories.filter(c=>!groupedCats.has(c));
+              // Resolve "Other" group dynamically — any cat not in an explicit group
+              const allGroupedCats = new Set(matNavGroups.flatMap(g=>g.cats));
+              const navGroups = matNavGroups.map(g =>
+                g.id==="g6"
+                  ? {...g, cats: matCategories.filter(c=>!new Set(matNavGroups.filter(x=>x.id!=="g6").flatMap(x=>x.cats)).has(c))}
+                  : g
+              );
 
-              const activeCat = matActiveCat || matCategories[0];
-              const pageMats  = mats.filter(m=>m.category===activeCat);
-              const isSF      = pageMats.some(m=>m.priceSF !== undefined);
-              const isEA      = pageMats.some(m=>(m.priceEA||0)>0);
+              const activeCat   = (matActiveCat && matCategories.includes(matActiveCat)) ? matActiveCat : matCategories[0];
+              const rawPageMats = mats.filter(m=>m.category===activeCat);
+              const isSF        = rawPageMats.some(m=>m.priceSF !== undefined);
+              const isEA        = rawPageMats.some(m=>(m.priceEA||0)>0);
+              const isSheetPlate= ["Sheet","Plate"].includes(activeCat) ||
+                                  rawPageMats.some(m=>m.sheetSize !== undefined);
+
+              // Sort
+              const pageMats = matSortDir==="none" ? rawPageMats : [...rawPageMats].sort((a,b)=>{
+                const cmp = a.name.localeCompare(b.name, undefined, {numeric:true});
+                return matSortDir==="asc" ? cmp : -cmp;
+              });
 
               const updM = (id, patch) => setMats(p=>p.map(x=>x.id===id?{...x,...patch}:x));
+
+              // Which group does activeCat belong to?
+              const activeCatGroup = navGroups.find(g=>g.cats.includes(activeCat))?.id || "";
+
+              const SHEET_SIZES = ["4' × 8'","4' × 10'","5' × 10'","Other"];
+
+              const sortIcon = matSortDir==="asc" ? " ↑" : matSortDir==="desc" ? " ↓" : "";
 
               return (
                 <div className="card" style={{padding:0,overflow:"hidden"}}>
@@ -2415,48 +2450,84 @@ export default function App() {
 
                     {/* ── Left nav ── */}
                     <nav className="mat-nav">
-                      {NAV_GROUPS.filter(g=>g.cats.length>0).map(group=>(
-                        <div key={group.label} className="mat-nav-group">
-                          <div className="mat-nav-group-label">{group.label}</div>
-                          {group.cats.map(cat=>(
-                            <button key={cat}
-                              className={"mat-nav-btn"+(activeCat===cat?" active":"")}
-                              onClick={()=>setMatActiveCat(cat)}>
-                              {cat}
-                              <span style={{float:"right",fontSize:10,color:"var(--ink3)",fontWeight:400,fontFamily:"'DM Mono',monospace"}}>
-                                {mats.filter(m=>m.category===cat).length}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      ))}
-                      {/* Add category */}
-                      <div style={{padding:"10px 14px"}}>
+                      <div className="mat-nav-scroll">
+                        {navGroups.filter(g=>g.cats.length>0 || g.id==="g6").map(group=>(
+                          <div key={group.id} className="mat-nav-group">
+                            <div className="mat-nav-group-header">
+                              <div className="mat-nav-group-label">
+                                <input
+                                  key={group.id+group.label}
+                                  defaultValue={group.label}
+                                  onBlur={e=>{
+                                    const v=e.target.value.trim();
+                                    if(!v){e.target.value=group.label;return;}
+                                    setMatNavGroups(p=>p.map(g=>g.id===group.id?{...g,label:v}:g));
+                                  }}
+                                  onKeyDown={e=>{
+                                    if(e.key==="Enter") e.target.blur();
+                                    if(e.key==="Escape"){e.target.value=group.label;e.target.blur();}
+                                  }}
+                                />
+                              </div>
+                              {group.id!=="g6" && (
+                                <button className="mat-nav-group-del" title="Delete group"
+                                  onClick={()=>{
+                                    if(!window.confirm(`Delete group "${group.label}"? Its categories move to Other.`)) return;
+                                    setMatNavGroups(p=>p.filter(g=>g.id!==group.id));
+                                  }}>✕</button>
+                              )}
+                            </div>
+                            {group.cats.map(cat=>(
+                              <button key={cat}
+                                className={"mat-nav-btn"+(activeCat===cat?" active":"")}
+                                onClick={()=>setMatActiveCat(cat)}>
+                                {cat}
+                                <span style={{float:"right",fontSize:10,color:"var(--ink3)",fontWeight:400,fontFamily:"'DM Mono',monospace"}}>
+                                  {mats.filter(m=>m.category===cat).length}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Nav footer — add group / add category */}
+                      <div className="mat-nav-footer">
                         <button className="btn-g btn-s" style={{width:"100%",fontSize:11}}
                           onClick={()=>{
-                            const name="New Category";
+                            const newId = "g"+Date.now();
+                            setMatNavGroups(p=>[...p.filter(g=>g.id!=="g6"),{id:newId,label:"New Group",cats:[]},p.find(g=>g.id==="g6")]);
+                          }}>+ Add Group</button>
+                        <button className="btn-b btn-s" style={{width:"100%",fontSize:11}}
+                          onClick={()=>{
+                            const name = "New Category";
                             setMatCategories(p=>[...p,name]);
                             setMatActiveCat(name);
-                          }}>+ Category</button>
+                          }}>+ Add Category</button>
                       </div>
                     </nav>
 
                     {/* ── Right page ── */}
                     <div className="mat-page">
+                      {/* Page header */}
                       <div className="mat-page-header">
                         <div>
                           <div className="mat-page-title">{activeCat}</div>
-                          <div className="mat-page-sub">{pageMats.length} item{pageMats.length!==1?"s":""} — click any cell to edit price</div>
+                          <div className="mat-page-sub">{pageMats.length} item{pageMats.length!==1?"s":""} — click any cell to edit</div>
                         </div>
-                        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
+                          {/* Sort toggle */}
+                          <button className="btn-g btn-s" style={{fontSize:11}}
+                            onClick={()=>setMatSortDir(d=>d==="asc"?"desc":d==="desc"?"none":"asc")}>
+                            Sort A–Z{sortIcon}
+                          </button>
                           <button className="btn-b btn-s"
                             onClick={()=>{
                               const newMat = {
-                                id: uid(), category: activeCat,
-                                name:"New Item",
-                                priceLF: isSF?undefined:0,
-                                priceSF: isSF?0:undefined,
-                                priceLB:0, priceEA:0
+                                id:uid(), category:activeCat, name:"New Item",
+                                ...(isSF ? {priceSF:0} : {priceLF:0}),
+                                priceLB:0, priceEA:0,
+                                ...(isSheetPlate ? {sheetSize:"4' × 8'"} : {}),
                               };
                               setMats(p=>[...p,newMat]);
                             }}>+ Add Row</button>
@@ -2464,84 +2535,124 @@ export default function App() {
                         </div>
                       </div>
 
-                      {pageMats.length===0 ? (
-                        <div style={{padding:"48px 0",textAlign:"center",color:"var(--ink3)",fontSize:13}}>
-                          No items in this category yet.<br/>
-                          <button className="btn-b btn-s" style={{marginTop:12}}
-                            onClick={()=>{
-                              const newMat={id:uid(),category:activeCat,name:"New Item",priceLF:0,priceLB:0,priceEA:0};
-                              setMats(p=>[...p,newMat]);
-                            }}>+ Add First Item</button>
-                        </div>
-                      ) : (
-                        <table className="mat-tbl">
-                          <thead><tr>
-                            <th style={{width:"45%"}}>Size / Description</th>
-                            <th className="r">{isSF?"$/SqFt":"$/LF"}</th>
-                            <th className="r">$/LB</th>
-                            {isEA && <th className="r">$/EA (20' stick)</th>}
-                            <th style={{width:28}}/>
-                          </tr></thead>
-                          <tbody>
-                            {pageMats.map(m=>(
-                              <tr key={m.id}>
-                                <td><input value={m.name}
-                                  onChange={e=>updM(m.id,{name:e.target.value})}/></td>
-                                <td>
-                                  <input type="number" className="num"
-                                    value={isSF ? (m.priceSF??0) : (m.priceLF??0)}
-                                    step="0.01" min="0"
-                                    onChange={e=>{
-                                      const v=parseFloat(e.target.value)||0;
-                                      updM(m.id, isSF?{priceSF:v}:{priceLF:v});
-                                    }}/>
-                                </td>
-                                <td>
-                                  <input type="number" className="num"
-                                    value={m.priceLB??0} step="0.01" min="0"
-                                    onChange={e=>updM(m.id,{priceLB:parseFloat(e.target.value)||0})}/>
-                                </td>
-                                {isEA && (
+                      {/* Scrollable table body */}
+                      <div className="mat-page-body">
+                        {pageMats.length===0 ? (
+                          <div style={{padding:"48px 0",textAlign:"center",color:"var(--ink3)",fontSize:13}}>
+                            No items in this category yet.
+                            <br/>
+                            <button className="btn-b btn-s" style={{marginTop:12}}
+                              onClick={()=>{
+                                const newMat={id:uid(),category:activeCat,name:"New Item",priceLF:0,priceLB:0,priceEA:0};
+                                setMats(p=>[...p,newMat]);
+                              }}>+ Add First Item</button>
+                          </div>
+                        ) : (
+                          <table className="mat-tbl">
+                            <thead><tr>
+                              <th className="sortable" style={{width:isSheetPlate?"34%":"44%"}}
+                                onClick={()=>setMatSortDir(d=>d==="asc"?"desc":d==="desc"?"none":"asc")}>
+                                Size / Description{sortIcon}
+                              </th>
+                              {isSheetPlate && <th style={{width:"14%"}}>Sheet Size</th>}
+                              <th className="r">{isSF?"$/SqFt":"$/LF"}</th>
+                              <th className="r">$/LB</th>
+                              {isEA && <th className="r">$/EA (20' stick)</th>}
+                              <th style={{width:28}}/>
+                            </tr></thead>
+                            <tbody>
+                              {pageMats.map(m=>(
+                                <tr key={m.id}>
+                                  <td><input value={m.name}
+                                    onChange={e=>updM(m.id,{name:e.target.value})}/></td>
+                                  {isSheetPlate && (
+                                    <td>
+                                      <select className="sheet-size"
+                                        value={m.sheetSize||"4' × 8'"}
+                                        onChange={e=>updM(m.id,{sheetSize:e.target.value})}>
+                                        {SHEET_SIZES.map(s=><option key={s}>{s}</option>)}
+                                      </select>
+                                    </td>
+                                  )}
                                   <td>
                                     <input type="number" className="num"
-                                      value={m.priceEA??0} step="0.01" min="0"
-                                      onChange={e=>updM(m.id,{priceEA:parseFloat(e.target.value)||0})}/>
+                                      value={isSF?(m.priceSF??0):(m.priceLF??0)}
+                                      step="0.01" min="0"
+                                      onChange={e=>{
+                                        const v=parseFloat(e.target.value)||0;
+                                        updM(m.id,isSF?{priceSF:v}:{priceLF:v});
+                                      }}/>
                                   </td>
-                                )}
-                                <td>
-                                  <button className="btn-d" style={{padding:"2px 6px",fontSize:11}}
-                                    onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
+                                  <td>
+                                    <input type="number" className="num"
+                                      value={m.priceLB??0} step="0.01" min="0"
+                                      onChange={e=>updM(m.id,{priceLB:parseFloat(e.target.value)||0})}/>
+                                  </td>
+                                  {isEA && (
+                                    <td>
+                                      <input type="number" className="num"
+                                        value={m.priceEA??0} step="0.01" min="0"
+                                        onChange={e=>updM(m.id,{priceEA:parseFloat(e.target.value)||0})}/>
+                                    </td>
+                                  )}
+                                  <td>
+                                    <button className="btn-d" style={{padding:"2px 6px",fontSize:11}}
+                                      onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
 
-                      {/* Category rename / delete controls */}
+                      {/* Category settings footer */}
                       <div className="mat-cat-mgr">
                         <div className="mat-cat-mgr-title">Category settings</div>
-                        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                          {/* Rename */}
                           <input
                             key={activeCat}
                             defaultValue={activeCat}
-                            style={{maxWidth:200,fontSize:12}}
+                            style={{maxWidth:160,fontSize:12}}
+                            placeholder="Category name"
                             onBlur={e=>{
-                              const newName = e.target.value.trim();
-                              if (!newName || newName === activeCat) { e.target.value = activeCat; return; }
+                              const newName=e.target.value.trim();
+                              if(!newName||newName===activeCat){e.target.value=activeCat;return;}
                               setMatCategories(p=>p.map(c=>c===activeCat?newName:c));
                               setMats(p=>p.map(m=>m.category===activeCat?{...m,category:newName}:m));
+                              setMatNavGroups(p=>p.map(g=>({...g,cats:g.cats.map(c=>c===activeCat?newName:c)})));
                               setMatActiveCat(newName);
                             }}
                             onKeyDown={e=>{
-                              if (e.key==="Enter") e.target.blur();
-                              if (e.key==="Escape") { e.target.value=activeCat; e.target.blur(); }
+                              if(e.key==="Enter") e.target.blur();
+                              if(e.key==="Escape"){e.target.value=activeCat;e.target.blur();}
                             }}
                           />
+                          {/* Move to group */}
+                          <select
+                            value={activeCatGroup}
+                            style={{fontSize:11,padding:"3px 6px"}}
+                            onChange={e=>{
+                              const targetId=e.target.value;
+                              setMatNavGroups(p=>p.map(g=>({
+                                ...g,
+                                cats: g.id===targetId
+                                  ? (g.cats.includes(activeCat)?g.cats:[...g.cats,activeCat])
+                                  : g.cats.filter(c=>c!==activeCat)
+                              })));
+                            }}>
+                            <option value="" disabled>Move to group…</option>
+                            {navGroups.map(g=>(
+                              <option key={g.id} value={g.id}>{g.label}</option>
+                            ))}
+                          </select>
+                          {/* Delete */}
                           <button className="btn-d btn-s" style={{fontSize:11}}
                             onClick={()=>{
                               if(pageMats.length>0 && !window.confirm(`Delete "${activeCat}" and its ${pageMats.length} item(s)?`)) return;
                               setMats(p=>p.filter(m=>m.category!==activeCat));
+                              setMatNavGroups(p=>p.map(g=>({...g,cats:g.cats.filter(c=>c!==activeCat)})));
                               setMatCategories(p=>{
                                 const next=p.filter(c=>c!==activeCat);
                                 setMatActiveCat(next[0]||"");
