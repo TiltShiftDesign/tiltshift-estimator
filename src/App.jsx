@@ -1980,7 +1980,7 @@ export default function App() {
 
   // Bump this any time DEFAULT_MATERIALS or DEFAULT_LABOR_CATEGORIES changes.
   // On load, if Supabase has an older version the defaults are pushed to the DB.
-  const CONFIG_VERSION = 4;
+  const CONFIG_VERSION = 5;
 
   // Load on mount
   useEffect(() => {
