@@ -914,44 +914,75 @@ function CalcBtn({ hasCalc, onClick, active }) {
   );
 }
 
-// ── Searchable material picker ────────────────────────────────────────────────
+// ── Searchable material picker (3-step for sheet/plate) ──────────────────────
+const SHEET_SIZE_SF = { "4' × 8'": 32, "4' × 10'": 40, "5' × 10'": 50 };
+const SHEET_SIZES   = ["4' × 8'", "4' × 10'", "5' × 10'"];
+
 function MatPicker({ line, mats, matCategories, onUpdMat }) {
-  const [open,      setOpen]      = useState(false);
-  const [selCat,    setSelCat]    = useState(null); // null = showing category list
+  const [open,    setOpen]    = useState(false);
+  const [selCat,  setSelCat]  = useState(null); // null = cat list
+  const [selMat,  setSelMat]  = useState(null); // material awaiting size pick
   const ref = useRef(null);
 
-  // Close on outside click
   useEffect(() => {
-    const handler = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setSelCat(null); } };
+    const handler = e => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false); setSelCat(null); setSelMat(null);
+      }
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Reset to category list when dropdown opens
-  const openPicker = () => { setSelCat(null); setOpen(o => !o); };
+  const openPicker = () => { setSelCat(null); setSelMat(null); setOpen(o => !o); };
 
-  const selected     = line.custom ? null : mats.find(x => x.id === line.materialId);
-  const displayName  = line.custom ? (line.customName || "Custom line") : (selected?.name || "— Select material —");
-  const displayCat   = line.custom ? "Custom" : (selected?.category || "");
+  const selected    = line.custom ? null : mats.find(x => x.id === line.materialId);
+  const displayCat  = line.custom ? "Custom" : (selected?.category || "");
+  const displayName = line.custom ? (line.customName || "Custom line")
+                                  : (selected?.name  || "— Select material —");
+  // For sheet/plate show the chosen size in the trigger
+  const displaySize = (!line.custom && selected?.sheetSize !== undefined && line.lineSheetSize)
+    ? line.lineSheetSize : null;
 
+  // Picking a non-sheet material closes immediately
   const pickMat = (mat) => {
-    const defaultUnit = mat.priceLF ? "LF" : mat.priceSF ? "SqFt" : mat.priceEA ? "EA" : mat.priceLB ? "LB" : "LF";
-    onUpdMat(line.id, { materialId:mat.id, custom:false, customName:"", unit:defaultUnit, customCost:null });
-    setOpen(false); setSelCat(null);
+    if (mat.sheetSize !== undefined) {
+      // Sheet/plate → go to step 3
+      setSelMat(mat);
+    } else {
+      const defaultUnit = mat.priceLF ? "LF" : mat.priceSF ? "SqFt" : mat.priceEA ? "EA" : mat.priceLB ? "LB" : "LF";
+      onUpdMat(line.id, { materialId:mat.id, custom:false, customName:"", unit:defaultUnit, customCost:null, lineSheetSize:null });
+      setOpen(false); setSelCat(null); setSelMat(null);
+    }
+  };
+
+  // Picking a sheet size: price = priceSF × SF of that size, unit = EA (per sheet)
+  const pickSize = (mat, size) => {
+    const sf = SHEET_SIZE_SF[size];
+    const pricePerSheet = sf ? Math.round((mat.priceSF || 0) * sf * 100) / 100 : 0;
+    onUpdMat(line.id, {
+      materialId:   mat.id,
+      custom:       false,
+      customName:   "",
+      unit:         "EA",
+      customCost:   pricePerSheet,
+      lineSheetSize: size,
+    });
+    setOpen(false); setSelCat(null); setSelMat(null);
   };
 
   const pickCustom = () => {
-    onUpdMat(line.id, { custom:true, materialId:null, customName:"", customCost:0, unit:"LF" });
-    setOpen(false); setSelCat(null);
+    onUpdMat(line.id, { custom:true, materialId:null, customName:"", customCost:0, unit:"LF", lineSheetSize:null });
+    setOpen(false); setSelCat(null); setSelMat(null);
   };
 
-  const MAT_CATS = matCategories || [];
+  const MAT_CATS     = matCategories || [];
   const catsWithItems = MAT_CATS.filter(c => mats.some(m => m.category === c));
-  const catItems = selCat ? mats.filter(m => m.category === selCat) : [];
+  const catItems      = selCat ? mats.filter(m => m.category === selCat) : [];
 
   return (
     <div ref={ref} style={{position:"relative",minWidth:200}}>
-      {/* Trigger */}
+      {/* ── Trigger ── */}
       <div onClick={openPicker}
         style={{
           display:"flex",alignItems:"center",justifyContent:"space-between",
@@ -963,7 +994,7 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
         <div style={{flex:1,overflow:"hidden"}}>
           {displayCat && (
             <div style={{fontSize:9,color:"var(--ink3)",letterSpacing:".06em",textTransform:"uppercase",lineHeight:1.2}}>
-              {displayCat}
+              {displayCat}{displaySize ? ` · ${displaySize}` : ""}
             </div>
           )}
           <div style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",
@@ -975,19 +1006,18 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
 
       {open && (
         <div style={{
-          position:"absolute",top:"100%",left:0,zIndex:999,width:280,
+          position:"absolute",top:"100%",left:0,zIndex:999,width:300,
           background:"var(--white)",border:"1px solid var(--border2)",borderRadius:2,
           boxShadow:"0 4px 16px rgba(28,26,23,.15)",
         }}>
           {/* ── Step 1: category list ── */}
-          {selCat === null && (
+          {selCat === null && selMat === null && (
             <div style={{maxHeight:320,overflowY:"auto"}}>
               <div style={{padding:"7px 10px",fontSize:10,fontWeight:600,letterSpacing:".1em",
                 textTransform:"uppercase",color:"var(--ink3)",background:"var(--cream2)",
                 borderBottom:"1px solid var(--cream3)"}}>
                 Select Category
               </div>
-              {/* Custom first-class option */}
               <div onClick={pickCustom}
                 style={{padding:"9px 12px",fontSize:12,cursor:"pointer",
                   borderBottom:"2px solid var(--cream3)",color:"var(--bronze)",fontWeight:600,
@@ -1017,12 +1047,11 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
             </div>
           )}
 
-          {/* ── Step 2: items in selected category ── */}
-          {selCat !== null && (
+          {/* ── Step 2: items in category ── */}
+          {selCat !== null && selMat === null && (
             <div style={{display:"flex",flexDirection:"column",maxHeight:340}}>
-              {/* Back header */}
               <div onClick={()=>setSelCat(null)}
-                style={{padding:"7px 10px",fontSize:11,cursor:"pointer",
+                style={{padding:"7px 10px",fontSize:11,cursor:"pointer",flexShrink:0,
                   background:"var(--cream2)",borderBottom:"1px solid var(--cream3)",
                   display:"flex",alignItems:"center",gap:6,color:"var(--bronze)",fontWeight:600,
                   userSelect:"none"}}
@@ -1045,12 +1074,64 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
                   >
                     <div style={{fontWeight: x.id===line.materialId?600:400}}>{x.name}</div>
                     <div style={{fontSize:10,color:"var(--ink3)",fontFamily:"'DM Mono',monospace",marginTop:1}}>
-                      {x.priceLF?`$${x.priceLF.toFixed(2)}/LF`:x.priceSF?`$${x.priceSF.toFixed(2)}/SF`:""}
-                      {x.priceLB?`  ·  $${x.priceLB.toFixed(2)}/LB`:""}
+                      {x.priceLF  ? `$${x.priceLF.toFixed(2)}/LF`  :
+                       x.priceSF  ? `$${x.priceSF.toFixed(2)}/SF`  : ""}
+                      {x.priceLB  ? `  ·  $${x.priceLB.toFixed(2)}/LB` : ""}
+                      {x.sheetSize ? "  · select size ›" : ""}
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── Step 3: sheet size picker ── */}
+          {selMat !== null && (
+            <div style={{display:"flex",flexDirection:"column"}}>
+              <div onClick={()=>setSelMat(null)}
+                style={{padding:"7px 10px",fontSize:11,cursor:"pointer",
+                  background:"var(--cream2)",borderBottom:"1px solid var(--cream3)",
+                  display:"flex",alignItems:"center",gap:6,color:"var(--bronze)",fontWeight:600,
+                  userSelect:"none"}}
+                onMouseEnter={e=>e.currentTarget.style.background="var(--cream3)"}
+                onMouseLeave={e=>e.currentTarget.style.background="var(--cream2)"}
+              >
+                <span>‹</span>
+                <span style={{fontSize:11}}>{selMat.name}</span>
+              </div>
+              <div style={{padding:"8px 10px 4px",fontSize:9,letterSpacing:".1em",
+                textTransform:"uppercase",color:"var(--ink3)",background:"var(--cream2)",
+                borderBottom:"1px solid var(--cream3)"}}>
+                Select Sheet Size
+              </div>
+              {SHEET_SIZES.map(size => {
+                const sf = SHEET_SIZE_SF[size];
+                const pricePerSheet = Math.round((selMat.priceSF || 0) * sf * 100) / 100;
+                const isActive = line.materialId===selMat.id && line.lineSheetSize===size;
+                return (
+                  <div key={size} onClick={()=>pickSize(selMat, size)}
+                    style={{
+                      padding:"10px 14px",cursor:"pointer",
+                      display:"flex",justifyContent:"space-between",alignItems:"center",
+                      borderBottom:"1px solid var(--cream3)",
+                      background: isActive ? "var(--cream2)" : "var(--white)",
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
+                    onMouseLeave={e=>e.currentTarget.style.background=isActive?"var(--cream2)":"var(--white)"}
+                  >
+                    <div>
+                      <div style={{fontSize:13,fontWeight:isActive?600:400}}>{size}</div>
+                      <div style={{fontSize:10,color:"var(--ink3)",marginTop:2}}>{sf} SF per sheet</div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontSize:13,fontWeight:600,fontFamily:"'DM Mono',monospace",color:"var(--bronze)"}}>
+                        ${pricePerSheet.toFixed(2)}
+                      </div>
+                      <div style={{fontSize:10,color:"var(--ink3)"}}>per sheet</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -1083,11 +1164,9 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
         {matLines.length===0
           ? <div style={{padding:"8px 0",color:"var(--ink3)",fontSize:12,textAlign:"center",background:"var(--cream)",borderRadius:2}}>No materials</div>
           : <table style={{width:"100%",borderCollapse:"collapse"}}>
-              <thead><tr>{["Material","Sheet Size","Qty","Unit","Unit Cost","Ext.","Note","∑",""].map(h=>{
-                // only show Sheet Size col if any line has a sheet mat
-                if(h==="Sheet Size" && !matLines.some(l=>{ const mm=mats.find(x=>x.id===l.materialId); return mm?.sheetSize!==undefined; })) return null;
-                return <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>;
-              })}</tr></thead>
+              <thead><tr>{["Material","Qty","Unit","Unit Cost","Ext.","Note","∑",""].map(h=>(
+                <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>
+              ))}</tr></thead>
               <tbody>{matLines.map(line=>{
                 const m = line.custom ? null : mats.find(x=>x.id===line.materialId);
                 const lineUnit = line.unit || (m?.priceSF ? "SqFt" : "LF");
@@ -1102,16 +1181,8 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                       ...(m.priceSF ? ["SqFt"] : []),
                       ...(m.priceLB ? ["LB"] : []),
                       ...(m.priceEA ? ["EA"] : []),
-                    ] : ["LF","LB","EA"];
-
-                // Sheet/Plate size helper
-                const isSheetMat = !line.custom && m?.sheetSize !== undefined;
-                const SHEET_SIZE_SF = {"4' × 8'":32,"4' × 10'":40,"5' × 10'":50};
-                const lineSheetSize = line.lineSheetSize || m?.sheetSize || "4' × 8'";
-                const sheetSF = SHEET_SIZE_SF[lineSheetSize] || 32;
-                const sheetCount = (lineUnit==="SqFt" && isSheetMat && sheetSF)
-                  ? (Number(line.qty)/sheetSF).toFixed(2)
-                  : null;
+                      ...(m.sheetSize ? ["EA"] : []),
+                    ].filter((v,i,a)=>a.indexOf(v)===i) : ["LF","LB","EA"];
 
                 const isOpen = openCalc === line.id;
                 const bb = isOpen ? "none" : "1px solid var(--cream3)";
@@ -1136,37 +1207,6 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                           : <MatPicker line={line} mats={mats} matCategories={MAT_CATS} onUpdMat={onUpdMat}/>
                         }
                       </td>
-                      {/* Sheet Size — only rendered when any line in table is a sheet mat */}
-                      {matLines.some(l=>{ const mm=mats.find(x=>x.id===l.materialId); return mm?.sheetSize!==undefined; }) && (
-                        <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"top",width:110}}>
-                          {isSheetMat ? (
-                            <div style={{display:"flex",flexDirection:"column",gap:3}}>
-                              <select
-                                value={lineSheetSize}
-                                onChange={e=>onUpdMat(line.id,"lineSheetSize",e.target.value)}
-                                style={{fontSize:11,padding:"3px 4px",background:"var(--cream)",border:"1px solid var(--border2)",borderRadius:2,width:"100%"}}>
-                                {["4' × 8'","4' × 10'","5' × 10'","Other"].map(s=><option key={s}>{s}</option>)}
-                              </select>
-                              {/* Sheet count helper — shows how many sheets the current SF qty equals */}
-                              {lineUnit==="SqFt" && lineSheetSize!=="Other" && (
-                                <div style={{display:"flex",alignItems:"center",gap:3}}>
-                                  <input
-                                    type="number" min="0" step="0.25"
-                                    value={sheetCount??0}
-                                    onChange={e=>{
-                                      const sheets=parseFloat(e.target.value)||0;
-                                      onUpdMat(line.id,"qty",String(sheets*sheetSF));
-                                    }}
-                                    style={{width:44,fontSize:11,fontFamily:"'DM Mono',monospace",textAlign:"right",padding:"1px 3px"}}
-                                    title="Number of sheets"
-                                  />
-                                  <span style={{fontSize:10,color:"var(--ink3)",whiteSpace:"nowrap"}}>sheets</span>
-                                </div>
-                              )}
-                            </div>
-                          ) : <span style={{color:"var(--ink3)",fontSize:10}}>—</span>}
-                        </td>
-                      )}
                       {/* Qty */}
                       <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:90}}>
                         <input type="number" min="0" value={line.qty}
@@ -1208,7 +1248,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                     </tr>
                     {isOpen && (
                       <tr>
-                        <td colSpan={isSheetMat ? 9 : 8} style={{padding:"0 7px 10px",borderBottom:"1px solid var(--cream3)"}}>
+                        <td colSpan={8} style={{padding:"0 7px 10px",borderBottom:"1px solid var(--cream3)"}}>
                           <CalcPanel
                             calc={line.calc}
                             fieldLabel={line.custom ? (line.customName||"Custom") : (m?.name || "Qty")}
