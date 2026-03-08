@@ -537,6 +537,11 @@ const matUnitPrice = (m, unit) => {
 };
 
 // Returns { base, install, alts[], total }
+// base/install each have: rawMat, matW, labor, laborDetail{officeHrs,officeCost,fabHrs,fabCost,installHrs,installCost}, sub, ovAmt, mkAmt, total
+const OFFICE_LABOR_IDS  = new Set(["cat1","cat2"]);  // Project Management, Design
+const FAB_LABOR_IDS     = new Set(["cat3","cat5"]);  // Fabrication, Finishing
+const INSTALL_LABOR_IDS = new Set(["cat4"]);          // Install
+
 const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
   const calcLines = (matLines, labLines) => {
     const rawMat = matLines.reduce((s,l) => {
@@ -546,16 +551,31 @@ const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
       return s + price * Number(l.qty);
     }, 0);
     const matW  = rawMat * (1 + Number(wastePct) / 100);
-    const labor = labLines.reduce((s,l) => {
+
+    // Break labor out by category type
+    let officeHrs=0, officeCost=0, fabHrs=0, fabCost=0, installHrs=0, installCost=0;
+    labLines.forEach(l => {
       const cat = laborCats.find(c => c.id === l.categoryId);
-      return s + (cat ? cat.rate * Number(l.hrs) : 0);
-    }, 0);
+      if (!cat) return;
+      const hrs  = Number(l.hrs) || 0;
+      const cost = cat.rate * hrs;
+      if (OFFICE_LABOR_IDS.has(cat.id))       { officeHrs  += hrs; officeCost  += cost; }
+      else if (FAB_LABOR_IDS.has(cat.id))     { fabHrs     += hrs; fabCost     += cost; }
+      else if (INSTALL_LABOR_IDS.has(cat.id)) { installHrs += hrs; installCost += cost; }
+      else                                    { fabHrs     += hrs; fabCost     += cost; } // fallback
+    });
+    const labor = officeCost + fabCost + installCost;
+
     const sub    = matW + labor;
     const ovAmt  = sub * (Number(ovhd) / 100);
     const preMarkup = sub + ovAmt;
-    const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999); // guard against 100%
+    const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999);
     const mkAmt  = Math.round((preMarkup / (1 - mkupFrac) - preMarkup) / 10) * 10;
-    return { rawMat, matW, labor, sub, ovAmt, mkAmt, total: sub + ovAmt + mkAmt };
+    return {
+      rawMat, matW, labor,
+      laborDetail: { officeHrs, officeCost, fabHrs, fabCost, installHrs, installCost },
+      sub, ovAmt, mkAmt, total: sub + ovAmt + mkAmt,
+    };
   };
 
   const base    = calcLines(item.materialLines || [], item.laborLines || []);
@@ -1455,131 +1475,189 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
       background:"var(--white)", border:"1px solid var(--border)", borderRadius:3,
       boxShadow:"0 1px 4px var(--sh)", overflow:"hidden",
     }}>
-      {/* ── Item top header ── */}
+      {/* ── Row 1: expand / number / name / type / rate-check / delete ── */}
       <div style={{
-        padding:"11px 14px", display:"flex", alignItems:"center", gap:10,
+        padding:"9px 14px", display:"flex", alignItems:"flex-start", gap:10,
         borderBottom:"1px solid var(--border)", background:"var(--white)",
-      }}>
-        <button onClick={()=>setOpen(o=>!o)} style={{
+      }} onClick={()=>setOpen(o=>!o)}>
+        <button style={{
           background:"none",border:"none",color:"var(--ink3)",fontSize:14,padding:"0 4px",
-          lineHeight:1,flexShrink:0,cursor:"pointer",
+          lineHeight:1,flexShrink:0,cursor:"pointer",marginTop:3,
           transform:open?"rotate(90deg)":"rotate(0deg)",transition:"transform .15s",
         }}>▶</button>
 
-        {/* Item number badge */}
         <div style={{
           fontFamily:"'DM Mono',monospace", fontSize:13, fontWeight:600,
           color:"var(--bronze)", background:"var(--cream2)", border:"1px solid var(--border)",
-          padding:"3px 9px", borderRadius:2, flexShrink:0, letterSpacing:".05em",
+          padding:"3px 9px", borderRadius:2, flexShrink:0, letterSpacing:".05em", marginTop:1,
         }}>{baseNum}</div>
 
         <input
           value={item.name}
           onChange={e => updItem({name:e.target.value})}
-          placeholder="Item name (e.g. Entry stair — north side)"
+          placeholder="Item name…"
           onClick={e => e.stopPropagation()}
           style={{
             flex:1, fontSize:13, fontWeight:500, background:"transparent",
             border:"none", borderBottom:"1px dashed var(--border2)", borderRadius:0,
-            padding:"2px 0", color:"var(--ink)",
+            padding:"2px 0", color:"var(--ink)", marginTop:1,
           }}
         />
 
-        <div style={{flexShrink:0, display:"flex", flexDirection:"column", gap:4, width:210}} onClick={e=>e.stopPropagation()}>
+        {/* Type selector + rate check inputs */}
+        <div style={{flexShrink:0, display:"flex", flexDirection:"column", gap:5, width:220}} onClick={e=>e.stopPropagation()}>
           <TypeSelect value={item.type} onChange={v=>updItem({type:v})}
             types={itemTypes} onAddType={onAddItemType}/>
-
-          {/* Rate check — shown when type is rail or stair, or fields already have values */}
+          {/* Rate check inputs — shown for rail/stair types or if already populated */}
           {(item.type==="Handrail / Guardrail" || item.type==="Guardrail" || item.type==="Handrail" ||
-            item.type==="Stair" || item.checkLF || item.checkRisers) && (() => {
-            const unitCost = totals.total;
-            const showLF     = item.type==="Handrail / Guardrail" || item.type==="Guardrail" || item.type==="Handrail" || item.checkLF;
-            const showRisers = item.type==="Stair" || item.checkRisers;
-            const lf     = parseFloat(item.checkLF) || 0;
-            const risers = parseFloat(item.checkRisers) || 0;
-            return (
-              <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
-                {showLF && (
-                  <div style={{display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0}}>
-                    <input type="number" min="0" step="0.5"
-                      value={item.checkLF||""}
-                      onChange={e=>updItem({checkLF:e.target.value})}
-                      onClick={e=>e.stopPropagation()}
-                      placeholder="LF"
-                      style={{width:52, fontSize:12, fontFamily:"'DM Mono',monospace", fontWeight:600,
-                        border:"1px solid var(--border2)", borderRadius:2, padding:"3px 5px",
-                        background:"var(--cream)"}}
-                    />
-                    {lf > 0 && unitCost > 0 ? (
-                      <div style={{fontFamily:"'DM Mono',monospace", fontSize:12, fontWeight:700, color:"var(--bronze)", whiteSpace:"nowrap"}}>
-                        {fmt(unitCost/lf)}<span style={{fontSize:9, fontWeight:400, color:"var(--ink3)", marginLeft:2}}>/LF</span>
-                      </div>
-                    ) : (
-                      <span style={{fontSize:10, color:"var(--ink3)"}}>$/LF</span>
-                    )}
-                  </div>
-                )}
-                {showRisers && (
-                  <div style={{display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0}}>
-                    <input type="number" min="0" step="1"
-                      value={item.checkRisers||""}
-                      onChange={e=>updItem({checkRisers:e.target.value})}
-                      onClick={e=>e.stopPropagation()}
-                      placeholder="risers"
-                      style={{width:52, fontSize:12, fontFamily:"'DM Mono',monospace", fontWeight:600,
-                        border:"1px solid var(--border2)", borderRadius:2, padding:"3px 5px",
-                        background:"var(--cream)"}}
-                    />
-                    {risers > 0 && unitCost > 0 ? (
-                      <div style={{fontFamily:"'DM Mono',monospace", fontSize:12, fontWeight:700, color:"var(--bronze)", whiteSpace:"nowrap"}}>
-                        {fmt(unitCost/risers)}<span style={{fontSize:9, fontWeight:400, color:"var(--ink3)", marginLeft:2}}>/riser</span>
-                      </div>
-                    ) : (
-                      <span style={{fontSize:10, color:"var(--ink3)"}}>$/riser</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </div>
-
-        {/* Unit cost × qty = subtotal display in header */}
-        {(() => {
-          const qty = parseFloat(item.qty) || 0;
-          const unit = item.qtyUnit || "EA";
-          const unitCost = totals.total;
-          const subtotal = qty > 0 ? unitCost * qty : unitCost;
-          return (
-            <div style={{flexShrink:0, textAlign:"right"}} onClick={e=>e.stopPropagation()}>
-              {qty > 0 ? (
-                <div style={{display:"flex", alignItems:"center", gap:6}}>
-                  <div style={{textAlign:"right"}}>
-                    <div style={{fontSize:10, color:"var(--ink3)", fontFamily:"'DM Mono',monospace", lineHeight:1.2}}>
-                      {fmt(unitCost)}<span style={{fontSize:9, marginLeft:2}}>/{unit}</span>
-                    </div>
-                    <div style={{fontSize:10, color:"var(--ink3)", lineHeight:1.2}}>
-                      × {qty} {unit}
-                    </div>
-                  </div>
-                  <div style={{fontSize:14, fontFamily:"'DM Mono',monospace", color:"var(--bronze)", fontWeight:700, minWidth:88}}>
-                    {subtotal > 0 ? fmt(subtotal) : "—"}
-                  </div>
+            item.type==="Stair" || item.checkLF || item.checkRisers) && (
+            <div style={{display:"flex", gap:6}}>
+              {(item.type==="Handrail / Guardrail"||item.type==="Guardrail"||item.type==="Handrail"||item.checkLF) && (
+                <div style={{display:"flex",alignItems:"center",gap:4,flex:1}}>
+                  <input type="number" min="0" step="0.5" value={item.checkLF||""}
+                    onChange={e=>updItem({checkLF:e.target.value})} onClick={e=>e.stopPropagation()}
+                    placeholder="LF"
+                    style={{width:48,fontSize:12,fontFamily:"'DM Mono',monospace",fontWeight:600,
+                      border:"1px solid var(--border2)",borderRadius:2,padding:"3px 5px",background:"var(--cream)"}}
+                  />
+                  <span style={{fontSize:10,color:"var(--ink3)"}}>LF</span>
                 </div>
-              ) : (
-                <div style={{fontFamily:"'DM Mono',monospace", fontSize:13, color:"var(--bronze)", fontWeight:600, minWidth:88}}>
-                  {unitCost > 0 ? fmt(unitCost) : "—"}
+              )}
+              {(item.type==="Stair"||item.checkRisers) && (
+                <div style={{display:"flex",alignItems:"center",gap:4,flex:1}}>
+                  <input type="number" min="0" step="1" value={item.checkRisers||""}
+                    onChange={e=>updItem({checkRisers:e.target.value})} onClick={e=>e.stopPropagation()}
+                    placeholder="risers"
+                    style={{width:48,fontSize:12,fontFamily:"'DM Mono',monospace",fontWeight:600,
+                      border:"1px solid var(--border2)",borderRadius:2,padding:"3px 5px",background:"var(--cream)"}}
+                  />
+                  <span style={{fontSize:10,color:"var(--ink3)"}}>risers</span>
                 </div>
               )}
             </div>
-          );
-        })()}
+          )}
+        </div>
 
-        <button className="btn-d" style={{flexShrink:0}}
+        <button className="btn-d" style={{flexShrink:0,marginTop:1}}
           onClick={e=>{e.stopPropagation();onDelete();}}>✕</button>
       </div>
 
-      {/* Qty row — always visible below header */}
+      {/* ── Row 2: Scope item summary grid ── */}
+      {(() => {
+        const b  = totals.base;
+        const ins = totals.install;
+        const lf     = parseFloat(item.checkLF) || 0;
+        const risers = parseFloat(item.checkRisers) || 0;
+        const div    = lf > 0 ? lf : risers > 0 ? risers : 0;
+        const divLabel = lf > 0 ? "LF" : risers > 0 ? "riser" : null;
+        const qty      = parseFloat(item.qty) || 0;
+        const qtyUnit  = item.qtyUnit || "EA";
+        const unitCost = totals.total;
+        const subtotal = qty > 0 ? unitCost * qty : unitCost;
+        const hasInstall = ins.total > 0;
+        const mono = {fontFamily:"'DM Mono',monospace"};
+
+        const Cell = ({label, value, sub, accent, wide}) => (
+          <div style={{
+            display:"flex",flexDirection:"column",justifyContent:"space-between",
+            padding:"7px 10px", borderRight:"1px solid var(--border)",
+            minWidth: wide ? 80 : 70, flex: wide ? "1.3" : "1",
+          }}>
+            <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500,whiteSpace:"nowrap",marginBottom:2}}>{label}</div>
+            <div style={{...mono,fontSize:12,fontWeight:700,color:accent||"var(--ink2)",whiteSpace:"nowrap"}}>{value}</div>
+            {sub && <div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{sub}</div>}
+          </div>
+        );
+
+        const fmtH = h => h > 0 ? `${h.toFixed(1)}h` : "—";
+        const fmtD = (cost, d) => d > 0 && cost > 0 ? `${fmt(cost/d)}/${divLabel}` : null;
+
+        return (
+          <div style={{
+            display:"flex", borderBottom:"1px solid var(--border)",
+            background:"var(--cream2)", overflowX:"auto",
+          }} onClick={e=>e.stopPropagation()}>
+
+            {/* ── FABRICATION ── */}
+            <div style={{display:"flex",borderRight:"2px solid var(--border)",flexShrink:0}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",
+                padding:"4px 8px",borderRight:"1px solid var(--border)",
+                background:"rgba(140,109,63,.06)"}}>
+                <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".14em",
+                  color:"var(--bronze)",fontWeight:600,writingMode:"horizontal-tb"}}>Fab</span>
+              </div>
+              <Cell label="Materials" value={b.matW>0?fmt(b.matW):"—"} wide/>
+              <Cell label="Office Labor"
+                value={b.laborDetail.officeHrs>0?fmtH(b.laborDetail.officeHrs):"—"}
+                sub={b.laborDetail.officeCost>0?fmt(b.laborDetail.officeCost):null}/>
+              <Cell label="Shop Labor"
+                value={b.laborDetail.fabHrs>0?fmtH(b.laborDetail.fabHrs):"—"}
+                sub={b.laborDetail.fabCost>0?fmt(b.laborDetail.fabCost):null}/>
+              <div style={{
+                display:"flex",flexDirection:"column",justifyContent:"space-between",
+                padding:"7px 10px",background:"rgba(140,109,63,.08)",minWidth:80,flex:"1.3",
+              }}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze)",fontWeight:600,marginBottom:2}}>Fab Total</div>
+                <div style={{...mono,fontSize:13,fontWeight:700,color:"var(--bronze)"}}>{b.total>0?fmt(b.total):"—"}</div>
+                {div>0&&b.total>0&&<div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{fmtD(b.total,div)}</div>}
+              </div>
+            </div>
+
+            {/* ── INSTALL ── */}
+            {hasInstall && (
+              <div style={{display:"flex",borderRight:"2px solid var(--border)",flexShrink:0}}>
+                <div style={{display:"flex",flexDirection:"column",justifyContent:"center",
+                  padding:"4px 8px",borderRight:"1px solid var(--border)",
+                  background:"rgba(90,122,140,.06)"}}>
+                  <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".14em",
+                    color:"#5a7a8c",fontWeight:600}}>Install</span>
+                </div>
+                <Cell label="Materials" value={ins.matW>0?fmt(ins.matW):"—"} wide/>
+                <Cell label="Install Labor"
+                  value={ins.laborDetail.installHrs>0?fmtH(ins.laborDetail.installHrs):ins.laborDetail.fabHrs>0?fmtH(ins.laborDetail.fabHrs):"—"}
+                  sub={ins.labor>0?fmt(ins.labor):null}/>
+                <div style={{
+                  display:"flex",flexDirection:"column",justifyContent:"space-between",
+                  padding:"7px 10px",background:"rgba(90,122,140,.1)",minWidth:80,flex:"1.3",
+                }}>
+                  <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"#5a7a8c",fontWeight:600,marginBottom:2}}>Install Total</div>
+                  <div style={{...mono,fontSize:13,fontWeight:700,color:"#5a7a8c"}}>{ins.total>0?fmt(ins.total):"—"}</div>
+                  {div>0&&ins.total>0&&<div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{fmtD(ins.total,div)}</div>}
+                </div>
+              </div>
+            )}
+
+            {/* ── UNIT TOTAL + QTY ── */}
+            <div style={{display:"flex",flex:1,flexShrink:0}}>
+              <div style={{
+                display:"flex",flexDirection:"column",justifyContent:"space-between",
+                padding:"7px 12px",background:"var(--ink)",flex:1,minWidth:110,
+              }}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze3)",fontWeight:600,marginBottom:2}}>
+                  Unit Cost{div>0?` / ${divLabel}`:""}
+                </div>
+                <div style={{...mono,fontSize:14,fontWeight:700,color:"var(--white)"}}>{unitCost>0?fmt(unitCost):"—"}</div>
+                {div>0&&unitCost>0&&<div style={{...mono,fontSize:9,color:"var(--bronze3)",marginTop:1}}>{fmtD(unitCost,div)}</div>}
+              </div>
+              {qty > 0 && (
+                <div style={{
+                  display:"flex",flexDirection:"column",justifyContent:"space-between",
+                  padding:"7px 12px",background:"var(--ink)",borderLeft:"1px solid rgba(255,255,255,.08)",
+                  minWidth:120,
+                }}>
+                  <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze3)",fontWeight:600,marginBottom:2}}>
+                    × {qty} {qtyUnit}
+                  </div>
+                  <div style={{...mono,fontSize:14,fontWeight:700,color:"var(--white)"}}>{fmt(subtotal)}</div>
+                  <div style={{...mono,fontSize:9,color:"#6a6660",marginTop:1}}>{fmt(unitCost)}/{qtyUnit}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── Row 3: Description + Qty ── */}
       <div style={{
         padding:"8px 14px 10px 14px",
         borderBottom:"1px solid var(--border)",
@@ -1598,7 +1676,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
           }}
         />
         {/* Qty — multiplies the entire scope item (shown on proposal) */}
-        <div style={{flexShrink:0, marginTop:8, minWidth:140}} onClick={e=>e.stopPropagation()}>
+        <div style={{flexShrink:0, marginTop:8, minWidth:120}} onClick={e=>e.stopPropagation()}>
           <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
             <span className="fl" style={{fontWeight:600}}>Qty</span>
             <select
@@ -1778,53 +1856,6 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
               + Add Alternate / Mod ({itemNum(itemIndex, (item.alternates||[]).length + 2)})
             </button>
           </div>
-
-          {/* ── Unit Cost / Qty / Subtotal summary ── */}
-          {(() => {
-            const qty      = parseFloat(item.qty) || 0;
-            const unit     = item.qtyUnit || "EA";
-            const fabPU    = totals.base.total;
-            const instPU   = totals.install.total;
-            const unitCost = totals.total;
-            const subtotal = qty > 0 ? unitCost * qty : unitCost;
-            const mono     = {fontFamily:"'DM Mono',monospace"};
-            const hasSections = installNum || (item.alternates||[]).length > 0;
-
-            return (
-              <div style={{background:"var(--ink)"}}>
-                {/* Combined unit cost row */}
-                <div style={{padding:"10px 16px", display:"flex", alignItems:"center", gap:0, borderBottom: qty > 0 ? "1px solid rgba(255,255,255,.07)" : "none"}}>
-                  <span style={{fontSize:10,color:"#6a6660",letterSpacing:".08em",fontFamily:"'DM Mono',monospace",flex:1}}>
-                    {hasSections ? `${baseNum} + ${installNum}${(item.alternates||[]).length>0?` + ${(item.alternates||[]).length} alt(s)`:""}` : baseNum}
-                  </span>
-                  <div style={{display:"flex",alignItems:"baseline",gap:10}}>
-                    {fabPU > 0 && instPU > 0 && (
-                      <span style={{fontSize:11,color:"#6a6660"}}>
-                        Fab {fmt(fabPU)} + Install {fmt(instPU)} =
-                      </span>
-                    )}
-                    <span style={{fontSize:12,color:"var(--bronze3)"}}>Unit Cost</span>
-                    <span style={{...mono, fontSize:16, color:"var(--white)", fontWeight:600}}>{unitCost > 0 ? fmt(unitCost) : "—"}</span>
-                    {qty > 0 && <span style={{fontSize:12,color:"#6a6660"}}>/ {unit}</span>}
-                  </div>
-                </div>
-
-                {/* Qty × unit = subtotal row — only when qty is set */}
-                {qty > 0 && (
-                  <div style={{padding:"10px 16px", display:"flex", alignItems:"center", gap:10}}>
-                    <span style={{fontSize:10,color:"#6a6660",flex:1,letterSpacing:".06em",textTransform:"uppercase"}}>Item Subtotal</span>
-                    <div style={{display:"flex",alignItems:"center",gap:10}}>
-                      <span style={{...mono, fontSize:13, color:"var(--bronze3)"}}>
-                        {fmt(unitCost)} × {qty} {unit}
-                      </span>
-                      <span style={{fontSize:12,color:"#6a6660"}}>=</span>
-                      <span style={{...mono, fontSize:18, color:"var(--white)", fontWeight:700}}>{fmt(subtotal)}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
 
         </div>
       )}
