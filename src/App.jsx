@@ -915,37 +915,43 @@ function CalcBtn({ hasCalc, onClick, active }) {
 
 // ── Searchable material picker ────────────────────────────────────────────────
 function MatPicker({ line, mats, matCategories, onUpdMat }) {
-  const [search, setSearch] = useState("");
-  const [open,   setOpen]   = useState(false);
+  const [open,      setOpen]      = useState(false);
+  const [selCat,    setSelCat]    = useState(null); // null = showing category list
   const ref = useRef(null);
-
-  const MAT_CATS = matCategories || [];
-  const q = search.toLowerCase();
-  const filtered = q
-    ? mats.filter(x => x.name.toLowerCase().includes(q) || x.category.toLowerCase().includes(q))
-    : mats;
 
   // Close on outside click
   useEffect(() => {
-    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const handler = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setSelCat(null); } };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selected = line.custom ? null : mats.find(x => x.id === line.materialId);
-  const displayName = line.custom ? (line.customName || "Custom line") : (selected?.name || "— Select material —");
+  // Reset to category list when dropdown opens
+  const openPicker = () => { setSelCat(null); setOpen(o => !o); };
 
-  const pick = (mat) => {
+  const selected     = line.custom ? null : mats.find(x => x.id === line.materialId);
+  const displayName  = line.custom ? (line.customName || "Custom line") : (selected?.name || "— Select material —");
+  const displayCat   = line.custom ? "Custom" : (selected?.category || "");
+
+  const pickMat = (mat) => {
     const defaultUnit = mat.priceLF ? "LF" : mat.priceSF ? "SqFt" : mat.priceEA ? "EA" : mat.priceLB ? "LB" : "LF";
     onUpdMat(line.id, { materialId:mat.id, custom:false, customName:"", unit:defaultUnit, customCost:null });
-    setSearch("");
-    setOpen(false);
+    setOpen(false); setSelCat(null);
   };
+
+  const pickCustom = () => {
+    onUpdMat(line.id, { custom:true, materialId:null, customName:"", customCost:0, unit:"LF" });
+    setOpen(false); setSelCat(null);
+  };
+
+  const MAT_CATS = matCategories || [];
+  const catsWithItems = MAT_CATS.filter(c => mats.some(m => m.category === c));
+  const catItems = selCat ? mats.filter(m => m.category === selCat) : [];
 
   return (
     <div ref={ref} style={{position:"relative",minWidth:200}}>
-      <div
-        onClick={() => setOpen(o => !o)}
+      {/* Trigger */}
+      <div onClick={openPicker}
         style={{
           display:"flex",alignItems:"center",justifyContent:"space-between",
           padding:"5px 8px",border:"1px solid var(--border2)",borderRadius:2,
@@ -953,75 +959,99 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
           borderColor: open ? "var(--bronze)" : "var(--border2)",
         }}
       >
-        <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",
-          color: line.custom ? "var(--ink2)" : selected ? "var(--ink)" : "var(--ink3)"
-        }}>{displayName}</span>
+        <div style={{flex:1,overflow:"hidden"}}>
+          {displayCat && (
+            <div style={{fontSize:9,color:"var(--ink3)",letterSpacing:".06em",textTransform:"uppercase",lineHeight:1.2}}>
+              {displayCat}
+            </div>
+          )}
+          <div style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",
+            color: line.custom ? "var(--ink2)" : selected ? "var(--ink)" : "var(--ink3)"
+          }}>{displayName}</div>
+        </div>
         <span style={{fontSize:9,color:"var(--ink3)",flexShrink:0}}>▾</span>
       </div>
+
       {open && (
         <div style={{
-          position:"absolute",top:"100%",left:0,zIndex:999,width:320,
+          position:"absolute",top:"100%",left:0,zIndex:999,width:280,
           background:"var(--white)",border:"1px solid var(--border2)",borderRadius:2,
-          boxShadow:"0 4px 16px rgba(28,26,23,.15)",maxHeight:320,display:"flex",flexDirection:"column",
+          boxShadow:"0 4px 16px rgba(28,26,23,.15)",
         }}>
-          <div style={{padding:"6px 8px",borderBottom:"1px solid var(--cream3)"}}>
-            <input
-              autoFocus
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search materials…"
-              style={{fontSize:12,width:"100%"}}
-              onClick={e => e.stopPropagation()}
-            />
-          </div>
-          <div style={{overflowY:"auto",flex:1}}>
-            {/* Custom line option */}
-            <div
-              onClick={() => {
-                onUpdMat(line.id, { custom:true, materialId:null, customName:"", customCost:0, unit:"LF" });
-                setSearch(""); setOpen(false);
-              }}
-              style={{padding:"7px 10px",fontSize:12,cursor:"pointer",borderBottom:"1px solid var(--cream3)",
-                color:"var(--bronze)",fontWeight:500,background:"var(--cream)"}}
-            >
-              + Custom line (not in library)
+          {/* ── Step 1: category list ── */}
+          {selCat === null && (
+            <div style={{maxHeight:320,overflowY:"auto"}}>
+              <div style={{padding:"7px 10px",fontSize:10,fontWeight:600,letterSpacing:".1em",
+                textTransform:"uppercase",color:"var(--ink3)",background:"var(--cream2)",
+                borderBottom:"1px solid var(--cream3)"}}>
+                Select Category
+              </div>
+              {/* Custom first-class option */}
+              <div onClick={pickCustom}
+                style={{padding:"9px 12px",fontSize:12,cursor:"pointer",
+                  borderBottom:"2px solid var(--cream3)",color:"var(--bronze)",fontWeight:600,
+                  background:"var(--cream)"}}
+                onMouseEnter={e=>e.currentTarget.style.background="rgba(140,109,63,.1)"}
+                onMouseLeave={e=>e.currentTarget.style.background="var(--cream)"}
+              >
+                ✏️ Custom (not in library)
+              </div>
+              {catsWithItems.map(cat => (
+                <div key={cat} onClick={()=>setSelCat(cat)}
+                  style={{
+                    padding:"9px 12px",fontSize:12.5,cursor:"pointer",
+                    display:"flex",justifyContent:"space-between",alignItems:"center",
+                    borderBottom:"1px solid var(--cream3)",
+                    background: cat===selected?.category ? "var(--cream2)" : "var(--white)",
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
+                  onMouseLeave={e=>e.currentTarget.style.background= cat===selected?.category?"var(--cream2)":"var(--white)"}
+                >
+                  <span>{cat}</span>
+                  <span style={{fontSize:10,color:"var(--ink3)",fontFamily:"'DM Mono',monospace"}}>
+                    {mats.filter(m=>m.category===cat).length} ›
+                  </span>
+                </div>
+              ))}
             </div>
-            {q
-              ? filtered.map(x => (
-                  <div key={x.id} onClick={() => pick(x)}
-                    style={{padding:"6px 10px",fontSize:12,cursor:"pointer",
+          )}
+
+          {/* ── Step 2: items in selected category ── */}
+          {selCat !== null && (
+            <div style={{display:"flex",flexDirection:"column",maxHeight:340}}>
+              {/* Back header */}
+              <div onClick={()=>setSelCat(null)}
+                style={{padding:"7px 10px",fontSize:11,cursor:"pointer",
+                  background:"var(--cream2)",borderBottom:"1px solid var(--cream3)",
+                  display:"flex",alignItems:"center",gap:6,color:"var(--bronze)",fontWeight:600,
+                  userSelect:"none"}}
+                onMouseEnter={e=>e.currentTarget.style.background="var(--cream3)"}
+                onMouseLeave={e=>e.currentTarget.style.background="var(--cream2)"}
+              >
+                <span>‹</span>
+                <span style={{letterSpacing:".08em",textTransform:"uppercase",fontSize:10}}>{selCat}</span>
+              </div>
+              <div style={{overflowY:"auto",flex:1}}>
+                {catItems.map(x => (
+                  <div key={x.id} onClick={()=>pickMat(x)}
+                    style={{
+                      padding:"7px 12px",fontSize:12,cursor:"pointer",
                       background: x.id===line.materialId ? "var(--cream2)" : "var(--white)",
+                      borderBottom:"1px solid var(--cream3)",
                     }}
                     onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
                     onMouseLeave={e=>e.currentTarget.style.background= x.id===line.materialId?"var(--cream2)":"var(--white)"}
                   >
-                    <span style={{color:"var(--ink3)",fontSize:10,marginRight:6}}>{x.category}</span>{x.name}
-                  </div>
-                ))
-              : MAT_CATS.map(cat => {
-                  const items = mats.filter(x => x.category === cat);
-                  if (!items.length) return null;
-                  return (
-                    <div key={cat}>
-                      <div style={{padding:"5px 10px",fontSize:10,fontWeight:600,letterSpacing:".08em",
-                        textTransform:"uppercase",color:"var(--ink3)",background:"var(--cream2)",
-                        borderBottom:"1px solid var(--cream3)"}}>
-                        {cat}
-                      </div>
-                      {items.map(x => (
-                        <div key={x.id} onClick={() => pick(x)}
-                          style={{padding:"6px 10px 6px 16px",fontSize:12,cursor:"pointer",
-                            background: x.id===line.materialId ? "var(--cream2)" : "var(--white)",
-                          }}
-                          onMouseEnter={e=>e.currentTarget.style.background="var(--cream)"}
-                          onMouseLeave={e=>e.currentTarget.style.background= x.id===line.materialId?"var(--cream2)":"var(--white)"}
-                        >{x.name}</div>
-                      ))}
+                    <div style={{fontWeight: x.id===line.materialId?600:400}}>{x.name}</div>
+                    <div style={{fontSize:10,color:"var(--ink3)",fontFamily:"'DM Mono',monospace",marginTop:1}}>
+                      {x.priceLF?`$${x.priceLF.toFixed(2)}/LF`:x.priceSF?`$${x.priceSF.toFixed(2)}/SF`:""}
+                      {x.priceLB?`  ·  $${x.priceLB.toFixed(2)}/LB`:""}
                     </div>
-                  );
-                })
-            }
-          </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -2346,11 +2376,12 @@ export default function App() {
             {tab==="materials" && (() => {
               // Group nav items into sections matching Saginaw structure
               const NAV_GROUPS = [
-                { label:"Tubing", cats:["Square Tube","Rectangular Tube","Round HSS"] },
-                { label:"Bar", cats:["Flat Bar","Round Bar","Square Bar"] },
+                { label:"Tubing",     cats:["Square Tube","Rectangular Tube","Round HSS"] },
+                { label:"Bar",        cats:["Flat Bar","Round Bar","Square Bar"] },
                 { label:"Structural", cats:["Angle","Wide Flange Beam","I-Beam","Standard Channel","Misc Channel"] },
-                { label:"Pipe & Sheet", cats:["Pipe","Sheet","Plate"] },
-                { label:"Other", cats:[] }, // catch-all for categories not in above groups
+                { label:"Pipe",       cats:["Pipe"] },
+                { label:"Sheet & Plate", cats:["Sheet","Plate"] },
+                { label:"Other",      cats:[] }, // catch-all
               ];
               // Find "Other" cats = any matCategory not already in a named group
               const groupedCats = new Set(NAV_GROUPS.flatMap(g=>g.cats));
@@ -2476,13 +2507,22 @@ export default function App() {
                       <div className="mat-cat-mgr">
                         <div className="mat-cat-mgr-title">Category settings</div>
                         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                          <input value={activeCat} style={{maxWidth:200,fontSize:12}}
-                            onChange={e=>{
-                              const newName=e.target.value;
+                          <input
+                            key={activeCat}
+                            defaultValue={activeCat}
+                            style={{maxWidth:200,fontSize:12}}
+                            onBlur={e=>{
+                              const newName = e.target.value.trim();
+                              if (!newName || newName === activeCat) { e.target.value = activeCat; return; }
                               setMatCategories(p=>p.map(c=>c===activeCat?newName:c));
                               setMats(p=>p.map(m=>m.category===activeCat?{...m,category:newName}:m));
                               setMatActiveCat(newName);
-                            }}/>
+                            }}
+                            onKeyDown={e=>{
+                              if (e.key==="Enter") e.target.blur();
+                              if (e.key==="Escape") { e.target.value=activeCat; e.target.blur(); }
+                            }}
+                          />
                           <button className="btn-d btn-s" style={{fontSize:11}}
                             onClick={()=>{
                               if(pageMats.length>0 && !window.confirm(`Delete "${activeCat}" and its ${pageMats.length} item(s)?`)) return;
