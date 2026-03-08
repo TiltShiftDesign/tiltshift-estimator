@@ -502,8 +502,11 @@ const blankScopeItem = () => ({
   type: "",
   finish: "",
   exclusions: [],
-  qty: "",             // numeric quantity
-  qtyUnit: "LF",       // LF, SF, EA, LB, HR, Set, Day, LS
+  qty: "",             // numeric quantity — multiplies the whole scope item
+  qtyUnit: "EA",       // EA, LF, SF, LB, Set, Day, LS
+  // Rate-check fields (informational only — do not affect pricing)
+  checkLF: "",         // total LF for $/LF sanity check
+  checkRisers: "",     // riser count for $/riser sanity check
   // Fabrication
   materialLines: [],
   laborLines: [],
@@ -1540,7 +1543,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             borderRadius:2,
           }}
         />
-        {/* Qty — multiplies the entire scope item */}
+        {/* Qty — multiplies the entire scope item (shown on proposal) */}
         <div style={{flexShrink:0, marginTop:8, minWidth:140}} onClick={e=>e.stopPropagation()}>
           <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
             <span className="fl" style={{fontWeight:600}}>Qty</span>
@@ -1552,6 +1555,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             >
               {["EA","LF","SF","LB","Set","Day","LS"].map(u=><option key={u}>{u}</option>)}
             </select>
+            <span style={{fontSize:9,color:"var(--ink3)",marginLeft:2}}>× unit cost</span>
           </div>
           <input
             type="number" min="0" step="1"
@@ -1764,6 +1768,73 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
                     </div>
                   </div>
                 )}
+              </div>
+            );
+          })()}
+
+          {/* ── Rate Check panel (informational only — does not affect pricing) ── */}
+          {(() => {
+            const unitCost = totals.total;
+            const lf       = parseFloat(item.checkLF) || 0;
+            const risers   = parseFloat(item.checkRisers) || 0;
+
+            return (
+              <div style={{
+                background:"var(--cream2)", borderTop:"1px solid var(--border)",
+                padding:"10px 16px",
+              }}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".12em",color:"var(--ink3)",fontWeight:500,marginBottom:8}}>
+                  Rate Check <span style={{fontWeight:400,letterSpacing:0,textTransform:"none",fontSize:10,color:"var(--ink3)"}}>— divide unit cost for sanity check only</span>
+                </div>
+                <div style={{display:"flex",gap:20,flexWrap:"wrap",alignItems:"flex-start"}}>
+                  {/* $/LF check */}
+                  <div style={{display:"flex",alignItems:"center",gap:10}}>
+                    <div>
+                      <div className="fl" style={{marginBottom:3}}>Length (LF)</div>
+                      <input type="number" min="0" step="0.5"
+                        value={item.checkLF||""}
+                        onChange={e=>updItem({checkLF:e.target.value})}
+                        placeholder="e.g. 15"
+                        style={{width:80,fontSize:13,fontFamily:"'DM Mono',monospace",fontWeight:600}}
+                      />
+                    </div>
+                    {lf > 0 && unitCost > 0 && (
+                      <div style={{
+                        background:"var(--white)",border:"1px solid var(--border)",borderRadius:2,
+                        padding:"6px 12px",minWidth:90,alignSelf:"flex-end",marginBottom:1,
+                      }}>
+                        <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",color:"var(--ink3)",marginBottom:1}}>Unit / LF</div>
+                        <div style={{fontFamily:"'DM Mono',monospace",fontSize:15,fontWeight:700,color:"var(--bronze)"}}>
+                          {fmt(unitCost / lf)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* $/riser check */}
+                  <div style={{display:"flex",alignItems:"center",gap:10}}>
+                    <div>
+                      <div className="fl" style={{marginBottom:3}}>Risers</div>
+                      <input type="number" min="0" step="1"
+                        value={item.checkRisers||""}
+                        onChange={e=>updItem({checkRisers:e.target.value})}
+                        placeholder="e.g. 12"
+                        style={{width:80,fontSize:13,fontFamily:"'DM Mono',monospace",fontWeight:600}}
+                      />
+                    </div>
+                    {risers > 0 && unitCost > 0 && (
+                      <div style={{
+                        background:"var(--white)",border:"1px solid var(--border)",borderRadius:2,
+                        padding:"6px 12px",minWidth:90,alignSelf:"flex-end",marginBottom:1,
+                      }}>
+                        <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",color:"var(--ink3)",marginBottom:1}}>Unit / Riser</div>
+                        <div style={{fontFamily:"'DM Mono',monospace",fontSize:15,fontWeight:700,color:"var(--bronze)"}}>
+                          {fmt(unitCost / risers)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })()}
