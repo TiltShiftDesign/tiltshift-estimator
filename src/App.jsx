@@ -1487,17 +1487,44 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             types={itemTypes} onAddType={onAddItemType}/>
         </div>
 
-        <div style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"var(--bronze)",fontWeight:600,flexShrink:0,minWidth:88,textAlign:"right"}}>
-          {totals.total > 0 ? fmt(totals.total) : "—"}
-        </div>
+        {/* Unit cost × qty = subtotal display in header */}
+        {(() => {
+          const qty = parseFloat(item.qty) || 0;
+          const unit = item.qtyUnit || "EA";
+          const unitCost = totals.total;
+          const subtotal = qty > 0 ? unitCost * qty : unitCost;
+          return (
+            <div style={{flexShrink:0, textAlign:"right"}} onClick={e=>e.stopPropagation()}>
+              {qty > 0 ? (
+                <div style={{display:"flex", alignItems:"center", gap:6}}>
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontSize:10, color:"var(--ink3)", fontFamily:"'DM Mono',monospace", lineHeight:1.2}}>
+                      {fmt(unitCost)}<span style={{fontSize:9, marginLeft:2}}>/{unit}</span>
+                    </div>
+                    <div style={{fontSize:10, color:"var(--ink3)", lineHeight:1.2}}>
+                      × {qty} {unit}
+                    </div>
+                  </div>
+                  <div style={{fontSize:14, fontFamily:"'DM Mono',monospace", color:"var(--bronze)", fontWeight:700, minWidth:88}}>
+                    {subtotal > 0 ? fmt(subtotal) : "—"}
+                  </div>
+                </div>
+              ) : (
+                <div style={{fontFamily:"'DM Mono',monospace", fontSize:13, color:"var(--bronze)", fontWeight:600, minWidth:88}}>
+                  {unitCost > 0 ? fmt(unitCost) : "—"}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <button className="btn-d" style={{flexShrink:0}}
           onClick={e=>{e.stopPropagation();onDelete();}}>✕</button>
       </div>
 
-      {/* Description + Qty — always visible below header row */}
+      {/* Qty row — always visible below header */}
       <div style={{
-        padding:"0 14px 10px 14px",
+        padding:"8px 14px 10px 14px",
         borderBottom:"1px solid var(--border)",
         background:"var(--white)",
         display:"flex", gap:12, alignItems:"flex-start",
@@ -1513,27 +1540,32 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             borderRadius:2,
           }}
         />
-        {/* Qty field — always visible, unit is selectable */}
-        <div style={{flexShrink:0, marginTop:8, minWidth:130}} onClick={e=>e.stopPropagation()}>
+        {/* Qty — multiplies the entire scope item */}
+        <div style={{flexShrink:0, marginTop:8, minWidth:140}} onClick={e=>e.stopPropagation()}>
           <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
-            <span className="fl">Qty</span>
+            <span className="fl" style={{fontWeight:600}}>Qty</span>
             <select
-              value={item.qtyUnit||"LF"}
+              value={item.qtyUnit||"EA"}
               onChange={e=>updItem({qtyUnit:e.target.value})}
               style={{fontSize:10,padding:"1px 2px",height:"auto",lineHeight:1,background:"transparent",
                 border:"none",borderBottom:"1px dashed var(--border2)",color:"var(--ink3)",cursor:"pointer"}}
             >
-              {["LF","SF","EA","LB","HR","Set","Day","LS"].map(u=><option key={u}>{u}</option>)}
+              {["EA","LF","SF","LB","Set","Day","LS"].map(u=><option key={u}>{u}</option>)}
             </select>
           </div>
           <input
-            type="number" min="0" step="0.1"
+            type="number" min="0" step="1"
             value={item.qty||""}
             onChange={e=>updItem({qty:e.target.value})}
             onClick={e=>e.stopPropagation()}
-            placeholder="—"
+            placeholder="1"
             style={{fontSize:14, fontFamily:"'DM Mono',monospace", fontWeight:600, width:"100%"}}
           />
+          {parseFloat(item.qty) > 0 && totals.total > 0 && (
+            <div style={{fontSize:10, color:"var(--ink3)", marginTop:4, fontFamily:"'DM Mono',monospace"}}>
+              {fmt(totals.total)}/{item.qtyUnit||"EA"} × {item.qty} = <span style={{color:"var(--bronze)", fontWeight:600}}>{fmt(totals.total * parseFloat(item.qty))}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1689,59 +1721,49 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             </button>
           </div>
 
-          {/* Combined item total */}
-          <div style={{padding:"10px 14px",background:"var(--ink)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,color:"#6a6660",letterSpacing:".08em"}}>
-              {baseNum} + {installNum}{(item.alternates||[]).length>0?` + ${(item.alternates||[]).length} alt(s)`:""}
-            </span>
-            <div style={{display:"flex",alignItems:"center",gap:16}}>
-              <span style={{fontSize:12,color:"var(--bronze3)"}}>Combined Item Total</span>
-              <span style={{fontFamily:"'DM Mono',monospace",fontSize:16,color:"var(--white)",fontWeight:600}}>{fmt(totals.total)}</span>
-            </div>
-          </div>
-
-          {/* ── Per-unit rate panel — shown whenever qty is set ── */}
+          {/* ── Unit Cost / Qty / Subtotal summary ── */}
           {(() => {
-            const qty    = parseFloat(item.qty) || 0;
-            const unit   = item.qtyUnit || "LF";
-            if (qty <= 0) return null;
-            const fabPU  = totals.base.total / qty;
-            const instPU = totals.install.total / qty;
-            const totPU  = totals.total / qty;
-            const mono   = {fontFamily:"'DM Mono',monospace"};
+            const qty      = parseFloat(item.qty) || 0;
+            const unit     = item.qtyUnit || "EA";
+            const fabPU    = totals.base.total;
+            const instPU   = totals.install.total;
+            const unitCost = totals.total;
+            const subtotal = qty > 0 ? unitCost * qty : unitCost;
+            const mono     = {fontFamily:"'DM Mono',monospace"};
+            const hasSections = installNum || (item.alternates||[]).length > 0;
+
             return (
-              <div style={{
-                background:"var(--cream2)", borderTop:"2px solid var(--bronze3)",
-                padding:"12px 16px", display:"flex", gap:0,
-              }}>
-                <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",fontWeight:500,alignSelf:"center",minWidth:100}}>
-                  Cost per {unit}
+              <div style={{background:"var(--ink)"}}>
+                {/* Combined unit cost row */}
+                <div style={{padding:"10px 16px", display:"flex", alignItems:"center", gap:0, borderBottom: qty > 0 ? "1px solid rgba(255,255,255,.07)" : "none"}}>
+                  <span style={{fontSize:10,color:"#6a6660",letterSpacing:".08em",fontFamily:"'DM Mono',monospace",flex:1}}>
+                    {hasSections ? `${baseNum} + ${installNum}${(item.alternates||[]).length>0?` + ${(item.alternates||[]).length} alt(s)`:""}` : baseNum}
+                  </span>
+                  <div style={{display:"flex",alignItems:"baseline",gap:10}}>
+                    {fabPU > 0 && instPU > 0 && (
+                      <span style={{fontSize:11,color:"#6a6660"}}>
+                        Fab {fmt(fabPU)} + Install {fmt(instPU)} =
+                      </span>
+                    )}
+                    <span style={{fontSize:12,color:"var(--bronze3)"}}>Unit Cost</span>
+                    <span style={{...mono, fontSize:16, color:"var(--white)", fontWeight:600}}>{unitCost > 0 ? fmt(unitCost) : "—"}</span>
+                    {qty > 0 && <span style={{fontSize:12,color:"#6a6660"}}>/ {unit}</span>}
+                  </div>
                 </div>
-                <div style={{flex:1, display:"flex", gap:8}}>
-                  {[
-                    ["Fabrication", fabPU,  "var(--bronze)"],
-                    ["Install",     instPU, "#5a7a8c"     ],
-                    ["Total",       totPU,  "var(--ink)"  ],
-                  ].map(([label, val, color]) => (
-                    <div key={label} style={{
-                      flex:1, background:"var(--white)", borderRadius:2,
-                      border:"1px solid var(--border)", padding:"10px 14px",
-                      display:"flex", flexDirection:"column", gap:3,
-                    }}>
-                      <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500}}>{label}</div>
-                      {qty > 0 ? (
-                        <div style={{...mono, fontSize:16, fontWeight:700, color}}>
-                          {`$${Number(val).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`}
-                          <span style={{fontSize:10,fontWeight:400,color:"var(--ink3)",marginLeft:3}}>/{unit}</span>
-                        </div>
-                      ) : (
-                        <div style={{...mono, fontSize:13, color:"var(--ink3)"}}>
-                          — <span style={{fontSize:10}}>enter {unit.toLowerCase()} qty</span>
-                        </div>
-                      )}
+
+                {/* Qty × unit = subtotal row — only when qty is set */}
+                {qty > 0 && (
+                  <div style={{padding:"10px 16px", display:"flex", alignItems:"center", gap:10}}>
+                    <span style={{fontSize:10,color:"#6a6660",flex:1,letterSpacing:".06em",textTransform:"uppercase"}}>Item Subtotal</span>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <span style={{...mono, fontSize:13, color:"var(--bronze3)"}}>
+                        {fmt(unitCost)} × {qty} {unit}
+                      </span>
+                      <span style={{fontSize:12,color:"#6a6660"}}>=</span>
+                      <span style={{...mono, fontSize:18, color:"var(--white)", fontWeight:700}}>{fmt(subtotal)}</span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -2205,7 +2227,23 @@ export default function App() {
 
   const allTotals = useCallback((est) => {
     if (!est) return { items:[], total:0 };
-    const items = est.scopeItems.map(i => calcItem(i, mats, laborCats, est.wastePct, est.overhead, est.markupPct));
+    const items = est.scopeItems.map(i => {
+      const t   = calcItem(i, mats, laborCats, est.wastePct, est.overhead, est.markupPct);
+      const qty = parseFloat(i.qty) || 0;
+      const multiplier = qty > 0 ? qty : 1;
+      // Scale all money values by qty multiplier
+      const scale = x => x * multiplier;
+      return {
+        ...t,
+        unitCost:   t.total,                  // per-unit price (always)
+        qty:        qty,
+        multiplier,
+        base:    { ...t.base,    total: scale(t.base.total)    },
+        install: { ...t.install, total: scale(t.install.total) },
+        alts:    t.alts.map(a => ({ ...a, total: scale(a.total) })),
+        total:   scale(t.total),
+      };
+    });
     return { items, total: items.reduce((s,t) => s + t.total, 0) };
   }, [mats, laborCats]);
 
@@ -2417,29 +2455,30 @@ export default function App() {
                     <div style={{padding:0}}>
                       <table style={{width:"100%",borderCollapse:"collapse"}}>
                         <thead><tr>
-                          {["#","Item","Type","Qty","Fabrication","Install","Item Total"].map(h=>(
-                            <th key={h} style={{textAlign: h==="Fabrication"||h==="Install"||h==="Item Total"||h==="Qty" ? "right" : "left",fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",fontWeight:500}}>{h}</th>
+                          {["#","Item","Type","Unit Cost","Qty","Item Total"].map(h=>(
+                            <th key={h} style={{textAlign: h==="Unit Cost"||h==="Qty"||h==="Item Total" ? "right" : "left",fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",fontWeight:500}}>{h}</th>
                           ))}
                         </tr></thead>
                         <tbody>
                           {activeEst.scopeItems.map((item,i)=>{
-                            const t = sT.items[i];
-                            const fabTotal     = t.base.total;
-                            const installTotal = t.install.total + t.alts.reduce((s,a)=>s+a.total,0);
-                            const hasInstall   = installTotal > 0;
+                            const t        = sT.items[i];
+                            const qty      = parseFloat(item.qty) || 0;
+                            const unit     = item.qtyUnit || "EA";
+                            const unitCost = t.unitCost;
+                            const subtotal = t.total;
                             return (
                               <tr key={item.id} style={{borderBottom:"1px solid var(--cream3)"}}>
                                 <td style={{padding:"10px 12px",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--bronze)",fontWeight:600,whiteSpace:"nowrap"}}>{itemNum(i,0)}</td>
                                 <td style={{padding:"10px 12px",color:"var(--ink)",fontWeight:500,maxWidth:200}}>{item.name||`Item ${i+1}`}</td>
                                 <td style={{padding:"10px 12px",color:"var(--ink3)",fontSize:11}}>{item.type||"—"}</td>
                                 <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--ink2)"}}>
-                                  {item.qty ? `${item.qty} ${item.qtyUnit||"LF"}` : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  {unitCost > 0 ? fmt(unitCost) : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  {qty > 0 && <span style={{fontSize:10,color:"var(--ink3)",marginLeft:3}}>/{unit}</span>}
                                 </td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12}}>{fmt(fabTotal)}</td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color: hasInstall ? "var(--ink)" : "var(--ink3)"}}>
-                                  {hasInstall ? fmt(installTotal) : <span style={{color:"var(--ink3)",fontSize:11}}>—</span>}
+                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--ink2)"}}>
+                                  {qty > 0 ? `${qty} ${unit}` : <span style={{color:"var(--ink3)"}}>—</span>}
                                 </td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:13,color:"var(--bronze)",fontWeight:700}}>{fmt(t.total)}</td>
+                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:13,color:"var(--bronze)",fontWeight:700}}>{fmt(subtotal)}</td>
                               </tr>
                             );
                           })}
@@ -2960,25 +2999,39 @@ export default function App() {
                 const baseNum    = itemNum(i, 0);
                 const installNum = itemNum(i, 1);
                 const hasInstall = pt.install.total > 0;
+                const qty        = parseFloat(item.qty) || 0;
+                const unit       = item.qtyUnit || "EA";
+                // Sub-rows show unit costs (unscaled) when qty is set
+                const fabDisplay    = qty > 0 ? pt.base.total / qty    : pt.base.total;
+                const instDisplay   = qty > 0 ? pt.install.total / qty : pt.install.total;
 
                 return (
                   <div key={item.id} className="pitm">
 
-                    {/* Name + total */}
+                    {/* Name + price row */}
                     <div className="pi-row">
                       <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1,minWidth:0}}>
                         <span className="pi-num">{baseNum.slice(0,2)}</span>
                         <span className="pi-name">{item.name||`Item ${i+1}`}</span>
-                        {item.qty && (
-                          <span style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"#8a8680",flexShrink:0}}>
-                            {item.qty} {item.qtyUnit||"LF"}
-                          </span>
-                        )}
                       </div>
-                      {/* Only show total here if no sub-breakdown below */}
-                      {!(hasInstall || (item.alternates||[]).some((_,ai)=>pt.alts[ai]?.total>0)) && (
-                        <span className="pi-price" style={{color:"#8c6d3f"}}>{fmt(pt.total)}</span>
-                      )}
+                      {/* Show unit cost × qty if qty set, else just total */}
+                      {(() => {
+                        const qty = parseFloat(item.qty) || 0;
+                        const unit = item.qtyUnit || "EA";
+                        const unitCost = pt.unitCost;
+                        const subtotal = pt.total;
+                        if (qty > 0) {
+                          return (
+                            <div style={{display:"flex",alignItems:"baseline",gap:6,flexShrink:0}}>
+                              <span style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"#8a8680"}}>
+                                {fmt(unitCost)}/{unit} × {qty}
+                              </span>
+                              <span className="pi-price" style={{color:"#8c6d3f"}}>{fmt(subtotal)}</span>
+                            </div>
+                          );
+                        }
+                        return <span className="pi-price" style={{color:"#8c6d3f"}}>{fmt(subtotal)}</span>;
+                      })()}
                     </div>
 
                     {/* Description — with top rule, narrower width */}
@@ -3011,7 +3064,9 @@ export default function App() {
                             <span className="pi-num">{baseNum}</span>
                             <span className="pi-sname">Fabrication</span>
                           </div>
-                          <span className="pi-price" style={{fontSize:9,color:"#555"}}>{fmt(pt.base.total)}</span>
+                          <span className="pi-price" style={{fontSize:9,color:"#555"}}>
+                            {fmt(fabDisplay)}{qty > 0 ? `/${unit}` : ""}
+                          </span>
                         </div>
                         {hasInstall && (
                           <div className="pi-sub">
@@ -3019,7 +3074,9 @@ export default function App() {
                               <span className="pi-num" style={{color:"#5a7a8c"}}>{installNum}</span>
                               <span className="pi-sname">Install{item.installNotes ? ` — ${item.installNotes}` : ""}</span>
                             </div>
-                            <span className="pi-price" style={{fontSize:9,color:"#555"}}>{fmt(pt.install.total)}</span>
+                            <span className="pi-price" style={{fontSize:9,color:"#555"}}>
+                              {fmt(instDisplay)}{qty > 0 ? `/${unit}` : ""}
+                            </span>
                           </div>
                         )}
                         {(item.alternates||[]).map((alt,ai)=>{
