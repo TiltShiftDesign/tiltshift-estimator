@@ -1083,9 +1083,11 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
         {matLines.length===0
           ? <div style={{padding:"8px 0",color:"var(--ink3)",fontSize:12,textAlign:"center",background:"var(--cream)",borderRadius:2}}>No materials</div>
           : <table style={{width:"100%",borderCollapse:"collapse"}}>
-              <thead><tr>{["Material","Qty","Unit","Unit Cost","Ext.","Note","∑",""].map(h=>(
-                <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>
-              ))}</tr></thead>
+              <thead><tr>{["Material","Sheet Size","Qty","Unit","Unit Cost","Ext.","Note","∑",""].map(h=>{
+                // only show Sheet Size col if any line has a sheet mat
+                if(h==="Sheet Size" && !matLines.some(l=>{ const mm=mats.find(x=>x.id===l.materialId); return mm?.sheetSize!==undefined; })) return null;
+                return <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"5px 7px",borderBottom:"1px solid var(--border)",letterSpacing:".07em",textTransform:"uppercase",fontWeight:500}}>{h}</th>;
+              })}</tr></thead>
               <tbody>{matLines.map(line=>{
                 const m = line.custom ? null : mats.find(x=>x.id===line.materialId);
                 const lineUnit = line.unit || (m?.priceSF ? "SqFt" : "LF");
@@ -1101,6 +1103,16 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                       ...(m.priceLB ? ["LB"] : []),
                       ...(m.priceEA ? ["EA"] : []),
                     ] : ["LF","LB","EA"];
+
+                // Sheet/Plate size helper
+                const isSheetMat = !line.custom && m?.sheetSize !== undefined;
+                const SHEET_SIZE_SF = {"4' × 8'":32,"4' × 10'":40,"5' × 10'":50};
+                const lineSheetSize = line.lineSheetSize || m?.sheetSize || "4' × 8'";
+                const sheetSF = SHEET_SIZE_SF[lineSheetSize] || 32;
+                const sheetCount = (lineUnit==="SqFt" && isSheetMat && sheetSF)
+                  ? (Number(line.qty)/sheetSF).toFixed(2)
+                  : null;
+
                 const isOpen = openCalc === line.id;
                 const bb = isOpen ? "none" : "1px solid var(--cream3)";
                 return (
@@ -1124,6 +1136,37 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                           : <MatPicker line={line} mats={mats} matCategories={MAT_CATS} onUpdMat={onUpdMat}/>
                         }
                       </td>
+                      {/* Sheet Size — only rendered when any line in table is a sheet mat */}
+                      {matLines.some(l=>{ const mm=mats.find(x=>x.id===l.materialId); return mm?.sheetSize!==undefined; }) && (
+                        <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"top",width:110}}>
+                          {isSheetMat ? (
+                            <div style={{display:"flex",flexDirection:"column",gap:3}}>
+                              <select
+                                value={lineSheetSize}
+                                onChange={e=>onUpdMat(line.id,"lineSheetSize",e.target.value)}
+                                style={{fontSize:11,padding:"3px 4px",background:"var(--cream)",border:"1px solid var(--border2)",borderRadius:2,width:"100%"}}>
+                                {["4' × 8'","4' × 10'","5' × 10'","Other"].map(s=><option key={s}>{s}</option>)}
+                              </select>
+                              {/* Sheet count helper — shows how many sheets the current SF qty equals */}
+                              {lineUnit==="SqFt" && lineSheetSize!=="Other" && (
+                                <div style={{display:"flex",alignItems:"center",gap:3}}>
+                                  <input
+                                    type="number" min="0" step="0.25"
+                                    value={sheetCount??0}
+                                    onChange={e=>{
+                                      const sheets=parseFloat(e.target.value)||0;
+                                      onUpdMat(line.id,"qty",String(sheets*sheetSF));
+                                    }}
+                                    style={{width:44,fontSize:11,fontFamily:"'DM Mono',monospace",textAlign:"right",padding:"1px 3px"}}
+                                    title="Number of sheets"
+                                  />
+                                  <span style={{fontSize:10,color:"var(--ink3)",whiteSpace:"nowrap"}}>sheets</span>
+                                </div>
+                              )}
+                            </div>
+                          ) : <span style={{color:"var(--ink3)",fontSize:10}}>—</span>}
+                        </td>
+                      )}
                       {/* Qty */}
                       <td style={{padding:"4px 7px",borderBottom:bb,verticalAlign:"middle",width:90}}>
                         <input type="number" min="0" value={line.qty}
@@ -1165,7 +1208,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                     </tr>
                     {isOpen && (
                       <tr>
-                        <td colSpan={8} style={{padding:"0 7px 10px",borderBottom:"1px solid var(--cream3)"}}>
+                        <td colSpan={isSheetMat ? 9 : 8} style={{padding:"0 7px 10px",borderBottom:"1px solid var(--cream3)"}}>
                           <CalcPanel
                             calc={line.calc}
                             fieldLabel={line.custom ? (line.customName||"Custom") : (m?.name || "Qty")}
