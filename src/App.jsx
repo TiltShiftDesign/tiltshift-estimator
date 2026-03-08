@@ -1544,11 +1544,11 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
 
       {/* ── Row 2: Scope item summary grid ── */}
       {(() => {
-        const b  = totals.base;
+        const b   = totals.base;
         const ins = totals.install;
-        const lf     = parseFloat(item.checkLF) || 0;
-        const risers = parseFloat(item.checkRisers) || 0;
-        const div    = lf > 0 ? lf : risers > 0 ? risers : 0;
+        const lf       = parseFloat(item.checkLF) || 0;
+        const risers   = parseFloat(item.checkRisers) || 0;
+        const div      = lf > 0 ? lf : risers > 0 ? risers : 0;
         const divLabel = lf > 0 ? "LF" : risers > 0 ? "riser" : null;
         const qty      = parseFloat(item.qty) || 0;
         const qtyUnit  = item.qtyUnit || "EA";
@@ -1557,102 +1557,185 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
         const hasInstall = ins.total > 0;
         const mono = {fontFamily:"'DM Mono',monospace"};
 
-        const Cell = ({label, value, sub, accent, wide}) => (
+        const fmtH = h => h > 0 ? `${h.toFixed(1)}h` : "—";
+        const fmtD = cost => div > 0 && cost > 0 ? `${fmt(cost/div)}/${divLabel}` : null;
+
+        // Row: label on left, then cells across columns
+        const fabColor  = "var(--bronze)";
+        const instColor = "#5a7a8c";
+
+        const SectionLabel = ({label, color}) => (
           <div style={{
-            display:"flex",flexDirection:"column",justifyContent:"space-between",
-            padding:"7px 10px", borderRight:"1px solid var(--border)",
-            minWidth: wide ? 80 : 70, flex: wide ? "1.3" : "1",
+            width:52, flexShrink:0, display:"flex", alignItems:"center",
+            padding:"0 8px", borderRight:"1px solid var(--border)",
           }}>
-            <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500,whiteSpace:"nowrap",marginBottom:2}}>{label}</div>
-            <div style={{...mono,fontSize:12,fontWeight:700,color:accent||"var(--ink2)",whiteSpace:"nowrap"}}>{value}</div>
-            {sub && <div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{sub}</div>}
+            <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".12em",
+              color, fontWeight:600}}>
+              {label}
+            </span>
           </div>
         );
 
-        const fmtH = h => h > 0 ? `${h.toFixed(1)}h` : "—";
-        const fmtD = (cost, d) => d > 0 && cost > 0 ? `${fmt(cost/d)}/${divLabel}` : null;
+        const Val = ({main, secondary, dim, bold}) => (
+          <div style={{display:"flex",flexDirection:"column",justifyContent:"center",gap:1}}>
+            <div style={{...mono, fontSize:bold?13:12, fontWeight:bold?700:600,
+              color: dim?"var(--ink3)":bold?"var(--white)":"var(--ink2)", whiteSpace:"nowrap"}}>
+              {main||"—"}
+            </div>
+            {secondary && <div style={{...mono,fontSize:9,color:dim?"#6a6660":"var(--ink3)",whiteSpace:"nowrap"}}>{secondary}</div>}
+          </div>
+        );
+
+        const colStyle = (flex, bg, borderRight) => ({
+          flex, display:"flex", flexDirection:"column",
+          background: bg||"transparent",
+          borderRight: borderRight||"1px solid var(--border)",
+          overflow:"hidden",
+        });
+
+        const rowStyle = (borderBottom) => ({
+          display:"flex", alignItems:"center",
+          padding:"6px 10px", minHeight:36,
+          borderBottom: borderBottom ? "1px solid var(--border)" : "none",
+        });
 
         return (
           <div style={{
             display:"flex", borderBottom:"1px solid var(--border)",
-            background:"var(--cream2)", overflowX:"auto",
+            background:"var(--cream2)",
           }} onClick={e=>e.stopPropagation()}>
 
-            {/* ── FABRICATION ── */}
-            <div style={{display:"flex",borderRight:"2px solid var(--border)",flexShrink:0}}>
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",
-                padding:"4px 8px",borderRight:"1px solid var(--border)",
-                background:"rgba(140,109,63,.06)"}}>
-                <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".14em",
-                  color:"var(--bronze)",fontWeight:600,writingMode:"horizontal-tb"}}>Fab</span>
+            {/* Label column */}
+            <div style={colStyle("0 0 52px")}>
+              {/* Header spacer */}
+              <div style={{...rowStyle(true), padding:"6px 8px", background:"var(--cream2)"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",
+                  color:"var(--ink3)",fontWeight:500,whiteSpace:"nowrap"}}>
+                </div>
               </div>
-              <Cell label="Materials" value={b.matW>0?fmt(b.matW):"—"} wide/>
-              <Cell label="Office Labor"
-                value={b.laborDetail.officeHrs>0?fmtH(b.laborDetail.officeHrs):"—"}
-                sub={b.laborDetail.officeCost>0?fmt(b.laborDetail.officeCost):null}/>
-              <Cell label="Shop Labor"
-                value={b.laborDetail.fabHrs>0?fmtH(b.laborDetail.fabHrs):"—"}
-                sub={b.laborDetail.fabCost>0?fmt(b.laborDetail.fabCost):null}/>
-              <div style={{
-                display:"flex",flexDirection:"column",justifyContent:"space-between",
-                padding:"7px 10px",background:"rgba(140,109,63,.08)",minWidth:80,flex:"1.3",
-              }}>
-                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze)",fontWeight:600,marginBottom:2}}>Fab Total</div>
-                <div style={{...mono,fontSize:13,fontWeight:700,color:"var(--bronze)"}}>{b.total>0?fmt(b.total):"—"}</div>
-                {div>0&&b.total>0&&<div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{fmtD(b.total,div)}</div>}
+              <div style={{...rowStyle(hasInstall), padding:"5px 8px", background:"rgba(140,109,63,.04)"}}>
+                <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".12em",color:fabColor,fontWeight:600}}>Fab</span>
               </div>
+              {hasInstall && (
+                <div style={{...rowStyle(false), padding:"5px 8px", background:"rgba(90,122,140,.04)"}}>
+                  <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".12em",color:instColor,fontWeight:600}}>Install</span>
+                </div>
+              )}
             </div>
 
-            {/* ── INSTALL ── */}
-            {hasInstall && (
-              <div style={{display:"flex",borderRight:"2px solid var(--border)",flexShrink:0}}>
-                <div style={{display:"flex",flexDirection:"column",justifyContent:"center",
-                  padding:"4px 8px",borderRight:"1px solid var(--border)",
-                  background:"rgba(90,122,140,.06)"}}>
-                  <span style={{fontSize:8,textTransform:"uppercase",letterSpacing:".14em",
-                    color:"#5a7a8c",fontWeight:600}}>Install</span>
+            {/* Materials column */}
+            <div style={colStyle(1)}>
+              <div style={{...rowStyle(true), padding:"6px 10px"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500}}>Materials</div>
+              </div>
+              <div style={{...rowStyle(hasInstall), background:"rgba(140,109,63,.04)"}}>
+                <Val main={b.matW>0?fmt(b.matW):null}/>
+              </div>
+              {hasInstall && (
+                <div style={rowStyle(false)}>
+                  <Val main={ins.matW>0?fmt(ins.matW):null}/>
                 </div>
-                <Cell label="Materials" value={ins.matW>0?fmt(ins.matW):"—"} wide/>
-                <Cell label="Install Labor"
-                  value={ins.laborDetail.installHrs>0?fmtH(ins.laborDetail.installHrs):ins.laborDetail.fabHrs>0?fmtH(ins.laborDetail.fabHrs):"—"}
-                  sub={ins.labor>0?fmt(ins.labor):null}/>
-                <div style={{
-                  display:"flex",flexDirection:"column",justifyContent:"space-between",
-                  padding:"7px 10px",background:"rgba(90,122,140,.1)",minWidth:80,flex:"1.3",
-                }}>
-                  <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"#5a7a8c",fontWeight:600,marginBottom:2}}>Install Total</div>
-                  <div style={{...mono,fontSize:13,fontWeight:700,color:"#5a7a8c"}}>{ins.total>0?fmt(ins.total):"—"}</div>
-                  {div>0&&ins.total>0&&<div style={{...mono,fontSize:9,color:"var(--ink3)",marginTop:1}}>{fmtD(ins.total,div)}</div>}
+              )}
+            </div>
+
+            {/* Office Labor column */}
+            <div style={colStyle(1)}>
+              <div style={{...rowStyle(true), padding:"6px 10px"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500,whiteSpace:"nowrap"}}>Office Labor</div>
+              </div>
+              <div style={{...rowStyle(hasInstall), background:"rgba(140,109,63,.04)"}}>
+                <Val main={b.laborDetail.officeHrs>0?fmtH(b.laborDetail.officeHrs):null}
+                     secondary={b.laborDetail.officeCost>0?fmt(b.laborDetail.officeCost):null}/>
+              </div>
+              {hasInstall && (
+                <div style={rowStyle(false)}>
+                  <Val main="—"/>
+                </div>
+              )}
+            </div>
+
+            {/* Shop Labor column */}
+            <div style={colStyle(1)}>
+              <div style={{...rowStyle(true), padding:"6px 10px"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500,whiteSpace:"nowrap"}}>Shop Labor</div>
+              </div>
+              <div style={{...rowStyle(hasInstall), background:"rgba(140,109,63,.04)"}}>
+                <Val main={b.laborDetail.fabHrs>0?fmtH(b.laborDetail.fabHrs):null}
+                     secondary={b.laborDetail.fabCost>0?fmt(b.laborDetail.fabCost):null}/>
+              </div>
+              {hasInstall && (
+                <div style={rowStyle(false)}>
+                  <Val main={ins.labor>0?fmtH(ins.laborDetail.installHrs||0):null}
+                       secondary={ins.labor>0?fmt(ins.labor):null}/>
+                </div>
+              )}
+            </div>
+
+            {/* Subtotal column */}
+            <div style={colStyle(1, undefined, "2px solid var(--border)")}>
+              <div style={{...rowStyle(true), padding:"6px 10px"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--ink3)",fontWeight:500}}>Subtotal</div>
+              </div>
+              <div style={{...rowStyle(hasInstall), background:"rgba(140,109,63,.08)"}}>
+                <Val main={b.total>0?fmt(b.total):null} secondary={fmtD(b.total)}/>
+              </div>
+              {hasInstall && (
+                <div style={{...rowStyle(false), background:"rgba(90,122,140,.08)"}}>
+                  <Val main={ins.total>0?fmt(ins.total):null} secondary={fmtD(ins.total)}/>
+                </div>
+              )}
+            </div>
+
+            {/* Unit Cost column */}
+            <div style={{...colStyle("0 0 auto", "var(--ink)"), borderRight:"none", minWidth:hasInstall||qty>0?100:110}}>
+              <div style={{...rowStyle(true), padding:"6px 12px", borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",
+                  color:"var(--bronze3)",fontWeight:600,whiteSpace:"nowrap"}}>
+                  Unit Cost
+                </div>
+              </div>
+              {/* Fab unit cost row */}
+              <div style={{...rowStyle(hasInstall), padding:"6px 12px", borderBottom: hasInstall?"1px solid rgba(255,255,255,.08)":"none"}}>
+                <Val main={b.total>0?fmt(b.total):null} secondary={fmtD(b.total)} dim bold={!hasInstall}/>
+              </div>
+              {hasInstall && (
+                <div style={{...rowStyle(false), padding:"6px 12px"}}>
+                  <Val main={ins.total>0?fmt(ins.total):null} secondary={fmtD(ins.total)} dim/>
+                </div>
+              )}
+            </div>
+
+            {/* Combined + Qty column — only when there's install or qty */}
+            {(hasInstall || qty > 0) && (
+              <div style={{...colStyle("0 0 auto", "var(--ink)"), borderRight:"none",
+                borderLeft:"1px solid rgba(255,255,255,.08)", minWidth:110}}>
+                <div style={{...rowStyle(true), padding:"6px 12px", borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+                  <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",
+                    color:"var(--bronze3)",fontWeight:600,whiteSpace:"nowrap"}}>
+                    {qty>0 ? `× ${qty} ${qtyUnit}` : "Combined"}
+                  </div>
+                </div>
+                {/* Combined unit cost */}
+                <div style={{...rowStyle(false), padding:"6px 12px", flexDirection:"column", alignItems:"flex-start", gap:2,
+                  flex:1, justifyContent:"center"}}>
+                  <div style={{...mono,fontSize:14,fontWeight:700,color:"var(--white)",whiteSpace:"nowrap"}}>
+                    {unitCost>0?fmt(qty>0?subtotal:unitCost):"—"}
+                  </div>
+                  {qty>0&&unitCost>0&&(
+                    <div style={{...mono,fontSize:9,color:"#6a6660",whiteSpace:"nowrap"}}>
+                      {fmt(unitCost)}/{qtyUnit}
+                      {div>0&&` · ${fmtD(unitCost)}`}
+                    </div>
+                  )}
+                  {!qty&&div>0&&unitCost>0&&(
+                    <div style={{...mono,fontSize:9,color:"var(--bronze3)",whiteSpace:"nowrap"}}>
+                      {fmtD(unitCost)}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* ── UNIT TOTAL + QTY ── */}
-            <div style={{display:"flex",flex:1,flexShrink:0}}>
-              <div style={{
-                display:"flex",flexDirection:"column",justifyContent:"space-between",
-                padding:"7px 12px",background:"var(--ink)",flex:1,minWidth:110,
-              }}>
-                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze3)",fontWeight:600,marginBottom:2}}>
-                  Unit Cost{div>0?` / ${divLabel}`:""}
-                </div>
-                <div style={{...mono,fontSize:14,fontWeight:700,color:"var(--white)"}}>{unitCost>0?fmt(unitCost):"—"}</div>
-                {div>0&&unitCost>0&&<div style={{...mono,fontSize:9,color:"var(--bronze3)",marginTop:1}}>{fmtD(unitCost,div)}</div>}
-              </div>
-              {qty > 0 && (
-                <div style={{
-                  display:"flex",flexDirection:"column",justifyContent:"space-between",
-                  padding:"7px 12px",background:"var(--ink)",borderLeft:"1px solid rgba(255,255,255,.08)",
-                  minWidth:120,
-                }}>
-                  <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".09em",color:"var(--bronze3)",fontWeight:600,marginBottom:2}}>
-                    × {qty} {qtyUnit}
-                  </div>
-                  <div style={{...mono,fontSize:14,fontWeight:700,color:"var(--white)"}}>{fmt(subtotal)}</div>
-                  <div style={{...mono,fontSize:9,color:"#6a6660",marginTop:1}}>{fmt(unitCost)}/{qtyUnit}</div>
-                </div>
-              )}
-            </div>
           </div>
         );
       })()}
