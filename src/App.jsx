@@ -502,7 +502,8 @@ const blankScopeItem = () => ({
   type: "",
   finish: "",
   exclusions: [],
-  qty: "",             // LF for handrail/guardrail, riser count for stair
+  qty: "",             // numeric quantity
+  qtyUnit: "LF",       // LF, SF, EA, LB, HR, Set, Day, LS
   // Fabrication
   materialLines: [],
   laborLines: [],
@@ -1421,22 +1422,28 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             borderRadius:2,
           }}
         />
-        {/* LF / Riser qty field — only for Handrail/Guardrail and Stair */}
-        {(item.type==="Handrail / Guardrail" || item.type==="Stair") && (
-          <div style={{flexShrink:0, marginTop:8, minWidth:110}}>
-            <div className="fl" style={{marginBottom:4}}>
-              {item.type==="Handrail / Guardrail" ? "Linear Feet" : "Riser Qty"}
-            </div>
-            <input
-              type="number" min="0" step={item.type==="Stair" ? "1" : "0.1"}
-              value={item.qty||""}
-              onChange={e=>updItem({qty:e.target.value})}
-              onClick={e=>e.stopPropagation()}
-              placeholder="0"
-              style={{fontSize:14, fontFamily:"'DM Mono',monospace", fontWeight:600, width:"100%"}}
-            />
+        {/* Qty field — always visible, unit is selectable */}
+        <div style={{flexShrink:0, marginTop:8, minWidth:130}} onClick={e=>e.stopPropagation()}>
+          <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
+            <span className="fl">Qty</span>
+            <select
+              value={item.qtyUnit||"LF"}
+              onChange={e=>updItem({qtyUnit:e.target.value})}
+              style={{fontSize:10,padding:"1px 2px",height:"auto",lineHeight:1,background:"transparent",
+                border:"none",borderBottom:"1px dashed var(--border2)",color:"var(--ink3)",cursor:"pointer"}}
+            >
+              {["LF","SF","EA","LB","HR","Set","Day","LS"].map(u=><option key={u}>{u}</option>)}
+            </select>
           </div>
-        )}
+          <input
+            type="number" min="0" step="0.1"
+            value={item.qty||""}
+            onChange={e=>updItem({qty:e.target.value})}
+            onClick={e=>e.stopPropagation()}
+            placeholder="—"
+            style={{fontSize:14, fontFamily:"'DM Mono',monospace", fontWeight:600, width:"100%"}}
+          />
+        </div>
       </div>
 
       {open && (
@@ -1560,7 +1567,11 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
                     <LinesEditor
                       matLines={alt.materialLines||[]} labLines={alt.laborLines||[]}
                       mats={mats} laborCats={laborCats} wastePct={wastePct}
-                      onUpdMat={(lid,f,v)=>updAlt(alt.id,{materialLines:alt.materialLines.map(l=>l.id===lid?{...l,[f]:v}:l)})}
+                      onUpdMat={(lid,fieldOrPatch,v)=>updAlt(alt.id,{materialLines:alt.materialLines.map(l=>{
+                        if(l.id!==lid) return l;
+                        if(typeof fieldOrPatch==="object") return {...l,...fieldOrPatch};
+                        return {...l,[fieldOrPatch]:v};
+                      })})}
                       onDelMat={lid=>updAlt(alt.id,{materialLines:alt.materialLines.filter(l=>l.id!==lid)})}
                       onAddMat={matId=>updAlt(alt.id,{materialLines:[...(alt.materialLines||[]),{id:uid(),materialId:matId||mats[0].id,qty:1,note:""}]})}
                       onUpdLab={(lid,nl)=>updAlt(alt.id,{laborLines:alt.laborLines.map(l=>l.id===lid?nl:l)})}
@@ -1598,13 +1609,14 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
             </div>
           </div>
 
-          {/* ── Per-unit rate panel (Handrail/Guardrail = LF, Stair = per riser) ── */}
-          {(item.type==="Handrail / Guardrail" || item.type==="Stair") && (() => {
+          {/* ── Per-unit rate panel — shown whenever qty is set ── */}
+          {(() => {
             const qty    = parseFloat(item.qty) || 0;
-            const unit   = item.type==="Handrail / Guardrail" ? "LF" : "Riser";
-            const fabPU  = qty > 0 ? totals.base.total / qty    : null;
-            const instPU = qty > 0 ? totals.install.total / qty : null;
-            const totPU  = qty > 0 ? totals.total / qty         : null;
+            const unit   = item.qtyUnit || "LF";
+            if (qty <= 0) return null;
+            const fabPU  = totals.base.total / qty;
+            const instPU = totals.install.total / qty;
+            const totPU  = totals.total / qty;
             const mono   = {fontFamily:"'DM Mono',monospace"};
             return (
               <div style={{
@@ -2288,8 +2300,8 @@ export default function App() {
                     <div style={{padding:0}}>
                       <table style={{width:"100%",borderCollapse:"collapse"}}>
                         <thead><tr>
-                          {["#","Item","Type","Fabrication","Install","Item Total"].map(h=>(
-                            <th key={h} style={{textAlign: h==="Fabrication"||h==="Install"||h==="Item Total" ? "right" : "left",fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",fontWeight:500}}>{h}</th>
+                          {["#","Item","Type","Qty","Fabrication","Install","Item Total"].map(h=>(
+                            <th key={h} style={{textAlign: h==="Fabrication"||h==="Install"||h==="Item Total"||h==="Qty" ? "right" : "left",fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",fontWeight:500}}>{h}</th>
                           ))}
                         </tr></thead>
                         <tbody>
@@ -2303,6 +2315,9 @@ export default function App() {
                                 <td style={{padding:"10px 12px",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--bronze)",fontWeight:600,whiteSpace:"nowrap"}}>{itemNum(i,0)}</td>
                                 <td style={{padding:"10px 12px",color:"var(--ink)",fontWeight:500,maxWidth:200}}>{item.name||`Item ${i+1}`}</td>
                                 <td style={{padding:"10px 12px",color:"var(--ink3)",fontSize:11}}>{item.type||"—"}</td>
+                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--ink2)"}}>
+                                  {item.qty ? `${item.qty} ${item.qtyUnit||"LF"}` : <span style={{color:"var(--ink3)"}}>—</span>}
+                                </td>
                                 <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12}}>{fmt(fabTotal)}</td>
                                 <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color: hasInstall ? "var(--ink)" : "var(--ink3)"}}>
                                   {hasInstall ? fmt(installTotal) : <span style={{color:"var(--ink3)",fontSize:11}}>—</span>}
@@ -2730,6 +2745,11 @@ export default function App() {
                       <div style={{display:"flex",alignItems:"baseline",gap:8,flex:1,minWidth:0}}>
                         <span className="pi-num">{baseNum.slice(0,2)}</span>
                         <span className="pi-name">{item.name||`Item ${i+1}`}</span>
+                        {item.qty && (
+                          <span style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"#8a8680",flexShrink:0}}>
+                            {item.qty} {item.qtyUnit||"LF"}
+                          </span>
+                        )}
                       </div>
                       {/* Only show total here if no sub-breakdown below */}
                       {!(hasInstall || (item.alternates||[]).some((_,ai)=>pt.alts[ai]?.total>0)) && (
