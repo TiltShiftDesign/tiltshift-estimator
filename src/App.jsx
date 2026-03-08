@@ -956,16 +956,18 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
     }
   };
 
-  // Picking a sheet size: price = priceSF × SF of that size, unit = EA (per sheet)
+  // Picking a sheet size: price = priceSheet if set, else priceSF × SF, unit = EA (per sheet)
   const pickSize = (mat, size) => {
     const sf = SHEET_SIZE_SF[size];
-    const pricePerSheet = sf ? Math.round((mat.priceSF || 0) * sf * 100) / 100 : 0;
+    const pricePerSheet = mat.priceSheet != null
+      ? mat.priceSheet
+      : (sf ? Math.round((mat.priceSF || 0) * sf * 100) / 100 : 0);
     onUpdMat(line.id, {
-      materialId:   mat.id,
-      custom:       false,
-      customName:   "",
-      unit:         "EA",
-      customCost:   pricePerSheet,
+      materialId:    mat.id,
+      custom:        false,
+      customName:    "",
+      unit:          "Sheet",
+      customCost:    pricePerSheet,
       lineSheetSize: size,
     });
     setOpen(false); setSelCat(null); setSelMat(null);
@@ -1169,20 +1171,26 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
               ))}</tr></thead>
               <tbody>{matLines.map(line=>{
                 const m = line.custom ? null : mats.find(x=>x.id===line.materialId);
+                const isSheetLine = !line.custom && m?.sheetSize !== undefined && line.lineSheetSize;
                 const lineUnit = line.unit || (m?.priceSF ? "SqFt" : "LF");
-                // Unit cost: custom override wins, then library price
+                // Unit cost: for sheet lines customCost holds the per-sheet price (not a "custom override")
                 const libraryPrice = matUnitPrice(m, lineUnit);
                 const unitPrice = line.customCost != null ? Number(line.customCost) : libraryPrice;
                 const ext = unitPrice * Number(line.qty);
                 const availUnits = line.custom
                   ? ["LF","SqFt","LB","EA"]
+                  : isSheetLine
+                  ? ["Sheet","SqFt","LB"]
                   : m ? [
-                      ...(m.priceLF ? ["LF"] : []),
-                      ...(m.priceSF ? ["SqFt"] : []),
-                      ...(m.priceLB ? ["LB"] : []),
-                      ...(m.priceEA ? ["EA"] : []),
-                      ...(m.sheetSize ? ["EA"] : []),
-                    ].filter((v,i,a)=>a.indexOf(v)===i) : ["LF","LB","EA"];
+                      ...(m.priceLF  ? ["LF"]    : []),
+                      ...(m.priceSF  ? ["SqFt"]  : []),
+                      ...(m.priceLB  ? ["LB"]    : []),
+                      ...(m.priceEA  ? ["EA"]    : []),
+                    ] : ["LF","LB","EA"];
+
+                // Is the unit cost "overridden" in a user-meaningful sense?
+                // Sheet lines always carry customCost (it's the sheet price), not a user override
+                const isUserOverride = line.customCost != null && !isSheetLine;
 
                 const isOpen = openCalc === line.id;
                 const bb = isOpen ? "none" : "1px solid var(--cream3)";
@@ -1226,9 +1234,9 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                           onChange={e => onUpdMat(line.id, "customCost", e.target.value === "" ? null : parseFloat(e.target.value)||0)}
                           style={{
                             fontSize:11,fontFamily:"'DM Mono',monospace",width:"100%",
-                            color: line.customCost != null ? "var(--bronze2)" : "var(--ink3)",
+                            color: isUserOverride ? "var(--bronze2)" : "var(--ink3)",
                           }}
-                          title={line.customCost != null ? "Custom price (overriding library)" : "Library price — edit to override"}
+                          title={isUserOverride ? "Custom price (overriding library)" : isSheetLine ? `Per-sheet price (${line.lineSheetSize})` : "Library price — edit to override"}
                         />
                       </td>
                       {/* Extended */}
@@ -1913,17 +1921,18 @@ button{cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:no
 .mat-page-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);}
 .mat-page-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
 .mat-page-body{flex:1;overflow-y:auto;padding:0 20px 12px;}
-.mat-tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.mat-tbl th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1.5px solid var(--ink);background:var(--cream2);white-space:nowrap;position:sticky;top:0;z-index:2;}
+.mat-tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+.mat-tbl th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1.5px solid var(--ink);background:var(--cream2);white-space:nowrap;position:sticky;top:0;z-index:2;overflow:hidden;}
 .mat-tbl th.r{text-align:right;}
 .mat-tbl th.sortable{cursor:pointer;user-select:none;}
 .mat-tbl th.sortable:hover{color:var(--ink);}
-.mat-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.mat-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;overflow:hidden;}
 .mat-tbl tr:hover td{background:rgba(140,109,63,.05);}
-.mat-tbl input{width:100%;font-size:12px;font-family:'DM Mono',monospace;background:transparent;border:none;border-bottom:1px dashed transparent;padding:2px 4px;color:var(--ink);}
+.mat-tbl input{width:100%;font-size:12px;font-family:'DM Mono',monospace;background:transparent;border:none;border-bottom:1px dashed transparent;padding:2px 4px;color:var(--ink);box-sizing:border-box;}
 .mat-tbl input:focus{border-bottom-color:var(--bronze);outline:none;background:#fff;}
-.mat-tbl input.num{text-align:right;width:88px;}
-.mat-tbl select.sheet-size{font-size:11px;padding:2px 4px;background:var(--cream);border:1px solid var(--border2);border-radius:2px;color:var(--ink2);width:100%;}
+.mat-tbl input.num{text-align:right;}
+.mat-tbl input.num-ro{text-align:right;color:var(--ink3);cursor:default;pointer-events:none;}
+.mat-tbl select.sheet-size{font-size:11px;padding:2px 4px;background:var(--cream);border:1px solid var(--border2);border-radius:2px;color:var(--ink2);width:100%;box-sizing:border-box;}
 .mat-cat-mgr{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--cream2);}
 .mat-cat-mgr-title{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--ink3);text-align:center;}
@@ -2633,26 +2642,33 @@ export default function App() {
                         ) : (
                           <table className="mat-tbl">
                             <thead><tr>
-                              <th className="sortable" style={{width:isSheetPlate?"34%":"44%"}}
-                                onClick={()=>setMatSortDir(d=>d==="asc"?"desc":d==="desc"?"none":"asc")}>
-                                Size / Description{sortIcon}
-                              </th>
-                              {isSheetPlate && <th style={{width:"14%"}}>Sheet Size</th>}
-                              <th className="r">{isSF?"$/SqFt":"$/LF"}</th>
-                              <th className="r">$/LB</th>
-                              {isEA && <th className="r">$/EA (20' stick)</th>}
-                              <th style={{width:28}}/>
+                              {isSheetPlate ? <>
+                                <th className="sortable" style={{width:"36%"}} onClick={()=>setMatSortDir(d=>d==="asc"?"desc":d==="desc"?"none":"asc")}>Size / Description{sortIcon}</th>
+                                <th style={{width:"12%"}}>Sheet Size</th>
+                                <th className="r" style={{width:"13%"}}>$/SqFt</th>
+                                <th className="r" style={{width:"15%"}}>$/Sheet</th>
+                                <th className="r" style={{width:"13%"}}>$/LB</th>
+                                <th style={{width:32}}/>
+                              </> : <>
+                                <th className="sortable" style={{width:"44%"}} onClick={()=>setMatSortDir(d=>d==="asc"?"desc":d==="desc"?"none":"asc")}>Size / Description{sortIcon}</th>
+                                <th className="r" style={{width:"18%"}}>$/LF</th>
+                                <th className="r" style={{width:"18%"}}>$/LB</th>
+                                {isEA && <th className="r" style={{width:"18%"}}>$/EA (20' stick)</th>}
+                                <th style={{width:32}}/>
+                              </>}
                             </tr></thead>
                             <tbody>
-                              {pageMats.map(m=>(
+                              {pageMats.map(m=>{
+                                const mSheetSF = SHEET_SIZE_SF[m.sheetSize] || 32;
+                                const pricePerSheet = isSheetPlate
+                                  ? (m.priceSheet != null ? m.priceSheet : Math.round((m.priceSF||0)*mSheetSF*100)/100)
+                                  : 0;
+                                return (
                                 <tr key={m.id}>
-                                  <td><input value={m.name}
-                                    onChange={e=>updM(m.id,{name:e.target.value})}/></td>
+                                  <td><input value={m.name} onChange={e=>updM(m.id,{name:e.target.value})}/></td>
                                   {isSheetPlate && (
                                     <td>
-                                      <select className="sheet-size"
-                                        value={m.sheetSize||"4' × 8'"}
-                                        onChange={e=>updM(m.id,{sheetSize:e.target.value})}>
+                                      <select className="sheet-size" value={m.sheetSize||"4' × 8'"} onChange={e=>updM(m.id,{sheetSize:e.target.value})}>
                                         {SHEET_SIZES.map(s=><option key={s}>{s}</option>)}
                                       </select>
                                     </td>
@@ -2663,27 +2679,41 @@ export default function App() {
                                       step="0.01" min="0"
                                       onChange={e=>{
                                         const v=parseFloat(e.target.value)||0;
-                                        updM(m.id,isSF?{priceSF:v}:{priceLF:v});
+                                        // Clear priceSheet override so it re-derives from priceSF
+                                        updM(m.id, isSF?{priceSF:v,priceSheet:null}:{priceLF:v});
                                       }}/>
                                   </td>
+                                  {isSheetPlate && (
+                                    <td>
+                                      <input type="number" className="num"
+                                        value={pricePerSheet}
+                                        step="0.01" min="0"
+                                        title="Price per sheet — edit to override (clears when $/SqFt changes)"
+                                        style={{color: m.priceSheet!=null ? "var(--bronze2)" : "var(--ink)"}}
+                                        onChange={e=>{
+                                          const v=parseFloat(e.target.value)||0;
+                                          updM(m.id,{priceSheet:v});
+                                        }}/>
+                                    </td>
+                                  )}
                                   <td>
                                     <input type="number" className="num"
                                       value={m.priceLB??0} step="0.01" min="0"
                                       onChange={e=>updM(m.id,{priceLB:parseFloat(e.target.value)||0})}/>
                                   </td>
-                                  {isEA && (
+                                  {isEA && !isSheetPlate && (
                                     <td>
                                       <input type="number" className="num"
                                         value={m.priceEA??0} step="0.01" min="0"
                                         onChange={e=>updM(m.id,{priceEA:parseFloat(e.target.value)||0})}/>
                                     </td>
                                   )}
-                                  <td>
+                                  <td style={{textAlign:"center"}}>
                                     <button className="btn-d" style={{padding:"2px 6px",fontSize:11}}
                                       onClick={()=>setMats(p=>p.filter(x=>x.id!==m.id))}>✕</button>
                                   </td>
                                 </tr>
-                              ))}
+                              )})}
                             </tbody>
                           </table>
                         )}
