@@ -2467,6 +2467,67 @@ export default function App() {
     }
   }, []);
 
+  // Branch: deep-clone the current estimate as a new version linked to the same parent
+  const branchEst = useCallback((sourceId, revLabel) => {
+    let newId = null;
+    setEsts(prev => {
+      const source = prev.find(e => e.id === sourceId);
+      if (!source) return prev;
+
+      const rootId = source.parentId || source.id;
+      const family = prev.filter(e => e.id === rootId || e.parentId === rootId);
+
+      // Auto-generate rev label if not provided
+      const usedLabels = family.map(e => e.revLabel).filter(Boolean);
+      const revLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let autoLabel = revLabel;
+      if (!autoLabel) {
+        for (const ch of revLetters) {
+          if (!usedLabels.includes(`Rev ${ch}`)) { autoLabel = `Rev ${ch}`; break; }
+        }
+      }
+
+      // Mark root with Rev A if untagged
+      const newPrev = prev.map(e =>
+        (e.id === rootId && !e.revLabel) ? { ...e, revLabel: "Rev A" } : e
+      );
+
+      // Deep-clone all line items with fresh ids
+      const cloneLines = lines => (lines||[]).map(l => ({ ...l, id: uid() }));
+      const cloneItem  = item => ({
+        ...item, id: uid(),
+        materialLines:        cloneLines(item.materialLines),
+        laborLines:           cloneLines(item.laborLines),
+        installMaterialLines: cloneLines(item.installMaterialLines),
+        installLaborLines:    cloneLines(item.installLaborLines),
+        alternates: (item.alternates||[]).map(a => ({
+          ...a, id: uid(),
+          materialLines: cloneLines(a.materialLines),
+          laborLines:    cloneLines(a.laborLines),
+        })),
+      });
+
+      newId = uid();
+      const branch = {
+        ...source,
+        id:         newId,
+        parentId:   rootId,
+        revLabel:   autoLabel,
+        status:     "Draft",
+        date:       new Date().toISOString().slice(0, 10),
+        scopeItems: source.scopeItems.map(cloneItem),
+      };
+
+      const lastSibIdx = newPrev.reduce((idx, e, i) =>
+        (e.id === rootId || e.parentId === rootId) ? i : idx, -1);
+      const result = [...newPrev];
+      result.splice(lastSibIdx + 1, 0, branch);
+      return result;
+    });
+    // Navigate to the new branch (newId is set synchronously inside setEsts)
+    if (newId) { setActId(newId); setTab("estimate"); }
+  }, []);
+
   const addLaborCat = useCallback(() => setLaborCats(p => [...p, {id:uid(), name:"New Category", rate:70, tasks:[]}]), []);
   const updLaborCat = useCallback((cid, patch) => setLaborCats(p => p.map(c => c.id===cid ? {...c,...patch} : c)), []);
   const delLaborCat = useCallback((cid) => setLaborCats(p => p.filter(c => c.id!==cid)), []);
@@ -2543,28 +2604,53 @@ export default function App() {
                   </div>
                   <div className="elist">
                     {ests.length===0 && <div style={{padding:"24px 12px",color:"var(--ink3)",textAlign:"center",fontSize:12,lineHeight:1.7}}>No estimates yet.<br/>Click <strong>+ New Estimate</strong> to begin.</div>}
-                    {ests.map(est=>{
-                      const {total}=allTotals(est);
-                      return (
-                        <div key={est.id} className={`ecard${actId===est.id?" act":""}`} onClick={()=>{setActId(est.id);setTab("estimate");}}>
-                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-                            <div className="ename" style={{flex:1,minWidth:0}}>{est.project||"Untitled Project"}</div>
-                            <button className="btn-d" style={{flexShrink:0,marginLeft:6,fontSize:11,padding:"1px 6px"}}
-                              onClick={e=>{e.stopPropagation();if(confirm(`Delete "${est.project||"Untitled Project"}"?`))delEst(est.id);}}>✕</button>
-                          </div>
-                          {est.jobNumber && <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"var(--bronze)",marginTop:2,fontWeight:500}}>{est.jobNumber}</div>}
-                          <div className="emeta">{est.client} · {est.date}</div>
-                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
-                            <span className={`sbadge sb-${est.status}`}>{est.status}</span>
-                            <span className="etotal">{total?fmt(total):"—"}</span>
-                          </div>
-                          <div style={{marginTop:5,fontSize:10,color:"var(--ink3)"}}>
-                            {est.scopeItems.length} item{est.scopeItems.length!==1?"s":""}
-                            {est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ") && ` · ${est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ")}`}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {(() => {
+                      // Group into families: roots first, then their branches
+                      const roots   = ests.filter(e => !e.parentId);
+                      const orphans = ests.filter(e => e.parentId && !ests.find(r => r.id === e.parentId));
+                      const ordered = [...roots, ...orphans];
+                      const rendered = [];
+                      for (const root of ordered) {
+                        const branches = ests.filter(e => e.parentId === root.id);
+                        const family   = [root, ...branches];
+                        const isFamily = family.some(e => e.revLabel);
+                        for (const est of family) {
+                          const {total} = allTotals(est);
+                          const isBranch = !!est.parentId;
+                          rendered.push(
+                            <div key={est.id}
+                              className={`ecard${actId===est.id?" act":""}`}
+                              style={isBranch ? {marginLeft:12, borderLeft:"2px solid var(--border2)"} : {}}
+                              onClick={()=>{setActId(est.id);setTab("estimate");}}>
+                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                                <div style={{flex:1,minWidth:0}}>
+                                  {isFamily && est.revLabel && (
+                                    <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".1em",
+                                      color:"var(--bronze)",fontWeight:600,marginBottom:2}}>
+                                      {est.revLabel}
+                                    </div>
+                                  )}
+                                  <div className="ename">{est.project||"Untitled Project"}</div>
+                                </div>
+                                <button className="btn-d" style={{flexShrink:0,marginLeft:6,fontSize:11,padding:"1px 6px"}}
+                                  onClick={e=>{e.stopPropagation();if(confirm(`Delete "${est.project||"Untitled Project"}"?`))delEst(est.id);}}>✕</button>
+                              </div>
+                              {est.jobNumber && <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"var(--bronze)",marginTop:2,fontWeight:500}}>{est.jobNumber}</div>}
+                              <div className="emeta">{est.client} · {est.date}</div>
+                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
+                                <span className={`sbadge sb-${est.status}`}>{est.status}</span>
+                                <span className="etotal">{total?fmt(total):"—"}</span>
+                              </div>
+                              <div style={{marginTop:5,fontSize:10,color:"var(--ink3)"}}>
+                                {est.scopeItems.length} item{est.scopeItems.length!==1?"s":""}
+                                {est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ") && ` · ${est.scopeItems.filter(i=>i.name).map(i=>i.name).slice(0,2).join(", ")}`}
+                              </div>
+                            </div>
+                          );
+                        }
+                      }
+                      return rendered;
+                    })()}
                   </div>
                 </div>
               )}
@@ -2587,12 +2673,32 @@ export default function App() {
                 {/* Project info card */}
                 <div className="card">
                   <div className="ch">
-                    <h3>Project Information</h3>
-                    <div style={{display:"flex",gap:8}}>
+                    <h3>
+                      Project Information
+                      {activeEst.revLabel && (
+                        <span style={{
+                          marginLeft:10, fontSize:11, fontWeight:600,
+                          fontFamily:"'DM Mono',monospace", color:"var(--bronze)",
+                          background:"var(--cream2)", border:"1px solid var(--border)",
+                          borderRadius:2, padding:"2px 8px", letterSpacing:".06em",
+                        }}>{activeEst.revLabel}</span>
+                      )}
+                    </h3>
+                    <div style={{display:"flex",gap:8,alignItems:"center"}}>
                       <select value={activeEst.status} onChange={e=>updEst(actId,{status:e.target.value})} style={{width:120,fontSize:12}}>
                         {STATUS_LIST.map(s=><option key={s}>{s}</option>)}
                       </select>
                       <button className="btn-g btn-s" onClick={()=>setShowProp(true)}>Preview Proposal</button>
+                      <button className="btn-g btn-s"
+                        style={{whiteSpace:"nowrap"}}
+                        title="Save a copy of this estimate to develop an alternate version"
+                        onClick={()=>{
+                          if(confirm(`Branch "${activeEst.project||"this estimate"}" into a new alternate version?\n\nThe current estimate will be saved as-is. The new branch starts as an identical copy you can edit freely.`)) {
+                            branchEst(actId);
+                          }
+                        }}>
+                        ⑂ Branch Version
+                      </button>
                     </div>
                   </div>
                   <div className="cb">
@@ -3146,24 +3252,41 @@ export default function App() {
                       ? <div style={{padding:24,color:"var(--ink3)",textAlign:"center"}}>No estimates yet.</div>
                       : <table style={{width:"100%",borderCollapse:"collapse"}}>
                           <thead><tr>
-                            {["Project","Client","Items","Estimator","Date","Status","Total"].map(h=>(
+                            {["Rev","Project","Client","Items","Estimator","Date","Status","Total"].map(h=>(
                               <th key={h} style={{textAlign:"left",fontSize:10,color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",letterSpacing:".1em",textTransform:"uppercase",fontWeight:500}}>{h}</th>
                             ))}
                           </tr></thead>
-                          <tbody>{ests.map(est=>{
-                            const {total}=allTotals(est);
-                            return (
-                              <tr key={est.id} style={{cursor:"pointer"}} onClick={()=>{setActId(est.id);setTab("estimate");}}>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",color:"var(--bronze)",fontWeight:500}}>{est.project||"Untitled"}</td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)"}}>{est.client}</td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",fontSize:11,color:"var(--ink3)"}}>{est.scopeItems.length}</td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",color:"var(--ink3)"}}>{est.estimator}</td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>{est.date}</td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)"}}><span className={`sbadge sb-${est.status}`}>{est.status}</span></td>
-                                <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"var(--bronze)",fontWeight:600}}>{total?fmt(total):"—"}</td>
-                              </tr>
-                            );
-                          })}</tbody>
+                          <tbody>{(() => {
+                            const roots   = ests.filter(e => !e.parentId);
+                            const orphans = ests.filter(e => e.parentId && !ests.find(r => r.id === e.parentId));
+                            const rows    = [];
+                            for (const root of [...roots, ...orphans]) {
+                              const branches = ests.filter(e => e.parentId === root.id);
+                              for (const est of [root, ...branches]) {
+                                const {total} = allTotals(est);
+                                const isBranch = !!est.parentId;
+                                rows.push(
+                                  <tr key={est.id} style={{cursor:"pointer", background: isBranch?"rgba(140,109,63,.03)":"transparent"}}
+                                    onClick={()=>{setActId(est.id);setTab("estimate");}}>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--bronze)",fontWeight:600,whiteSpace:"nowrap"}}>
+                                      {est.revLabel || "—"}
+                                    </td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",color:"var(--bronze)",fontWeight:500,paddingLeft: isBranch?24:12}}>
+                                      {isBranch && <span style={{color:"var(--border2)",marginRight:6}}>└</span>}
+                                      {est.project||"Untitled"}
+                                    </td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)"}}>{est.client}</td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",fontSize:11,color:"var(--ink3)"}}>{est.scopeItems.length}</td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",color:"var(--ink3)"}}>{est.estimator}</td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>{est.date}</td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)"}}><span className={`sbadge sb-${est.status}`}>{est.status}</span></td>
+                                    <td style={{padding:"9px 12px",borderBottom:"1px solid var(--cream3)",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"var(--bronze)",fontWeight:600}}>{total?fmt(total):"—"}</td>
+                                  </tr>
+                                );
+                              }
+                            }
+                            return rows;
+                          })()}</tbody>
                         </table>
                     }
                   </div>
