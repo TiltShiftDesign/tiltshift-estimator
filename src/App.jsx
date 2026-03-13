@@ -1959,7 +1959,7 @@ function CostBreakdown({ t, wastePct, ovhd, mkup, label, accent }) {
         ["Material w/ Waste",   t.matW],
         ["Labor",               t.labor],
         [`Overhead ($${ovhd}/hr)`, t.ovAmt],
-        [`Markup (${mkup}%)`,   t.mkAmt],
+        [`Profit Margin (${mkup}%)`,   t.mkAmt],
       ].map(([l,v]) => (
         <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 12px",borderBottom:"1px solid var(--cream3)"}}>
           <span style={{fontSize:11,color:"var(--ink3)"}}>{l}</span>
@@ -2290,7 +2290,7 @@ export default function App() {
   const [nf, setNf] = useState({
     project:"", client:"", estimator:"", jobNumber:"",
     date: new Date().toISOString().slice(0,10),
-    wastePct:10, markupPct:20, overhead:26,
+    wastePct:10, markupPct:20, overhead:36,
   });
 
   // ── Persistence: Supabase is the single source of truth ─────────────────────
@@ -2410,25 +2410,63 @@ export default function App() {
     setEsts(p => p.map(e => e.id !== id ? e : (typeof u==="function" ? u(e) : {...e,...u}))), []);
 
   const allTotals = useCallback((est) => {
-    if (!est) return { items:[], total:0 };
+    if (!est) return { items:[], total:0, totals:{} };
     const items = est.scopeItems.map(i => {
       const t   = calcItem(i, mats, laborCats, est.wastePct, est.overhead, est.markupPct, est.laborRateOverrides||{});
       const qty = parseFloat(i.qty) || 0;
       const multiplier = qty > 0 ? qty : 1;
-      // Scale all money values by qty multiplier
       const scale = x => x * multiplier;
+      // Scale laborDetail too
+      const scaleLD = ld => ({
+        officeHrs:   ld.officeHrs   * multiplier,
+        officeCost:  ld.officeCost  * multiplier,
+        fabHrs:      ld.fabHrs      * multiplier,
+        fabCost:     ld.fabCost     * multiplier,
+        installHrs:  ld.installHrs  * multiplier,
+        installCost: ld.installCost * multiplier,
+      });
       return {
         ...t,
-        unitCost:   t.total,                  // per-unit price (always)
-        qty:        qty,
-        multiplier,
-        base:    { ...t.base,    total: scale(t.base.total)    },
-        install: { ...t.install, total: scale(t.install.total) },
-        alts:    t.alts.map(a => ({ ...a, total: scale(a.total) })),
-        total:   scale(t.total),
+        unitCost:   t.total,
+        qty, multiplier,
+        base: {
+          ...t.base,
+          total:       scale(t.base.total),
+          matW:        scale(t.base.matW),
+          labor:       scale(t.base.labor),
+          ovAmt:       scale(t.base.ovAmt),
+          mkAmt:       scale(t.base.mkAmt),
+          laborDetail: scaleLD(t.base.laborDetail),
+        },
+        install: {
+          ...t.install,
+          total:       scale(t.install.total),
+          matW:        scale(t.install.matW),
+          labor:       scale(t.install.labor),
+          ovAmt:       scale(t.install.ovAmt),
+          mkAmt:       scale(t.install.mkAmt),
+          laborDetail: scaleLD(t.install.laborDetail),
+        },
+        alts: t.alts.map(a => ({ ...a, total: scale(a.total) })),
+        total: scale(t.total),
       };
     });
-    return { items, total: items.reduce((s,t) => s + t.total, 0) };
+    // Aggregate project-level totals
+    const sum = (key, sub) => items.reduce((s, t) => s + (t[sub][key] || 0), 0);
+    const sumLD = (key) => items.reduce((s,t) =>
+      s + (t.base.laborDetail[key]||0) + (t.install.laborDetail[key]||0), 0);
+    const projectTotals = {
+      officeHrs:   sumLD("officeHrs"),
+      officeCost:  sumLD("officeCost"),
+      fabHrs:      sumLD("fabHrs"),
+      fabCost:     sumLD("fabCost"),
+      installHrs:  sumLD("installHrs"),
+      installCost: sumLD("installCost"),
+      materials:   sum("matW","base") + sum("matW","install"),
+      overhead:    sum("ovAmt","base") + sum("ovAmt","install"),
+      margin:      sum("mkAmt","base") + sum("mkAmt","install"),
+    };
+    return { items, total: items.reduce((s,t) => s + t.total, 0), projectTotals };
   }, [mats, laborCats]);
 
   const create = useCallback(() => {
@@ -2443,7 +2481,7 @@ export default function App() {
     };
     setEsts(p => [est, ...p]);
     setActId(id); setTab("estimate"); setShowNew(false);
-    setNf({ project:"",client:"",estimator:"",jobNumber:"",date:new Date().toISOString().slice(0,10),wastePct:10,markupPct:20,overhead:26 });
+    setNf({ project:"",client:"",estimator:"",jobNumber:"",date:new Date().toISOString().slice(0,10),wastePct:10,markupPct:20,overhead:36 });
   }, [nf, estimators]);
 
   const addScopeItem = useCallback((estId) => {
@@ -2727,7 +2765,7 @@ export default function App() {
                     <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid var(--cream3)"}}>
                       <div className="fl" style={{marginBottom:10}}>Cost Factors (applied to all items)</div>
                       <div className="factors">
-                        {[["Waste %","wastePct"],["Overhead $/hr","overhead"],["Markup %","markupPct"]].map(([lb,k])=>(
+                        {[["Waste %","wastePct"],["Overhead $/hr","overhead"],["Profit Margin %","markupPct"]].map(([lb,k])=>(
                           <div key={k}><div className="fl">{lb}</div>
                             <input type="number" value={activeEst[k]} onChange={e=>updEst(actId,{[k]:e.target.value})} style={{width:90}}/>
                           </div>
@@ -2803,51 +2841,140 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* ── Estimate Summary — between project info and scope items ── */}
-                {sT && activeEst.scopeItems.length > 0 && (
-                  <div className="card">
-                    <div className="ch"><h3>Estimate Summary</h3>
-                      <span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"var(--bronze)",fontWeight:600}}>{fmt(sT.total)}</span>
+                {/* ── Estimate Summary ── */}
+                {sT && activeEst.scopeItems.length > 0 && (() => {
+                  const pt  = sT.projectTotals;
+                  const mono = {fontFamily:"'DM Mono',monospace"};
+                  const fmtH = h => h > 0 ? `${h.toFixed(1)}h` : "—";
+                  const cols = [
+                    { key:"#",           label:"#",              right:false, w:48  },
+                    { key:"item",        label:"Item",           right:false, w:null},
+                    { key:"type",        label:"Type",           right:false, w:100 },
+                    { key:"officeLabor", label:"Office Labor",   right:true,  w:110 },
+                    { key:"shopLabor",   label:"Shop Labor",     right:true,  w:110 },
+                    { key:"materials",   label:"Materials",      right:true,  w:100 },
+                    { key:"overhead",    label:"Overhead",       right:true,  w:90  },
+                    { key:"margin",      label:"Profit Margin",  right:true,  w:110 },
+                    { key:"qty",         label:"Qty",            right:true,  w:72  },
+                    { key:"total",       label:"Total",          right:true,  w:100 },
+                  ];
+                  const thStyle = (c) => ({
+                    textAlign: c.right?"right":"left",
+                    fontSize:9, textTransform:"uppercase", letterSpacing:".1em",
+                    color:"var(--ink3)", padding:"8px 10px",
+                    borderBottom:"1px solid var(--border)", fontWeight:500,
+                    width: c.w||undefined, whiteSpace:"nowrap",
+                  });
+                  const tdBase = (right) => ({
+                    padding:"9px 10px", borderBottom:"1px solid var(--cream3)",
+                    textAlign: right?"right":"left", verticalAlign:"top",
+                  });
+
+                  return (
+                    <div className="card">
+                      <div className="ch">
+                        <h3>Estimate Summary</h3>
+                        <span style={{...mono,fontSize:13,color:"var(--bronze)",fontWeight:600}}>{fmt(sT.total)}</span>
+                      </div>
+                      <div style={{padding:0,overflowX:"auto"}}>
+                        <table style={{width:"100%",borderCollapse:"collapse",minWidth:860}}>
+                          <thead><tr>{cols.map(c=><th key={c.key} style={thStyle(c)}>{c.label}</th>)}</tr></thead>
+                          <tbody>
+                            {activeEst.scopeItems.map((item,i) => {
+                              const t   = sT.items[i];
+                              const qty = parseFloat(item.qty)||0;
+                              const unit = item.qtyUnit||"EA";
+                              // Aggregate base + install for this item
+                              const offHrs  = t.base.laborDetail.officeHrs  + t.install.laborDetail.officeHrs;
+                              const offCost = t.base.laborDetail.officeCost + t.install.laborDetail.officeCost;
+                              const fabHrs  = t.base.laborDetail.fabHrs     + t.install.laborDetail.fabHrs;
+                              const fabCost = t.base.laborDetail.fabCost    + t.install.laborDetail.fabCost;
+                              const instHrs = t.base.laborDetail.installHrs + t.install.laborDetail.installHrs;
+                              const instCost= t.base.laborDetail.installCost+ t.install.laborDetail.installCost;
+                              const mats    = t.base.matW + t.install.matW;
+                              const ovhd    = t.base.ovAmt + t.install.ovAmt;
+                              const margin  = t.base.mkAmt + t.install.mkAmt;
+                              const totalShopHrs  = fabHrs + instHrs;
+                              const totalShopCost = fabCost + instCost;
+                              return (
+                                <tr key={item.id}>
+                                  <td style={{...tdBase(false),...mono,fontSize:11,color:"var(--bronze)",fontWeight:600}}>{itemNum(i,0)}</td>
+                                  <td style={{...tdBase(false),fontWeight:500,color:"var(--ink)",maxWidth:180}}>{item.name||`Item ${i+1}`}</td>
+                                  <td style={{...tdBase(false),fontSize:11,color:"var(--ink3)"}}>{item.type||"—"}</td>
+                                  {/* Office Labor */}
+                                  <td style={{...tdBase(true)}}>
+                                    {offCost>0 ? <><div style={{...mono,fontSize:12,color:"var(--ink2)"}}>{fmt(offCost)}</div><div style={{...mono,fontSize:9,color:"var(--ink3)"}}>{fmtH(offHrs)}</div></> : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  </td>
+                                  {/* Shop Labor (fab + install) */}
+                                  <td style={{...tdBase(true)}}>
+                                    {totalShopCost>0 ? <><div style={{...mono,fontSize:12,color:"var(--ink2)"}}>{fmt(totalShopCost)}</div><div style={{...mono,fontSize:9,color:"var(--ink3)"}}>{fmtH(totalShopHrs)}</div></> : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  </td>
+                                  {/* Materials */}
+                                  <td style={{...tdBase(true)}}>
+                                    {mats>0 ? <span style={{...mono,fontSize:12,color:"var(--ink2)"}}>{fmt(mats)}</span> : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  </td>
+                                  {/* Overhead */}
+                                  <td style={{...tdBase(true)}}>
+                                    {ovhd>0 ? <span style={{...mono,fontSize:12,color:"var(--ink2)"}}>{fmt(ovhd)}</span> : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  </td>
+                                  {/* Profit Margin */}
+                                  <td style={{...tdBase(true)}}>
+                                    {margin>0 ? <span style={{...mono,fontSize:12,color:"var(--ink2)"}}>{fmt(margin)}</span> : <span style={{color:"var(--ink3)"}}>—</span>}
+                                  </td>
+                                  {/* Qty */}
+                                  <td style={{...tdBase(true),...mono,fontSize:11,color:"var(--ink3)"}}>
+                                    {qty>0 ? `${qty} ${unit}` : "—"}
+                                  </td>
+                                  {/* Total */}
+                                  <td style={{...tdBase(true),...mono,fontSize:13,color:"var(--bronze)",fontWeight:700}}>{fmt(t.total)}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Project totals footer */}
+                      <div style={{borderTop:"2px solid var(--border)",background:"var(--ink)"}}>
+                        {/* Totals row */}
+                        <div style={{display:"flex",alignItems:"stretch",overflowX:"auto"}}>
+                          {/* Label */}
+                          <div style={{padding:"12px 10px",minWidth:48+null+100,flex:"0 0 auto",display:"flex",alignItems:"center"}}>
+                            <span style={{fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--bronze3)",fontWeight:600}}>Project Totals</span>
+                          </div>
+                          {/* Office Labor */}
+                          <div style={{padding:"10px 10px",width:110,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:13,color:"var(--white)",fontWeight:600}}>{fmt(pt.officeCost)}</div>
+                            <div style={{...mono,fontSize:9,color:"#6a6660",marginTop:2}}>{fmtH(pt.officeHrs)}</div>
+                          </div>
+                          {/* Shop Labor */}
+                          <div style={{padding:"10px 10px",width:110,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:13,color:"var(--white)",fontWeight:600}}>{fmt(pt.fabCost+pt.installCost)}</div>
+                            <div style={{...mono,fontSize:9,color:"#6a6660",marginTop:2}}>{fmtH(pt.fabHrs+pt.installHrs)}</div>
+                          </div>
+                          {/* Materials */}
+                          <div style={{padding:"10px 10px",width:100,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:13,color:"var(--white)",fontWeight:600}}>{fmt(pt.materials)}</div>
+                          </div>
+                          {/* Overhead */}
+                          <div style={{padding:"10px 10px",width:90,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:13,color:"var(--white)",fontWeight:600}}>{fmt(pt.overhead)}</div>
+                          </div>
+                          {/* Margin */}
+                          <div style={{padding:"10px 10px",width:110,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:13,color:"var(--white)",fontWeight:600}}>{fmt(pt.margin)}</div>
+                          </div>
+                          {/* Qty spacer */}
+                          <div style={{width:72,flexShrink:0,borderLeft:"1px solid rgba(255,255,255,.07)"}}/>
+                          {/* Grand total */}
+                          <div style={{padding:"10px 10px",width:100,flexShrink:0,textAlign:"right",borderLeft:"1px solid rgba(255,255,255,.07)"}}>
+                            <div style={{...mono,fontSize:15,color:"var(--bronze3)",fontWeight:700}}>{fmt(sT.total)}</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div style={{padding:0}}>
-                      <table style={{width:"100%",borderCollapse:"collapse"}}>
-                        <thead><tr>
-                          {["#","Item","Type","Unit Cost","Qty","Item Total"].map(h=>(
-                            <th key={h} style={{textAlign: h==="Unit Cost"||h==="Qty"||h==="Item Total" ? "right" : "left",fontSize:10,textTransform:"uppercase",letterSpacing:".1em",color:"var(--ink3)",padding:"8px 12px",borderBottom:"1px solid var(--border)",fontWeight:500}}>{h}</th>
-                          ))}
-                        </tr></thead>
-                        <tbody>
-                          {activeEst.scopeItems.map((item,i)=>{
-                            const t        = sT.items[i];
-                            const qty      = parseFloat(item.qty) || 0;
-                            const unit     = item.qtyUnit || "EA";
-                            const unitCost = t.unitCost;
-                            const subtotal = t.total;
-                            return (
-                              <tr key={item.id} style={{borderBottom:"1px solid var(--cream3)"}}>
-                                <td style={{padding:"10px 12px",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--bronze)",fontWeight:600,whiteSpace:"nowrap"}}>{itemNum(i,0)}</td>
-                                <td style={{padding:"10px 12px",color:"var(--ink)",fontWeight:500,maxWidth:200}}>{item.name||`Item ${i+1}`}</td>
-                                <td style={{padding:"10px 12px",color:"var(--ink3)",fontSize:11}}>{item.type||"—"}</td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--ink2)"}}>
-                                  {unitCost > 0 ? fmt(unitCost) : <span style={{color:"var(--ink3)"}}>—</span>}
-                                  {qty > 0 && <span style={{fontSize:10,color:"var(--ink3)",marginLeft:3}}>/{unit}</span>}
-                                </td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:12,color:"var(--ink2)"}}>
-                                  {qty > 0 ? `${qty} ${unit}` : <span style={{color:"var(--ink3)"}}>—</span>}
-                                </td>
-                                <td style={{padding:"10px 12px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:13,color:"var(--bronze)",fontWeight:700}}>{fmt(subtotal)}</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                    <div style={{display:"flex",justifyContent:"space-between",padding:"11px 18px",background:"var(--ink)"}}>
-                      <span style={{color:"var(--bronze3)",fontSize:13,fontWeight:500,letterSpacing:".03em"}}>Total Combined Bid</span>
-                      <span style={{fontFamily:"'DM Mono',monospace",fontSize:18,color:"var(--white)",fontWeight:600}}>{fmt(sT.total)}</span>
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Scope items section */}
                 <div style={{display:"flex",alignItems:"center",marginTop:4}}>
@@ -3324,7 +3451,7 @@ export default function App() {
               </div>
               <div><div className="fl">Date</div><input type="date" value={nf.date} onChange={e=>setNf(f=>({...f,date:e.target.value}))}/></div>
               <div><div className="fl">Waste %</div><input type="number" value={nf.wastePct} onChange={e=>setNf(f=>({...f,wastePct:e.target.value}))}/></div>
-              <div><div className="fl">Markup %</div><input type="number" value={nf.markupPct} onChange={e=>setNf(f=>({...f,markupPct:e.target.value}))}/></div>
+              <div><div className="fl">Profit Margin %</div><input type="number" value={nf.markupPct} onChange={e=>setNf(f=>({...f,markupPct:e.target.value}))}/></div>
             </div>
             <p style={{fontSize:11,color:"var(--ink3)",marginTop:14}}>You'll add individual scope items after creating the estimate.</p>
             <div className="mf">
