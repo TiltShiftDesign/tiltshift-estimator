@@ -542,7 +542,7 @@ const OFFICE_LABOR_IDS  = new Set(["cat1","cat2"]);  // Project Management, Desi
 const FAB_LABOR_IDS     = new Set(["cat3","cat5"]);  // Fabrication, Finishing
 const INSTALL_LABOR_IDS = new Set(["cat4"]);          // Install
 
-const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
+const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup, rateOverrides={}) => {
   const calcLines = (matLines, labLines) => {
     const rawMat = matLines.reduce((s,l) => {
       if (l.custom) return s + (Number(l.customCost)||0) * Number(l.qty);
@@ -552,22 +552,23 @@ const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup) => {
     }, 0);
     const matW  = rawMat * (1 + Number(wastePct) / 100);
 
-    // Break labor out by category type
+    // Break labor out by category type, respecting per-job rate overrides
     let officeHrs=0, officeCost=0, fabHrs=0, fabCost=0, installHrs=0, installCost=0;
     labLines.forEach(l => {
       const cat = laborCats.find(c => c.id === l.categoryId);
       if (!cat) return;
       const hrs  = Number(l.hrs) || 0;
-      const cost = cat.rate * hrs;
+      const rate = (rateOverrides[cat.id] != null) ? Number(rateOverrides[cat.id]) : cat.rate;
+      const cost = rate * hrs;
       if (OFFICE_LABOR_IDS.has(cat.id))       { officeHrs  += hrs; officeCost  += cost; }
       else if (FAB_LABOR_IDS.has(cat.id))     { fabHrs     += hrs; fabCost     += cost; }
       else if (INSTALL_LABOR_IDS.has(cat.id)) { installHrs += hrs; installCost += cost; }
-      else                                    { fabHrs     += hrs; fabCost     += cost; } // fallback
+      else                                    { fabHrs     += hrs; fabCost     += cost; }
     });
     const labor = officeCost + fabCost + installCost;
 
     const sub    = matW + labor;
-    const ovAmt  = sub * (Number(ovhd) / 100);
+    const ovAmt  = labor * (Number(ovhd) / 100);
     const preMarkup = sub + ovAmt;
     const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999);
     const mkAmt  = Math.round((preMarkup / (1 - mkupFrac) - preMarkup) / 10) * 10;
@@ -1167,7 +1168,7 @@ function MatPicker({ line, mats, matCategories, onUpdMat }) {
 
 // ── Reusable lines editor (materials + labor in one panel) ───────────────────
 function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, onDelMat, onAddMat,
-  onUpdLab, onDelLab, onAddLab, matCategory, matCategories }) {
+  onUpdLab, onDelLab, onAddLab, matCategory, matCategories, rateOverrides }) {
   const MAT_CATS = matCategories || DEFAULT_MAT_CATEGORIES;
   const firstMatId = matCategory
     ? (mats.find(x=>x.category===matCategory)||mats[0]).id
@@ -1313,7 +1314,7 @@ function LinesEditor({ matLines, labLines, mats, laborCats, wastePct, onUpdMat, 
                 const isOpen = openCalc === line.id;
                 return (
                   <Fragment key={line.id}>
-                    <LaborLineRow line={line} laborCats={laborCats}
+                    <LaborLineRow line={line} laborCats={laborCats} rateOverrides={rateOverrides}
                       onChange={nl=>onUpdLab(line.id,nl)} onDelete={()=>onDelLab(line.id)}
                       calcOpen={isOpen} onToggleCalc={()=>toggleCalc(line.id)}/>
                     {isOpen && (
@@ -1410,7 +1411,7 @@ function ExclusionsEditor({ exclusions, onChange, exclusionOptions, onAddOption 
 }
 
 // ── Scope Item Card ───────────────────────────────────────────────────────────
-function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
+function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup, rateOverrides,
   onUpdate, onDelete, defaultOpen, itemTypes, onAddItemType,
   finishes, onAddFinish, exclusionOptions, onAddExclusionOption, matCategories }) {
 
@@ -1418,7 +1419,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
   const [installOpen, setInstallOpen] = useState(false);
   const [altOpen,     setAltOpen]     = useState({});  // { altId: bool }
 
-  const totals = calcItem(item, mats, laborCats, wastePct, ovhd, mkup);
+  const totals = calcItem(item, mats, laborCats, wastePct, ovhd, mkup, rateOverrides);
   const baseNum    = itemNum(itemIndex, 0);   // "01.0"
   const installNum = itemNum(itemIndex, 1);   // "01.1"
 
@@ -1804,7 +1805,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
               mats={mats} laborCats={laborCats} wastePct={wastePct}
               onUpdMat={updMat} onDelMat={delMat} onAddMat={addMatLine}
               onUpdLab={updLab} onDelLab={delLab} onAddLab={addLabLine}
-              matCategories={matCategories}
+              matCategories={matCategories} rateOverrides={rateOverrides}
             />
             {/* Finish + Exclusions row */}
             <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:16}}>
@@ -1871,7 +1872,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
                 mats={mats} laborCats={laborCats} wastePct={wastePct}
                 onUpdMat={updInstMat} onDelMat={delInstMat} onAddMat={addInstMatLine}
                 onUpdLab={updInstLab} onDelLab={delInstLab} onAddLab={addInstLabLine}
-                matCategory="Install Materials" matCategories={matCategories}
+                matCategory="Install Materials" matCategories={matCategories} rateOverrides={rateOverrides}
               />
               <div>
                 <div className="fl" style={{marginBottom:5}}>Install Notes</div>
@@ -1919,7 +1920,7 @@ function ScopeItemCard({ item, itemIndex, mats, laborCats, wastePct, ovhd, mkup,
                       onUpdLab={(lid,nl)=>updAlt(alt.id,{laborLines:alt.laborLines.map(l=>l.id===lid?nl:l)})}
                       onDelLab={lid=>updAlt(alt.id,{laborLines:alt.laborLines.filter(l=>l.id!==lid)})}
                       onAddLab={()=>updAlt(alt.id,{laborLines:[...(alt.laborLines||[]),{id:uid(),categoryId:laborCats[0].id,task:"",hrs:1,note:""}]})}
-                      matCategories={matCategories}
+                      matCategories={matCategories} rateOverrides={rateOverrides}
                     />
                     <div>
                       <div className="fl" style={{marginBottom:5}}>Notes</div>
@@ -1956,7 +1957,7 @@ function CostBreakdown({ t, wastePct, ovhd, mkup, label, accent }) {
         [`Waste (${wastePct}%)`, t.matW - t.rawMat],
         ["Material w/ Waste",   t.matW],
         ["Labor",               t.labor],
-        [`Overhead (${ovhd}%)`, t.ovAmt],
+        [`Overhead on Labor (${ovhd}%)`, t.ovAmt],
         [`Markup (${mkup}%)`,   t.mkAmt],
       ].map(([l,v]) => (
         <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 12px",borderBottom:"1px solid var(--cream3)"}}>
@@ -1973,8 +1974,10 @@ function CostBreakdown({ t, wastePct, ovhd, mkup, label, accent }) {
 }
 
 // ── Labor Line Row ────────────────────────────────────────────────────────────
-function LaborLineRow({ line, laborCats, onChange, onDelete, calcOpen, onToggleCalc }) {
+function LaborLineRow({ line, laborCats, rateOverrides, onChange, onDelete, calcOpen, onToggleCalc }) {
   const cat = laborCats.find(c => c.id === line.categoryId);
+  const overrideRate = cat && rateOverrides && rateOverrides[cat.id] != null ? Number(rateOverrides[cat.id]) : null;
+  const effectiveRate = overrideRate ?? cat?.rate ?? 0;
   const bb  = calcOpen ? "none" : "1px solid var(--cream3)";
 
   return (
@@ -2009,12 +2012,19 @@ function LaborLineRow({ line, laborCats, onChange, onDelete, calcOpen, onToggleC
           style={{width:"100%", fontSize:12}}
         />
       </td>
-      <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle",width:90,textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:11,color:"var(--ink3)"}}>
-        {cat ? fmt(cat.rate) : "—"}
+      <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle",width:90,textAlign:"right",fontFamily:"'DM Mono',monospace",fontSize:11}}>
+        {cat ? (
+          <span title={overrideRate!=null?`Global rate: ${fmt(cat.rate)}`:"Global rate"}>
+            <span style={{color: overrideRate!=null ? "var(--bronze)" : "var(--ink3)", fontWeight: overrideRate!=null ? 600 : 400}}>
+              {fmt(effectiveRate)}
+            </span>
+            {overrideRate!=null && <span style={{fontSize:9,color:"var(--bronze)",marginLeft:2}}>★</span>}
+          </span>
+        ) : "—"}
       </td>
       <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle",width:110}}>
         <span style={{color:"var(--bronze)",fontWeight:600,fontFamily:"'DM Mono',monospace",fontSize:12}}>
-          {cat ? fmt(cat.rate * Number(line.hrs)) : "—"}
+          {cat ? fmt(effectiveRate * Number(line.hrs)) : "—"}
         </span>
       </td>
       <td style={{padding:"6px 10px",borderBottom:bb,verticalAlign:"middle"}}>
@@ -2401,7 +2411,7 @@ export default function App() {
   const allTotals = useCallback((est) => {
     if (!est) return { items:[], total:0 };
     const items = est.scopeItems.map(i => {
-      const t   = calcItem(i, mats, laborCats, est.wastePct, est.overhead, est.markupPct);
+      const t   = calcItem(i, mats, laborCats, est.wastePct, est.overhead, est.markupPct, est.laborRateOverrides||{});
       const qty = parseFloat(i.qty) || 0;
       const multiplier = qty > 0 ? qty : 1;
       // Scale all money values by qty multiplier
@@ -2426,6 +2436,7 @@ export default function App() {
       id, project:nf.project, client:nf.client, estimator:nf.estimator,
       jobNumber:nf.jobNumber||"",
       date:nf.date, wastePct:nf.wastePct, markupPct:nf.markupPct, overhead:nf.overhead,
+      laborRateOverrides: {},   // { [catId]: rate } — per-job overrides of global labor rates
       status:"Draft",
       scopeItems: [blankScopeItem()],
     };
@@ -2616,6 +2627,72 @@ export default function App() {
                         ))}
                       </div>
                     </div>
+
+                    {/* ── Labor Rate Overrides ── */}
+                    <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid var(--cream3)"}}>
+                      <div className="fl" style={{marginBottom:4}}>Labor Rate Overrides</div>
+                      <div style={{fontSize:11,color:"var(--ink3)",marginBottom:10}}>
+                        Leave blank to use global rates. Overrides apply to this job only.
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:0,border:"1px solid var(--border)",borderRadius:2,overflow:"hidden"}}>
+                        {laborCats.map((cat,i) => {
+                          const overrideVal = (activeEst.laborRateOverrides||{})[cat.id];
+                          const hasOverride = overrideVal != null && overrideVal !== "";
+                          return (
+                            <div key={cat.id} style={{
+                              display:"flex", alignItems:"center", gap:10,
+                              padding:"7px 12px",
+                              borderBottom: i < laborCats.length-1 ? "1px solid var(--border)" : "none",
+                              background: hasOverride ? "rgba(140,109,63,.05)" : "var(--white)",
+                            }}>
+                              <span style={{flex:1, fontSize:12, color:"var(--ink2)", fontWeight: hasOverride?500:400}}>
+                                {cat.name}
+                              </span>
+                              <span style={{fontFamily:"'DM Mono',monospace", fontSize:11, color:"var(--ink3)", width:56, textAlign:"right"}}>
+                                {fmt(cat.rate)}/hr
+                              </span>
+                              <span style={{fontSize:11, color:"var(--ink3)"}}>→</span>
+                              <div style={{position:"relative", width:90}}>
+                                <input
+                                  type="number" min="0" step="1"
+                                  value={overrideVal ?? ""}
+                                  placeholder={String(cat.rate)}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    const overrides = {...(activeEst.laborRateOverrides||{})};
+                                    if (val === "" || val == null) {
+                                      delete overrides[cat.id];
+                                    } else {
+                                      overrides[cat.id] = parseFloat(val);
+                                    }
+                                    updEst(actId, {laborRateOverrides: overrides});
+                                  }}
+                                  style={{
+                                    width:"100%", fontSize:13,
+                                    fontFamily:"'DM Mono',monospace", fontWeight:600,
+                                    color: hasOverride ? "var(--bronze)" : "var(--ink)",
+                                    borderColor: hasOverride ? "var(--bronze)" : undefined,
+                                  }}
+                                />
+                              </div>
+                              {hasOverride && (
+                                <button
+                                  onClick={() => {
+                                    const overrides = {...(activeEst.laborRateOverrides||{})};
+                                    delete overrides[cat.id];
+                                    updEst(actId, {laborRateOverrides: overrides});
+                                  }}
+                                  style={{background:"none",border:"none",color:"var(--ink3)",
+                                    cursor:"pointer",fontSize:14,padding:"0 2px",lineHeight:1}}
+                                  title="Clear override"
+                                >×</button>
+                              )}
+                              {!hasOverride && <div style={{width:18}}/>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2684,6 +2761,7 @@ export default function App() {
                       itemIndex={idx}
                       mats={mats}
                       laborCats={laborCats}
+                      rateOverrides={activeEst.laborRateOverrides||{}}
                       wastePct={activeEst.wastePct}
                       ovhd={activeEst.overhead}
                       mkup={activeEst.markupPct}
