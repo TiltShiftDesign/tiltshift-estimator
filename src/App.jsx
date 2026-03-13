@@ -565,10 +565,11 @@ const calcItem = (item, mats, laborCats, wastePct, ovhd, mkup, rateOverrides={})
       else if (INSTALL_LABOR_IDS.has(cat.id)) { installHrs += hrs; installCost += cost; }
       else                                    { fabHrs     += hrs; fabCost     += cost; }
     });
-    const labor = officeCost + fabCost + installCost;
+    const labor    = officeCost + fabCost + installCost;
+    const totalHrs = officeHrs + fabHrs + installHrs;
 
     const sub    = matW + labor;
-    const ovAmt  = labor * (Number(ovhd) / 100);
+    const ovAmt  = totalHrs * Number(ovhd);
     const preMarkup = sub + ovAmt;
     const mkupFrac  = Math.min(Number(mkup) / 100, 0.9999);
     const mkAmt  = Math.round((preMarkup / (1 - mkupFrac) - preMarkup) / 10) * 10;
@@ -1957,7 +1958,7 @@ function CostBreakdown({ t, wastePct, ovhd, mkup, label, accent }) {
         [`Waste (${wastePct}%)`, t.matW - t.rawMat],
         ["Material w/ Waste",   t.matW],
         ["Labor",               t.labor],
-        [`Overhead on Labor (${ovhd}%)`, t.ovAmt],
+        [`Overhead ($${ovhd}/hr)`, t.ovAmt],
         [`Markup (${mkup}%)`,   t.mkAmt],
       ].map(([l,v]) => (
         <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 12px",borderBottom:"1px solid var(--cream3)"}}>
@@ -2289,7 +2290,7 @@ export default function App() {
   const [nf, setNf] = useState({
     project:"", client:"", estimator:"", jobNumber:"",
     date: new Date().toISOString().slice(0,10),
-    wastePct:10, markupPct:20, overhead:8,
+    wastePct:10, markupPct:20, overhead:26,
   });
 
   // ── Persistence: Supabase is the single source of truth ─────────────────────
@@ -2442,7 +2443,7 @@ export default function App() {
     };
     setEsts(p => [est, ...p]);
     setActId(id); setTab("estimate"); setShowNew(false);
-    setNf({ project:"",client:"",estimator:"",jobNumber:"",date:new Date().toISOString().slice(0,10),wastePct:10,markupPct:20,overhead:8 });
+    setNf({ project:"",client:"",estimator:"",jobNumber:"",date:new Date().toISOString().slice(0,10),wastePct:10,markupPct:20,overhead:26 });
   }, [nf, estimators]);
 
   const addScopeItem = useCallback((estId) => {
@@ -2726,7 +2727,7 @@ export default function App() {
                     <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid var(--cream3)"}}>
                       <div className="fl" style={{marginBottom:10}}>Cost Factors (applied to all items)</div>
                       <div className="factors">
-                        {[["Waste %","wastePct"],["Overhead %","overhead"],["Markup %","markupPct"]].map(([lb,k])=>(
+                        {[["Waste %","wastePct"],["Overhead $/hr","overhead"],["Markup %","markupPct"]].map(([lb,k])=>(
                           <div key={k}><div className="fl">{lb}</div>
                             <input type="number" value={activeEst[k]} onChange={e=>updEst(actId,{[k]:e.target.value})} style={{width:90}}/>
                           </div>
